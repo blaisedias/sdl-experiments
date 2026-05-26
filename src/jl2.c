@@ -501,12 +501,11 @@ static void player_poll_loop(app_context_ptr app_ctx) {
 //debug
 printf("starting player_poll_loop\n"); fflush(stdout);
     unsigned fps = 0;
-    int force_visual_refresh=0;
+
     while(app_running(app_ctx)) {
         sleep_milli_seconds(500);
         // ensure that the player is initialised - if possible, nop if the player is initialised
-        if (poll_player(player, &pts) || --force_visual_refresh <=0) {
-            force_visual_refresh=4;
+        if (poll_player(player, &pts)) {
 //            puts("P poll data");
             bool can_seek = true;
             {
@@ -557,7 +556,9 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                             if (t->type == WIDGET_MULTISTATE_BUTTON) {
                                 widget_multistate_button_set_state(t, pvalue.integer);
                             } else if (t->type == WIDGET_SLIDER) {
-                                widget_slider_set_value(t, pvalue.integer);
+                                if (strcmp("time", t->player_value_key)) {
+                                    widget_slider_set_value(t, pvalue.integer);
+                                }
                             }
                             break;
                         case PFV_STRINGPTR:
