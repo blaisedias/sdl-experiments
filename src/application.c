@@ -81,9 +81,15 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
             if (0 == SDL_GetCurrentDisplayMode(i_display, &dm)) {
                 // TODO: handle multiple displays?
                 if (i_display == 0) {
-                    app_ctx->refresh_rate = dm.refresh_rate;
-                    app_ctx->frame_time_millis = 1000/dm.refresh_rate;
-                    app_ctx->frame_time_micros = 1000000/dm.refresh_rate;
+                    if (dm.refresh_rate) {
+                        app_ctx->refresh_rate = dm.refresh_rate;
+                        app_ctx->frame_time_millis = 1000/dm.refresh_rate;
+                        app_ctx->frame_time_micros = 1000000/dm.refresh_rate;
+                    } else {
+                        printf("Warning refresh rate returned is %d defaulting to 60Hz\n", dm.refresh_rate);
+                        app_ctx->frame_time_millis = 1000/60;
+                        app_ctx->frame_time_micros = 1000000/60;
+                    }
                     printf("Display:%d fmt=%x, w=%d, h=%d, refresh rate:%d %d milliSeconds %d microSeconds\n",
                             i_display,
                             dm.format, dm.w, dm.h,
