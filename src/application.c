@@ -87,9 +87,9 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
                     printf("Display:%d fmt=%x, w=%d, h=%d, refresh rate:%d %d milliSeconds %d microSeconds\n",
                             i_display,
                             dm.format, dm.w, dm.h,
-                            dm.refresh_rate,
-                            app_ctx->frame_time_millis,
-                            app_ctx->frame_time_micros);
+                            (int)dm.refresh_rate,
+                            (int)app_ctx->frame_time_millis,
+                            (int)app_ctx->frame_time_micros);
                 }
             } 
     }
