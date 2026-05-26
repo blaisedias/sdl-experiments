@@ -1,0 +1,153 @@
+{
+    "Authors":  [
+        {
+            "Name": "OpenClipart-Vectors",
+            "link": "https://pixabay.com/users/openclipart-vectors-30363/",
+            "Content": "loudspeaker graphics and frame",
+            "License": [
+                "https://pixabay.com/service/terms/",
+                "Summary:",
+                " Subject to the Prohibited Uses (see below), the Content License allows users to:",
+                "✓      Use Content for free",
+                "✓      Use Content without having to attribute the author (although giving credit is always appreciated by our community!)",
+                "✓      Modify or adapt Content into new works",
+                "What are you not allowed to do with Content?",
+                "We refer to these as Prohibited Uses which include:",
+                "✕      You cannot sell or distribute Content (either in digital or physical form) on a Standalone basis. Standalone means where no creative effort has been applied to the Content and it remains in substantially the same form as it exists on our website.",
+                "✕      If Content contains any recognisable trademarks, logos or brands, you cannot use that Content for commercial purposes in relation to goods and services. In particular, you cannot print that Content on merchandise or other physical products for sale.",
+                "✕      You cannot use Content in any immoral or illegal way, especially Content which features recognisable people.",
+                "✕      You cannot use Content in a misleading or deceptive way.",
+                "✕      You cannot use any of the Content as part of a trade-mark, design-mark, trade-name, business name or service mark."
+            ]
+        },
+        {
+            "Github": "https://github.com/blaisedias/",
+            "Github": "https://github.com/blaisedias/",
+            "Content": "chevron and circular LED surround",
+            "License": "CC-BY-SA-4.0"
+        }
+    ],
+    "License": "See Authors",
+    "kind": "vumeter",
+    "vutype": "frames",
+    "format": "compose2",
+    "format_version": 2,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 48,
+    "#dimensions": [
+        "natural width and height of the vumeter",
+        "for this vu meter:",
+        "width = left_margin + dial_width + spacing + dial_width + right_margin",
+        "margins=50, spacing=50, dial_width=1024",
+        "height=768"
+    ],
+    "dimensions" :{ "h": 2000, "w": 4200 },
+    "#files": [
+        "The set of images required to render this VU-Meter"
+    ],
+    "files": [
+        "L-frame2000.png",
+        "R-frame2000.png",
+        "L-lsp1620.png",
+        "R-lsp1620.png"
+    ],
+    "#resources" :[
+        "associative array of image resources"
+    ],
+    "resources": {
+        "LEFT_BG": "L-frame2000.png", "RIGHT_BG": "R-frame2000.png",
+        "$SEQUENCE" : [
+            { "key_prefix": "L", "start": 0,  "end": 48,  "value": "L-lsp1620.png"},
+            { "key_prefix": "R", "start": 0,  "end": 48,  "value": "R-lsp1620.png"}
+        ]
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {},
+    "#backgrounds" : [
+        "associative arrays keyed on background name",
+        " contents of each associative array are of associative arrays of channels",
+        " channels with names other the 'left' and 'right' or common, i.e. rendered always",
+        " channels are arrays of placements - there is no volume level associated with these placements"
+    ],
+    "backgrounds": {
+        "speakerGray": {
+            "left": {
+                "placements": [
+                    "LEFT_BG"
+                ]
+            },
+            "right": {
+                "placements": [
+                    "RIGHT_BG"
+                ]
+            }
+        }
+    },
+    "#levels*":[
+        "associative arrays with keys 'left' and 'right'",
+        "The contents of each key must be objects which are associative arrays with 3 keys",
+        "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregateoff' => render all placements beyond the volume level",
+        "'peak' : one of 'hold', 'decay', 'hold+decay'",
+        "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays of volume level to placements",
+        "Each object does not have to contain placement references for each volume level",
+        "However the combination of objects SHOULD contain placement references for each volume level"
+    ],
+    "levels": {
+        "levels_1": {
+            "left": [
+                {
+                    "render": "single",
+                    "peak": "decay",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 0,  "end": 48, "value": "L{index}"}
+                       ]
+                    }
+                }
+           ],
+            "right": [
+                {
+                    "render": "single",
+                    "peak": "decay",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 0,  "end": 48, "value": "R{index}"}
+                       ]
+                    }
+                }
+            ]
+        }
+    },
+    "vumeters#": [
+        "associative arrays keyed on VU Meter name",
+        " contents of each associative array are 2 keys",
+        "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
+        "   background: which background in layout to use, if abseent then no backgorund is rendered"
+    ],
+    "vumeters" :{
+        "SpeakerGray": {
+            "background": "speakerGray",
+            "levels" : "levels_1"
+        }
+    }
+}

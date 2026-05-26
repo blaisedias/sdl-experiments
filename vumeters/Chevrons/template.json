@@ -1,0 +1,501 @@
+{
+    "Authors":  [
+        {
+            "Github": "https://github.com/blaisedias/"
+        }
+    ],
+    "License": "CC-BY-SA-4.0",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 50,
+    "#dimensions": [
+        "natural width and height of the vumeter"
+    ],
+    "dimensions": {"h": 648, "w": 1935 },
+    "#files": [
+        "The set of images required to render this VU-Meter",
+        "derived from resources"
+    ],
+    "files": [
+        "white-orange-center.png",
+        "cyan-bar-off.png",
+        "cyan-bar-on.png",
+        "green-bar-off.png",
+        "green-bar-on.png",
+        "white-left.png",
+        "left-trail.png",
+        "orange-bar-off.png",
+        "orange-bar-on.png",
+        "red-bar-off.png",
+        "red-bar-on.png",
+        "white-right.png",
+        "right-trail.png",
+        "white-bar-off.png",
+        "white-bar-on.png",
+        "cyan-orange-center.png",
+        "cyan-left.png",
+        "cyan-right.png",
+        "green-red-center.png",
+        "green-left.png",
+        "green-right.png",
+        "pastel-green-red-center.png",
+        "pastel-green-bar-off.png",
+        "pastel-green-bar-on.png",
+        "pastel-red-bar-off.png",
+        "pastel-red-bar-on.png"
+    ],
+    "#resources" :[
+        "associative array of image resources, which serve as symbolic links",
+        "to image file names and their dimensions"
+    ],
+    "resources": {
+        "WO_center": "white-orange-center.png",
+        "W_left": "white-left.png",
+        "W_right": "white-right.png",
+
+        "PGR_center": "pastel-green-red-center.png",
+        "PG_left": "pastel-green-left.png",
+        "PG_right": "pastel-green-right.png",
+
+        "CO_center": "cyan-orange-center.png",
+        "C_left": "cyan-left.png",
+        "C_right": "cyan-right.png",
+
+        "GR_center": "green-red-center.png",
+        "G_left": "green-left.png",
+        "G_right": "green-right.png",
+
+        "W_on": "white-bar-on.png",
+        "C_on": "cyan-bar-on.png",
+        "G_on": "green-bar-on.png",
+        "O_on": "orange-bar-on.png",
+        "R_on": "red-bar-on.png",
+        "PG_on": "pastel-green-bar-on.png",
+        "PR_on": "pastel-red-bar-on.png",
+
+        "W_off": "white-bar-off.png",
+        "C_off": "cyan-bar-off.png",
+        "G_off": "green-bar-off.png",
+        "O_off": "orange-bar-off.png",
+        "R_off": "red-bar-off.png",
+        "PG_off": "pastel-green-bar-off.png",
+        "PR_off": "pastel-red-bar-off.png"
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {
+        "$SEQUENCE" : [
+            { "prefix": "WL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "W_on" },
+            { "prefix": "CL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "C_on" },
+            { "prefix": "GL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "G_on" },
+            { "prefix": "wl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "W_off" },
+            { "prefix": "cl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "C_off" },
+            { "prefix": "gl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "G_off" },
+            { "prefix": "WR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "W_on" },
+            { "prefix": "CR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "C_on" },
+            { "prefix": "GR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "G_on" },
+            { "prefix": "wr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "W_off" },
+            { "prefix": "cr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "C_off" },
+            { "prefix": "gr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "G_off" },
+
+            { "prefix": "PGL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "PG_on" },
+            { "prefix": "pgl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "PG_off" },
+            { "prefix": "PGR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "PG_on" },
+            { "prefix": "pgr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "PG_off" },
+
+
+            { "prefix": "OL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "O_on" },
+            { "prefix": "ol", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "O_off" },
+            { "prefix": "RL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "R_on" },
+            { "prefix": "rl", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "R_off" },
+
+            { "prefix": "OR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "O_on" },
+            { "prefix": "or", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "O_off" },
+            { "prefix": "RR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "R_on" },
+            { "prefix": "rr", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "R_off" },
+
+            { "prefix": "PRL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "PR_on" },
+            { "prefix": "prl", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "PR_off" },
+            { "prefix": "PRR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "PR_on" },
+            { "prefix": "prr", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "PR_off" }
+        ],
+        "WO_center" : { "x":0, "y":274},
+        "W_left"  : { "x":0, "y":0},
+        "W_right"  : { "x":0, "y":388},
+
+        "PGR_center" : { "x":0, "y":274},
+        "PG_left"  : { "x":0, "y":0},
+        "PG_right"  : { "x":0, "y":388},
+
+        "CO_center" : { "x":0, "y":274},
+        "C_left"  : { "x":0, "y":0},
+        "C_right"  : { "x":0, "y":388},
+
+        "GR_center" : { "x":0, "y":274},
+        "G_left"  : { "x":0, "y":0},
+        "G_right"  : { "x":0, "y":388}
+    },
+    "#backgrounds" : [
+        "associative arrays keyed on background name",
+        " contents of each associative array are associative arrays of channels",
+        " channels with names other the 'left' and 'right' or common, i.e. rendered always",
+        " each channels is an array of placements - there is no volume level associated with these placements"
+    ],
+    "backgrounds": {
+        "white_orange": {
+            "bg": {
+                "placements": [
+                    "WO_center"
+                ]
+            },
+            "left": {
+                "placements" : [
+                    "W_left"
+                ]
+            },
+            "right": {
+               "placements": [
+                   "W_right"
+               ]
+            }
+        },
+        "cyan_orange": {
+            "bg": {
+                "placements": [
+                    "CO_center"
+                ]
+            },
+            "left": {
+                "placements" : [
+                    "C_left"
+                ]
+            },
+            "right": {
+               "placements": [
+                   "C_right"
+               ]
+            }
+        },
+        "green_red": {
+            "bg": {
+                "placements": [
+                    "GR_center"
+                ]
+            },
+            "left": {
+                "placements" : [
+                    "G_left"
+                ]
+            },
+            "right": {
+               "placements": [
+                   "G_right"
+               ]
+            }
+        },
+        "pastel_green_red": {
+            "bg": {
+                "placements": [
+                    "PGR_center"
+                ]
+            },
+            "left": {
+                "placements" : [
+                    "PG_left"
+                ]
+            },
+            "right": {
+               "placements": [
+                   "PG_right"
+               ]
+            }
+        }
+    },
+    "#levels*":[
+        "Associative arrays keyed on level name, of level associative arrays with keys 'left' and 'right'",
+        "The contents of each key must be objects which are associative arrays with 3 keys",
+        "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregateoff' => render all placements beyond the volume level",
+        "'peak' : one of 'hold', 'decay', 'hold+decay'",
+        "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values.",
+        "                 For use with digital VU Meters, where multiple volume level can be rendered simultaneously",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "                 For use with 'analog' VU Meters simulating needle movement",
+        "       'hold+decay': peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays mapping volume level to placements",
+        "Each object does not have to contain placements for all volume levels",
+        "However the combination of objects SHOULD contain placements for all volume levels",
+        "if not then absent volume levels will not be rendered"
+    ],
+    "levels": {
+        "levels_quad_colour": {
+            "left": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "WL{index}"},
+                            { "start": 19, "end": 36, "value": "CL{index}"},
+                            { "start": 37, "end": 42, "value": "OL{index}"},
+                            { "start": 43, "end": 49, "value": "RL{index}"}
+                        ]
+                    }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "wl{index}"},
+                            { "start": 19, "end": 36, "value": "cl{index}"},
+                            { "start": 37, "end": 42, "value": "ol{index}"},
+                            { "start": 43, "end": 49, "value": "rl{index}"}
+                        ]
+                    }
+                }
+            ],
+            "right": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "WR{index}"},
+                            { "start": 19, "end": 36, "value": "CR{index}"},
+                            { "start": 37, "end": 42, "value": "OR{index}"},
+                            { "start": 43, "end": 49, "value": "RR{index}"}
+                        ]
+                   }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "wr{index}"},
+                            { "start": 19, "end": 36, "value": "cr{index}"},
+                            { "start": 37, "end": 42, "value": "or{index}"},
+                            { "start": 43, "end": 49, "value": "rr{index}"}
+                        ]
+                    }
+                }
+            ]
+        },
+        "levels_white_orange": {
+            "left": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "WL{index}"},
+                            { "start": 37, "end": 49, "value": "OL{index}"}
+                        ]
+                    }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "wl{index}"},
+                            { "start": 37, "end": 49, "value": "ol{index}"}
+                        ]
+                    }
+                }
+            ],
+            "right": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "WR{index}"},
+                            { "start": 37, "end": 49, "value": "OR{index}"}
+                        ]
+                   }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "wr{index}"},
+                            { "start": 37, "end": 49, "value": "or{index}"}
+                        ]
+                    }
+                }
+            ]
+        },
+        "levels_cyan_orange": {
+            "left": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "CL{index}"},
+                            { "start": 37, "end": 49, "value": "OL{index}"}
+                        ]
+                    }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "cl{index}"},
+                            { "start": 37, "end": 49, "value": "ol{index}"}
+                        ]
+                    }
+                }
+            ],
+            "right": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "CR{index}"},
+                            { "start": 37, "end": 49, "value": "OR{index}"}
+                        ]
+                   }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "cr{index}"},
+                            { "start": 37, "end": 49, "value": "or{index}"}
+                        ]
+                    }
+                }
+            ]
+        },
+        "levels_green_red": {
+            "left": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "GL{index}"},
+                            { "start": 37, "end": 49, "value": "RL{index}"}
+                        ]
+                    }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "gl{index}"},
+                            { "start": 37, "end": 49, "value": "rl{index}"}
+                        ]
+                    }
+                }
+            ],
+            "right": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "GR{index}"},
+                            { "start": 37, "end": 49, "value": "RR{index}"}
+                        ]
+                   }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "gr{index}"},
+                            { "start": 37, "end": 49, "value": "rr{index}"}
+                        ]
+                    }
+                }
+            ]
+        },
+        "levels_pastel_green_red": {
+            "left": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "PGL{index}"},
+                            { "start": 37, "end": 49, "value": "PRL{index}"}
+                        ]
+                    }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "pgl{index}"},
+                            { "start": 37, "end": 49, "value": "prl{index}"}
+                        ]
+                    }
+                }
+            ],
+            "right": [
+                {
+                    "render": "aggregate",
+                    "peak" : "hold",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "PGR{index}"},
+                            { "start": 37, "end": 49, "value": "PRR{index}"}
+                        ]
+                   }
+                },
+                {
+                    "render": "aggregateoff",
+                    "placements": {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "pgr{index}"},
+                            { "start": 37, "end": 49, "value": "prr{index}"}
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "vumeters#": [
+        "Associate array of VU Meters defined in this file keyed on VU Meter name",
+        "In turn contents are associative arrays containing 2 keys",
+        "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
+        "   background: which background in layout to use, if absent then no background is rendered"
+    ],
+    "vumeters": {
+        "Chevrons": {
+            "background": "white_orange",
+            "levels":  "levels_quad_colour"
+        },
+        "Chevrons WhiteOrange": {
+            "background": "white_orange",
+            "levels":  "levels_white_orange"
+        },
+        "Chevrons CyanOrange": {
+            "background": "cyan_orange",
+            "levels":  "levels_cyan_orange"
+        },
+        "Chevrons GreenRed": {
+            "background": "green_red",
+            "levels":  "levels_green_red"
+        },
+        "Chevrons PastelGreenRed": {
+            "background": "pastel_green_red",
+            "levels":  "levels_pastel_green_red"
+        }
+    }
+}

@@ -1,0 +1,1291 @@
+{
+  "Authors": [
+    {
+      "Name": "OpenClipart-Vectors",
+      "link": "https://pixabay.com/users/openclipart-vectors-30363/",
+      "Content": "loudspeaker graphics and frame",
+      "License": [
+        "https://pixabay.com/service/terms/",
+        "Summary:",
+        " Subject to the Prohibited Uses (see below), the Content License allows users to:",
+        "\u2713      Use Content for free",
+        "\u2713      Use Content without having to attribute the author (although giving credit is always appreciated by our community!)",
+        "\u2713      Modify or adapt Content into new works",
+        "What are you not allowed to do with Content?",
+        "We refer to these as Prohibited Uses which include:",
+        "\u2715      You cannot sell or distribute Content (either in digital or physical form) on a Standalone basis. Standalone means where no creative effort has been applied to the Content and it remains in substantially the same form as it exists on our website.",
+        "\u2715      If Content contains any recognisable trademarks, logos or brands, you cannot use that Content for commercial purposes in relation to goods and services. In particular, you cannot print that Content on merchandise or other physical products for sale.",
+        "\u2715      You cannot use Content in any immoral or illegal way, especially Content which features recognisable people.",
+        "\u2715      You cannot use Content in a misleading or deceptive way.",
+        "\u2715      You cannot use any of the Content as part of a trade-mark, design-mark, trade-name, business name or service mark."
+      ]
+    },
+    {
+      "Github": "https://github.com/blaisedias/",
+      "Content": "chevron and circular LED surround",
+      "License": "CC-BY-SA-4.0"
+    }
+  ],
+  "License": "See Authors",
+  "kind": "vumeter",
+  "vutype": "frames",
+  "format": "compose2",
+  "format_version": 2,
+  "#volume_levels": [
+    "equivalent to number of frames,",
+    "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+  ],
+  "volume_levels": 48,
+  "#dimensions": [
+    "natural width and height of the vumeter",
+    "for this vu meter:",
+    "width = left_margin + dial_width + spacing + dial_width + right_margin",
+    "margins=50, spacing=50, dial_width=1024",
+    "height=768"
+  ],
+  "dimensions": {
+    "h": 2000,
+    "w": 4200
+  },
+  "#files": [
+    "The set of images required to render this VU-Meter"
+  ],
+  "files": [
+    "frame2000.png",
+    "lsp1580.png"
+  ],
+  "#resources": [
+    "associative array of image resources"
+  ],
+  "resources": {
+    "LEFT_BG": {
+      "imagefile": "frame2000.png"
+    },
+    "RIGHT_BG": {
+      "imagefile": "frame2000.png"
+    },
+    "L00": {
+      "imagefile": "lsp1580.png"
+    },
+    "L01": {
+      "imagefile": "lsp1580.png"
+    },
+    "L02": {
+      "imagefile": "lsp1580.png"
+    },
+    "L03": {
+      "imagefile": "lsp1580.png"
+    },
+    "L04": {
+      "imagefile": "lsp1580.png"
+    },
+    "L05": {
+      "imagefile": "lsp1580.png"
+    },
+    "L06": {
+      "imagefile": "lsp1580.png"
+    },
+    "L07": {
+      "imagefile": "lsp1580.png"
+    },
+    "L08": {
+      "imagefile": "lsp1580.png"
+    },
+    "L09": {
+      "imagefile": "lsp1580.png"
+    },
+    "L10": {
+      "imagefile": "lsp1580.png"
+    },
+    "L11": {
+      "imagefile": "lsp1580.png"
+    },
+    "L12": {
+      "imagefile": "lsp1580.png"
+    },
+    "L13": {
+      "imagefile": "lsp1580.png"
+    },
+    "L14": {
+      "imagefile": "lsp1580.png"
+    },
+    "L15": {
+      "imagefile": "lsp1580.png"
+    },
+    "L16": {
+      "imagefile": "lsp1580.png"
+    },
+    "L17": {
+      "imagefile": "lsp1580.png"
+    },
+    "L18": {
+      "imagefile": "lsp1580.png"
+    },
+    "L19": {
+      "imagefile": "lsp1580.png"
+    },
+    "L20": {
+      "imagefile": "lsp1580.png"
+    },
+    "L21": {
+      "imagefile": "lsp1580.png"
+    },
+    "L22": {
+      "imagefile": "lsp1580.png"
+    },
+    "L23": {
+      "imagefile": "lsp1580.png"
+    },
+    "L24": {
+      "imagefile": "lsp1580.png"
+    },
+    "L25": {
+      "imagefile": "lsp1580.png"
+    },
+    "L26": {
+      "imagefile": "lsp1580.png"
+    },
+    "L27": {
+      "imagefile": "lsp1580.png"
+    },
+    "L28": {
+      "imagefile": "lsp1580.png"
+    },
+    "L29": {
+      "imagefile": "lsp1580.png"
+    },
+    "L30": {
+      "imagefile": "lsp1580.png"
+    },
+    "L31": {
+      "imagefile": "lsp1580.png"
+    },
+    "L32": {
+      "imagefile": "lsp1580.png"
+    },
+    "L33": {
+      "imagefile": "lsp1580.png"
+    },
+    "L34": {
+      "imagefile": "lsp1580.png"
+    },
+    "L35": {
+      "imagefile": "lsp1580.png"
+    },
+    "L36": {
+      "imagefile": "lsp1580.png"
+    },
+    "L37": {
+      "imagefile": "lsp1580.png"
+    },
+    "L38": {
+      "imagefile": "lsp1580.png"
+    },
+    "L39": {
+      "imagefile": "lsp1580.png"
+    },
+    "L40": {
+      "imagefile": "lsp1580.png"
+    },
+    "L41": {
+      "imagefile": "lsp1580.png"
+    },
+    "L42": {
+      "imagefile": "lsp1580.png"
+    },
+    "L43": {
+      "imagefile": "lsp1580.png"
+    },
+    "L44": {
+      "imagefile": "lsp1580.png"
+    },
+    "L45": {
+      "imagefile": "lsp1580.png"
+    },
+    "L46": {
+      "imagefile": "lsp1580.png"
+    },
+    "L47": {
+      "imagefile": "lsp1580.png"
+    },
+    "L48": {
+      "imagefile": "lsp1580.png"
+    },
+    "R00": {
+      "imagefile": "lsp1580.png"
+    },
+    "R01": {
+      "imagefile": "lsp1580.png"
+    },
+    "R02": {
+      "imagefile": "lsp1580.png"
+    },
+    "R03": {
+      "imagefile": "lsp1580.png"
+    },
+    "R04": {
+      "imagefile": "lsp1580.png"
+    },
+    "R05": {
+      "imagefile": "lsp1580.png"
+    },
+    "R06": {
+      "imagefile": "lsp1580.png"
+    },
+    "R07": {
+      "imagefile": "lsp1580.png"
+    },
+    "R08": {
+      "imagefile": "lsp1580.png"
+    },
+    "R09": {
+      "imagefile": "lsp1580.png"
+    },
+    "R10": {
+      "imagefile": "lsp1580.png"
+    },
+    "R11": {
+      "imagefile": "lsp1580.png"
+    },
+    "R12": {
+      "imagefile": "lsp1580.png"
+    },
+    "R13": {
+      "imagefile": "lsp1580.png"
+    },
+    "R14": {
+      "imagefile": "lsp1580.png"
+    },
+    "R15": {
+      "imagefile": "lsp1580.png"
+    },
+    "R16": {
+      "imagefile": "lsp1580.png"
+    },
+    "R17": {
+      "imagefile": "lsp1580.png"
+    },
+    "R18": {
+      "imagefile": "lsp1580.png"
+    },
+    "R19": {
+      "imagefile": "lsp1580.png"
+    },
+    "R20": {
+      "imagefile": "lsp1580.png"
+    },
+    "R21": {
+      "imagefile": "lsp1580.png"
+    },
+    "R22": {
+      "imagefile": "lsp1580.png"
+    },
+    "R23": {
+      "imagefile": "lsp1580.png"
+    },
+    "R24": {
+      "imagefile": "lsp1580.png"
+    },
+    "R25": {
+      "imagefile": "lsp1580.png"
+    },
+    "R26": {
+      "imagefile": "lsp1580.png"
+    },
+    "R27": {
+      "imagefile": "lsp1580.png"
+    },
+    "R28": {
+      "imagefile": "lsp1580.png"
+    },
+    "R29": {
+      "imagefile": "lsp1580.png"
+    },
+    "R30": {
+      "imagefile": "lsp1580.png"
+    },
+    "R31": {
+      "imagefile": "lsp1580.png"
+    },
+    "R32": {
+      "imagefile": "lsp1580.png"
+    },
+    "R33": {
+      "imagefile": "lsp1580.png"
+    },
+    "R34": {
+      "imagefile": "lsp1580.png"
+    },
+    "R35": {
+      "imagefile": "lsp1580.png"
+    },
+    "R36": {
+      "imagefile": "lsp1580.png"
+    },
+    "R37": {
+      "imagefile": "lsp1580.png"
+    },
+    "R38": {
+      "imagefile": "lsp1580.png"
+    },
+    "R39": {
+      "imagefile": "lsp1580.png"
+    },
+    "R40": {
+      "imagefile": "lsp1580.png"
+    },
+    "R41": {
+      "imagefile": "lsp1580.png"
+    },
+    "R42": {
+      "imagefile": "lsp1580.png"
+    },
+    "R43": {
+      "imagefile": "lsp1580.png"
+    },
+    "R44": {
+      "imagefile": "lsp1580.png"
+    },
+    "R45": {
+      "imagefile": "lsp1580.png"
+    },
+    "R46": {
+      "imagefile": "lsp1580.png"
+    },
+    "R47": {
+      "imagefile": "lsp1580.png"
+    },
+    "R48": {
+      "imagefile": "lsp1580.png"
+    }
+  },
+  "#placement": [
+    "placement is an associative array of image aliases to coordinates",
+    "each placement specifies where an image associated with an alias will be rendered",
+    "Format: ",
+    "alias: { x-coordinate, y-coordinate} "
+  ],
+  "placement": {
+    "L00": {
+      "h": 1292,
+      "w": 1292,
+      "x": 354.0,
+      "y": 354.0,
+      "resource": "L00"
+    },
+    "L01": {
+      "h": 1298,
+      "w": 1298,
+      "x": 351.0,
+      "y": 351.0,
+      "resource": "L01"
+    },
+    "L02": {
+      "h": 1304,
+      "w": 1304,
+      "x": 348.0,
+      "y": 348.0,
+      "resource": "L02"
+    },
+    "L03": {
+      "h": 1310,
+      "w": 1310,
+      "x": 345.0,
+      "y": 345.0,
+      "resource": "L03"
+    },
+    "L04": {
+      "h": 1316,
+      "w": 1316,
+      "x": 342.0,
+      "y": 342.0,
+      "resource": "L04"
+    },
+    "L05": {
+      "h": 1322,
+      "w": 1322,
+      "x": 339.0,
+      "y": 339.0,
+      "resource": "L05"
+    },
+    "L06": {
+      "h": 1328,
+      "w": 1328,
+      "x": 336.0,
+      "y": 336.0,
+      "resource": "L06"
+    },
+    "L07": {
+      "h": 1334,
+      "w": 1334,
+      "x": 333.0,
+      "y": 333.0,
+      "resource": "L07"
+    },
+    "L08": {
+      "h": 1340,
+      "w": 1340,
+      "x": 330.0,
+      "y": 330.0,
+      "resource": "L08"
+    },
+    "L09": {
+      "h": 1346,
+      "w": 1346,
+      "x": 327.0,
+      "y": 327.0,
+      "resource": "L09"
+    },
+    "L10": {
+      "h": 1352,
+      "w": 1352,
+      "x": 324.0,
+      "y": 324.0,
+      "resource": "L10"
+    },
+    "L11": {
+      "h": 1358,
+      "w": 1358,
+      "x": 321.0,
+      "y": 321.0,
+      "resource": "L11"
+    },
+    "L12": {
+      "h": 1364,
+      "w": 1364,
+      "x": 318.0,
+      "y": 318.0,
+      "resource": "L12"
+    },
+    "L13": {
+      "h": 1370,
+      "w": 1370,
+      "x": 315.0,
+      "y": 315.0,
+      "resource": "L13"
+    },
+    "L14": {
+      "h": 1376,
+      "w": 1376,
+      "x": 312.0,
+      "y": 312.0,
+      "resource": "L14"
+    },
+    "L15": {
+      "h": 1382,
+      "w": 1382,
+      "x": 309.0,
+      "y": 309.0,
+      "resource": "L15"
+    },
+    "L16": {
+      "h": 1388,
+      "w": 1388,
+      "x": 306.0,
+      "y": 306.0,
+      "resource": "L16"
+    },
+    "L17": {
+      "h": 1394,
+      "w": 1394,
+      "x": 303.0,
+      "y": 303.0,
+      "resource": "L17"
+    },
+    "L18": {
+      "h": 1400,
+      "w": 1400,
+      "x": 300.0,
+      "y": 300.0,
+      "resource": "L18"
+    },
+    "L19": {
+      "h": 1406,
+      "w": 1406,
+      "x": 297.0,
+      "y": 297.0,
+      "resource": "L19"
+    },
+    "L20": {
+      "h": 1412,
+      "w": 1412,
+      "x": 294.0,
+      "y": 294.0,
+      "resource": "L20"
+    },
+    "L21": {
+      "h": 1418,
+      "w": 1418,
+      "x": 291.0,
+      "y": 291.0,
+      "resource": "L21"
+    },
+    "L22": {
+      "h": 1424,
+      "w": 1424,
+      "x": 288.0,
+      "y": 288.0,
+      "resource": "L22"
+    },
+    "L23": {
+      "h": 1430,
+      "w": 1430,
+      "x": 285.0,
+      "y": 285.0,
+      "resource": "L23"
+    },
+    "L24": {
+      "h": 1436,
+      "w": 1436,
+      "x": 282.0,
+      "y": 282.0,
+      "resource": "L24"
+    },
+    "L25": {
+      "h": 1442,
+      "w": 1442,
+      "x": 279.0,
+      "y": 279.0,
+      "resource": "L25"
+    },
+    "L26": {
+      "h": 1448,
+      "w": 1448,
+      "x": 276.0,
+      "y": 276.0,
+      "resource": "L26"
+    },
+    "L27": {
+      "h": 1454,
+      "w": 1454,
+      "x": 273.0,
+      "y": 273.0,
+      "resource": "L27"
+    },
+    "L28": {
+      "h": 1460,
+      "w": 1460,
+      "x": 270.0,
+      "y": 270.0,
+      "resource": "L28"
+    },
+    "L29": {
+      "h": 1466,
+      "w": 1466,
+      "x": 267.0,
+      "y": 267.0,
+      "resource": "L29"
+    },
+    "L30": {
+      "h": 1472,
+      "w": 1472,
+      "x": 264.0,
+      "y": 264.0,
+      "resource": "L30"
+    },
+    "L31": {
+      "h": 1478,
+      "w": 1478,
+      "x": 261.0,
+      "y": 261.0,
+      "resource": "L31"
+    },
+    "L32": {
+      "h": 1484,
+      "w": 1484,
+      "x": 258.0,
+      "y": 258.0,
+      "resource": "L32"
+    },
+    "L33": {
+      "h": 1490,
+      "w": 1490,
+      "x": 255.0,
+      "y": 255.0,
+      "resource": "L33"
+    },
+    "L34": {
+      "h": 1496,
+      "w": 1496,
+      "x": 252.0,
+      "y": 252.0,
+      "resource": "L34"
+    },
+    "L35": {
+      "h": 1502,
+      "w": 1502,
+      "x": 249.0,
+      "y": 249.0,
+      "resource": "L35"
+    },
+    "L36": {
+      "h": 1508,
+      "w": 1508,
+      "x": 246.0,
+      "y": 246.0,
+      "resource": "L36"
+    },
+    "L37": {
+      "h": 1514,
+      "w": 1514,
+      "x": 243.0,
+      "y": 243.0,
+      "resource": "L37"
+    },
+    "L38": {
+      "h": 1520,
+      "w": 1520,
+      "x": 240.0,
+      "y": 240.0,
+      "resource": "L38"
+    },
+    "L39": {
+      "h": 1526,
+      "w": 1526,
+      "x": 237.0,
+      "y": 237.0,
+      "resource": "L39"
+    },
+    "L40": {
+      "h": 1532,
+      "w": 1532,
+      "x": 234.0,
+      "y": 234.0,
+      "resource": "L40"
+    },
+    "L41": {
+      "h": 1538,
+      "w": 1538,
+      "x": 231.0,
+      "y": 231.0,
+      "resource": "L41"
+    },
+    "L42": {
+      "h": 1544,
+      "w": 1544,
+      "x": 228.0,
+      "y": 228.0,
+      "resource": "L42"
+    },
+    "L43": {
+      "h": 1550,
+      "w": 1550,
+      "x": 225.0,
+      "y": 225.0,
+      "resource": "L43"
+    },
+    "L44": {
+      "h": 1556,
+      "w": 1556,
+      "x": 222.0,
+      "y": 222.0,
+      "resource": "L44"
+    },
+    "L45": {
+      "h": 1562,
+      "w": 1562,
+      "x": 219.0,
+      "y": 219.0,
+      "resource": "L45"
+    },
+    "L46": {
+      "h": 1568,
+      "w": 1568,
+      "x": 216.0,
+      "y": 216.0,
+      "resource": "L46"
+    },
+    "L47": {
+      "h": 1574,
+      "w": 1574,
+      "x": 213.0,
+      "y": 213.0,
+      "resource": "L47"
+    },
+    "L48": {
+      "h": 1580,
+      "w": 1580,
+      "x": 210.0,
+      "y": 210.0,
+      "resource": "L48"
+    },
+    "LEFT_BG": {
+      "h": 2000,
+      "w": 2000,
+      "x": 0,
+      "y": 0,
+      "resource": "LEFT_BG"
+    },
+    "R00": {
+      "flip": 1,
+      "h": 1292,
+      "w": 1292,
+      "x": 2554.0,
+      "y": 354.0,
+      "resource": "R00"
+    },
+    "R01": {
+      "flip": 1,
+      "h": 1298,
+      "w": 1298,
+      "x": 2551.0,
+      "y": 351.0,
+      "resource": "R01"
+    },
+    "R02": {
+      "flip": 1,
+      "h": 1304,
+      "w": 1304,
+      "x": 2548.0,
+      "y": 348.0,
+      "resource": "R02"
+    },
+    "R03": {
+      "flip": 1,
+      "h": 1310,
+      "w": 1310,
+      "x": 2545.0,
+      "y": 345.0,
+      "resource": "R03"
+    },
+    "R04": {
+      "flip": 1,
+      "h": 1316,
+      "w": 1316,
+      "x": 2542.0,
+      "y": 342.0,
+      "resource": "R04"
+    },
+    "R05": {
+      "flip": 1,
+      "h": 1322,
+      "w": 1322,
+      "x": 2539.0,
+      "y": 339.0,
+      "resource": "R05"
+    },
+    "R06": {
+      "flip": 1,
+      "h": 1328,
+      "w": 1328,
+      "x": 2536.0,
+      "y": 336.0,
+      "resource": "R06"
+    },
+    "R07": {
+      "flip": 1,
+      "h": 1334,
+      "w": 1334,
+      "x": 2533.0,
+      "y": 333.0,
+      "resource": "R07"
+    },
+    "R08": {
+      "flip": 1,
+      "h": 1340,
+      "w": 1340,
+      "x": 2530.0,
+      "y": 330.0,
+      "resource": "R08"
+    },
+    "R09": {
+      "flip": 1,
+      "h": 1346,
+      "w": 1346,
+      "x": 2527.0,
+      "y": 327.0,
+      "resource": "R09"
+    },
+    "R10": {
+      "flip": 1,
+      "h": 1352,
+      "w": 1352,
+      "x": 2524.0,
+      "y": 324.0,
+      "resource": "R10"
+    },
+    "R11": {
+      "flip": 1,
+      "h": 1358,
+      "w": 1358,
+      "x": 2521.0,
+      "y": 321.0,
+      "resource": "R11"
+    },
+    "R12": {
+      "flip": 1,
+      "h": 1364,
+      "w": 1364,
+      "x": 2518.0,
+      "y": 318.0,
+      "resource": "R12"
+    },
+    "R13": {
+      "flip": 1,
+      "h": 1370,
+      "w": 1370,
+      "x": 2515.0,
+      "y": 315.0,
+      "resource": "R13"
+    },
+    "R14": {
+      "flip": 1,
+      "h": 1376,
+      "w": 1376,
+      "x": 2512.0,
+      "y": 312.0,
+      "resource": "R14"
+    },
+    "R15": {
+      "flip": 1,
+      "h": 1382,
+      "w": 1382,
+      "x": 2509.0,
+      "y": 309.0,
+      "resource": "R15"
+    },
+    "R16": {
+      "flip": 1,
+      "h": 1388,
+      "w": 1388,
+      "x": 2506.0,
+      "y": 306.0,
+      "resource": "R16"
+    },
+    "R17": {
+      "flip": 1,
+      "h": 1394,
+      "w": 1394,
+      "x": 2503.0,
+      "y": 303.0,
+      "resource": "R17"
+    },
+    "R18": {
+      "flip": 1,
+      "h": 1400,
+      "w": 1400,
+      "x": 2500.0,
+      "y": 300.0,
+      "resource": "R18"
+    },
+    "R19": {
+      "flip": 1,
+      "h": 1406,
+      "w": 1406,
+      "x": 2497.0,
+      "y": 297.0,
+      "resource": "R19"
+    },
+    "R20": {
+      "flip": 1,
+      "h": 1412,
+      "w": 1412,
+      "x": 2494.0,
+      "y": 294.0,
+      "resource": "R20"
+    },
+    "R21": {
+      "flip": 1,
+      "h": 1418,
+      "w": 1418,
+      "x": 2491.0,
+      "y": 291.0,
+      "resource": "R21"
+    },
+    "R22": {
+      "flip": 1,
+      "h": 1424,
+      "w": 1424,
+      "x": 2488.0,
+      "y": 288.0,
+      "resource": "R22"
+    },
+    "R23": {
+      "flip": 1,
+      "h": 1430,
+      "w": 1430,
+      "x": 2485.0,
+      "y": 285.0,
+      "resource": "R23"
+    },
+    "R24": {
+      "flip": 1,
+      "h": 1436,
+      "w": 1436,
+      "x": 2482.0,
+      "y": 282.0,
+      "resource": "R24"
+    },
+    "R25": {
+      "flip": 1,
+      "h": 1442,
+      "w": 1442,
+      "x": 2479.0,
+      "y": 279.0,
+      "resource": "R25"
+    },
+    "R26": {
+      "flip": 1,
+      "h": 1448,
+      "w": 1448,
+      "x": 2476.0,
+      "y": 276.0,
+      "resource": "R26"
+    },
+    "R27": {
+      "flip": 1,
+      "h": 1454,
+      "w": 1454,
+      "x": 2473.0,
+      "y": 273.0,
+      "resource": "R27"
+    },
+    "R28": {
+      "flip": 1,
+      "h": 1460,
+      "w": 1460,
+      "x": 2470.0,
+      "y": 270.0,
+      "resource": "R28"
+    },
+    "R29": {
+      "flip": 1,
+      "h": 1466,
+      "w": 1466,
+      "x": 2467.0,
+      "y": 267.0,
+      "resource": "R29"
+    },
+    "R30": {
+      "flip": 1,
+      "h": 1472,
+      "w": 1472,
+      "x": 2464.0,
+      "y": 264.0,
+      "resource": "R30"
+    },
+    "R31": {
+      "flip": 1,
+      "h": 1478,
+      "w": 1478,
+      "x": 2461.0,
+      "y": 261.0,
+      "resource": "R31"
+    },
+    "R32": {
+      "flip": 1,
+      "h": 1484,
+      "w": 1484,
+      "x": 2458.0,
+      "y": 258.0,
+      "resource": "R32"
+    },
+    "R33": {
+      "flip": 1,
+      "h": 1490,
+      "w": 1490,
+      "x": 2455.0,
+      "y": 255.0,
+      "resource": "R33"
+    },
+    "R34": {
+      "flip": 1,
+      "h": 1496,
+      "w": 1496,
+      "x": 2452.0,
+      "y": 252.0,
+      "resource": "R34"
+    },
+    "R35": {
+      "flip": 1,
+      "h": 1502,
+      "w": 1502,
+      "x": 2449.0,
+      "y": 249.0,
+      "resource": "R35"
+    },
+    "R36": {
+      "flip": 1,
+      "h": 1508,
+      "w": 1508,
+      "x": 2446.0,
+      "y": 246.0,
+      "resource": "R36"
+    },
+    "R37": {
+      "flip": 1,
+      "h": 1514,
+      "w": 1514,
+      "x": 2443.0,
+      "y": 243.0,
+      "resource": "R37"
+    },
+    "R38": {
+      "flip": 1,
+      "h": 1520,
+      "w": 1520,
+      "x": 2440.0,
+      "y": 240.0,
+      "resource": "R38"
+    },
+    "R39": {
+      "flip": 1,
+      "h": 1526,
+      "w": 1526,
+      "x": 2437.0,
+      "y": 237.0,
+      "resource": "R39"
+    },
+    "R40": {
+      "flip": 1,
+      "h": 1532,
+      "w": 1532,
+      "x": 2434.0,
+      "y": 234.0,
+      "resource": "R40"
+    },
+    "R41": {
+      "flip": 1,
+      "h": 1538,
+      "w": 1538,
+      "x": 2431.0,
+      "y": 231.0,
+      "resource": "R41"
+    },
+    "R42": {
+      "flip": 1,
+      "h": 1544,
+      "w": 1544,
+      "x": 2428.0,
+      "y": 228.0,
+      "resource": "R42"
+    },
+    "R43": {
+      "flip": 1,
+      "h": 1550,
+      "w": 1550,
+      "x": 2425.0,
+      "y": 225.0,
+      "resource": "R43"
+    },
+    "R44": {
+      "flip": 1,
+      "h": 1556,
+      "w": 1556,
+      "x": 2422.0,
+      "y": 222.0,
+      "resource": "R44"
+    },
+    "R45": {
+      "flip": 1,
+      "h": 1562,
+      "w": 1562,
+      "x": 2419.0,
+      "y": 219.0,
+      "resource": "R45"
+    },
+    "R46": {
+      "flip": 1,
+      "h": 1568,
+      "w": 1568,
+      "x": 2416.0,
+      "y": 216.0,
+      "resource": "R46"
+    },
+    "R47": {
+      "flip": 1,
+      "h": 1574,
+      "w": 1574,
+      "x": 2413.0,
+      "y": 213.0,
+      "resource": "R47"
+    },
+    "R48": {
+      "flip": 1,
+      "h": 1580,
+      "w": 1580,
+      "x": 2410.0,
+      "y": 210.0,
+      "resource": "R48"
+    },
+    "RIGHT_BG": {
+      "flip": 1,
+      "h": 2000,
+      "w": 2000,
+      "x": 2200,
+      "y": 0,
+      "resource": "RIGHT_BG"
+    }
+  },
+  "#backgrounds": [
+    "associative arrays keyed on background name",
+    " contents of each associative array are of associative arrays of channels",
+    " channels with names other the 'left' and 'right' or common, i.e. rendered always",
+    " channels are arrays of placements - there is no volume level associated with these placements"
+  ],
+  "backgrounds": {
+    "speakerGreen": {
+      "left": {
+        "placements": [
+          "LEFT_BG"
+        ]
+      },
+      "right": {
+        "placements": [
+          "RIGHT_BG"
+        ]
+      }
+    }
+  },
+  "#levels*": [
+    "associative arrays with keys 'left' and 'right'",
+    "The contents of each key must be objects which are associative arrays with 3 keys",
+    "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+    "   'single' => only render the placement matching the volume level",
+    "   'aggregate' => render all placements upto the volume level",
+    "   'aggregateoff' => render all placements beyond the volume level",
+    "'peak' : one of 'hold', 'decay', 'hold+decay'",
+    "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+    "                 lower volume levels are rendered to match sampled values",
+    "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+    "       'hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+    "                      lower volume levels follows peak volume level decaying at configured rate",
+    "       Notes: ",
+    "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+    "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+    "         3) if peak is not set then volume levels are rendered to match sampled values",
+    "'placements': an associative arrays of volume level to placements",
+    "Each object does not have to contain placement references for each volume level",
+    "However the combination of objects SHOULD contain placement references for each volume level"
+  ],
+  "levels": {
+    "levels_1": {
+      "left": [
+        {
+          "render": "single",
+          "peak": "decay",
+          "placements": {
+            "0": "L00",
+            "1": "L01",
+            "2": "L02",
+            "3": "L03",
+            "4": "L04",
+            "5": "L05",
+            "6": "L06",
+            "7": "L07",
+            "8": "L08",
+            "9": "L09",
+            "10": "L10",
+            "11": "L11",
+            "12": "L12",
+            "13": "L13",
+            "14": "L14",
+            "15": "L15",
+            "16": "L16",
+            "17": "L17",
+            "18": "L18",
+            "19": "L19",
+            "20": "L20",
+            "21": "L21",
+            "22": "L22",
+            "23": "L23",
+            "24": "L24",
+            "25": "L25",
+            "26": "L26",
+            "27": "L27",
+            "28": "L28",
+            "29": "L29",
+            "30": "L30",
+            "31": "L31",
+            "32": "L32",
+            "33": "L33",
+            "34": "L34",
+            "35": "L35",
+            "36": "L36",
+            "37": "L37",
+            "38": "L38",
+            "39": "L39",
+            "40": "L40",
+            "41": "L41",
+            "42": "L42",
+            "43": "L43",
+            "44": "L44",
+            "45": "L45",
+            "46": "L46",
+            "47": "L47",
+            "48": "L48"
+          }
+        }
+      ],
+      "right": [
+        {
+          "render": "single",
+          "peak": "decay",
+          "placements": {
+            "0": "R00",
+            "1": "R01",
+            "2": "R02",
+            "3": "R03",
+            "4": "R04",
+            "5": "R05",
+            "6": "R06",
+            "7": "R07",
+            "8": "R08",
+            "9": "R09",
+            "10": "R10",
+            "11": "R11",
+            "12": "R12",
+            "13": "R13",
+            "14": "R14",
+            "15": "R15",
+            "16": "R16",
+            "17": "R17",
+            "18": "R18",
+            "19": "R19",
+            "20": "R20",
+            "21": "R21",
+            "22": "R22",
+            "23": "R23",
+            "24": "R24",
+            "25": "R25",
+            "26": "R26",
+            "27": "R27",
+            "28": "R28",
+            "29": "R29",
+            "30": "R30",
+            "31": "R31",
+            "32": "R32",
+            "33": "R33",
+            "34": "R34",
+            "35": "R35",
+            "36": "R36",
+            "37": "R37",
+            "38": "R38",
+            "39": "R39",
+            "40": "R40",
+            "41": "R41",
+            "42": "R42",
+            "43": "R43",
+            "44": "R44",
+            "45": "R45",
+            "46": "R46",
+            "47": "R47",
+            "48": "R48"
+          }
+        }
+      ]
+    }
+  },
+  "vumeters#": [
+    "associative arrays keyed on VU Meter name",
+    " contents of each associative array are 2 keys",
+    "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
+    "   background: which background in layout to use, if abseent then no backgorund is rendered"
+  ],
+  "vumeters": {
+    "SpeakerGreen": {
+      "background": "speakerGreen",
+      "levels": "levels_1"
+    }
+  }
+}
