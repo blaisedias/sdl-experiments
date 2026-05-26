@@ -52,7 +52,6 @@ if [ -f "/usr/local/etc/pcp/pcpversion.cfg" ]; then
     export TCACHE_SIZE="texture_cache_size 59768832"
 fi
 export TCACHE_SIZE="texture_cache_size 50000000"
-export TCACHE_SIZE="texture_cache_size 100000000"
 
 set -x
 ./bin/jl2 dl ./lib/TubeD.so  dl ./lib/Chevrons.so dl ./lib/PurpleTastic.so dl ./lib/SpeakerGreen.so dl ./lib/SpeakerGray.so $* $TCACHE_SIZE
