@@ -321,6 +321,9 @@ vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const ch
         dst_elem->rect.h = VU_SCALEV(src_elem->rect.h);
         dst_elem->texture_index = src_elem->texture_index;
         dst_elem->flip = src_elem->flip;
+        dst_elem->center.x = VU_SCALEV(src_elem->center.x);
+        dst_elem->center.y = VU_SCALEV(src_elem->center.y);
+        dst_elem->angle = src_elem->angle;
     }
 #undef VU_SCALE
 #if     0
@@ -452,7 +455,8 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
         tcache_quick_get_texture(vu->resources.textures[vu->placements.elements[comp->placements[value]].texture_index], renderer),\
         NULL,\
         &render_rect,\
-        vu->rotation, NULL, \
+        vu->rotation + vu->placements.elements[comp->placements[value]].angle, \
+        &vu->placements.elements[comp->placements[value]].center, \
         flipValues[vu->placements.elements[comp->placements[value]].flip])
 
     for(i=0; i<2; ++i) {

@@ -14,6 +14,8 @@ typedef struct {
     int         texture_index;
     SDL_Rect    rect;
     SDL_RendererFlip flip;
+    float       angle;
+    SDL_Point   center;
 } vumeter_element;
 
 typedef enum {
