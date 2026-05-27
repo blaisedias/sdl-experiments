@@ -383,9 +383,19 @@ static int64_t ms_2;
 // to check and reset performance counters when vumeter is changed.
 static const vumeter* prev_vumeter;
 
+static inline void renderPlacement(vumeter_element* pve, SDL_Rect* enclosure, vumeter_properties* vu, SDL_Renderer* renderer) {
+    SDL_Rect render_rect;
+    rebaseRect(enclosure, &pve->rect, &render_rect);
+    SDL_RenderCopyEx(renderer,
+            tcache_quick_get_texture(vu->resources.textures[pve->texture_index], renderer),
+            NULL,
+            &render_rect,
+            vu->rotation + pve->angle,
+            &pve->center,
+            flipValues[pve->flip]);
+}
 
 void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter* vumeter, int* vols, SDL_Rect* enclosure) {
-//    SDL_RenderClear(renderer);
     if (!vu) {
         return;
     }
@@ -413,8 +423,6 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
     runtimes[0]->vol = vols[0];
     runtimes[1]->vol = vols[1];
 
-    SDL_Rect render_rect;
-
     for (i=0; i < 2; ++i) {
         if (runtimes[i]->vol > runtimes[i]->peak_hold_vol) {
 //            runtimes[i].peak_hold_counter = peak_hold_counter_start;
@@ -439,25 +447,13 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
     if (vumeter->background) {
         const int *bg = vumeter->background->bg;
         while(bg != NULL && 0 != *bg) {
-            vumeter_element *p = &vu->placements.elements[*bg];
-            rebaseRect(enclosure, &p->rect, &render_rect);
-            SDL_RenderCopyEx(renderer,
-                    tcache_quick_get_texture(vu->resources.textures[p->texture_index], renderer),
-                    NULL, &render_rect, vu->rotation, NULL,
-                    flipValues[p->flip]);
+            renderPlacement(&vu->placements.elements[*bg], enclosure, vu, renderer);
             ++bg;
         }
     }
 
 #define _RENDER_VOLUME_LEVEL_(value) \
-        rebaseRect(enclosure, &vu->placements.elements[comp->placements[value]].rect, &render_rect); \
-        SDL_RenderCopyEx(renderer,\
-        tcache_quick_get_texture(vu->resources.textures[vu->placements.elements[comp->placements[value]].texture_index], renderer),\
-        NULL,\
-        &render_rect,\
-        vu->rotation + vu->placements.elements[comp->placements[value]].angle, \
-        &vu->placements.elements[comp->placements[value]].center, \
-        flipValues[vu->placements.elements[comp->placements[value]].flip])
+    renderPlacement(vu->placements.elements+comp->placements[value], enclosure, vu, renderer)
 
     for(i=0; i<2; ++i) {
         vol_printf("%2d) ", i);
