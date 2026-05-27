@@ -54,4 +54,4 @@ fi
 export TCACHE_SIZE="texture_cache_size 50000000"
 
 set -x
-./bin/jl2 dl ./lib/TubeD.so  dl ./lib/Chevrons.so dl ./lib/PurpleTastic.so dl ./lib/SpeakerGreen.so dl ./lib/SpeakerGray.so $* $TCACHE_SIZE
+./bin/jl2 dl ./lib/TubeD.so  dl ./lib/Chevrons.so dl ./lib/PurpleTastic.so dl ./lib/SpeakerGreen.so dl ./lib/SpeakerGray.so dl ./lib/TransparentWhite.so $* $TCACHE_SIZE

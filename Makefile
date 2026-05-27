@@ -62,7 +62,7 @@ CC = gcc
 CF_PIC = $(CF) -fpic
 CF_SHARED = $(CF) -fpic -shared
 
-SHARED_OBJS = $(LIB_DIR)/Chevrons.so $(LIB_DIR)/PurpleTastic.so $(LIB_DIR)/TubeD.so $(LIB_DIR)/SpeakerGreen.so $(LIB_DIR)/SpeakerGray.so
+SHARED_OBJS = $(LIB_DIR)/Chevrons.so $(LIB_DIR)/PurpleTastic.so $(LIB_DIR)/TubeD.so $(LIB_DIR)/SpeakerGreen.so $(LIB_DIR)/SpeakerGray.so $(LIB_DIR)/TransparentWhite.so
 #SQVUMETER_OBJS = \
 #		  $(OBJS_DIR)/sqvumeter.o \
 #		  $(OBJS_DIR)/application.o \
