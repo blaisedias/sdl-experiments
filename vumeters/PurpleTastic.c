@@ -357,7 +357,7 @@ enum placements_enum {
 };
 
 
-static vumeter_element placements[] = {
+static vu_placement_t placements[] = {
    { .texture_index=RSRC_NULL, .rect={ 0, 0, 0, 0}, },
    { .texture_index=RSRC_L00, .rect={ 174, 439, 390, 178}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_L01, .rect={ 183, 421, 381, 196}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
@@ -505,7 +505,7 @@ static background backgrounds[] = {
 
 
 //Levels
-static component levels_1_left[] = {
+static vu_component_t levels_1_left[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -616,10 +616,10 @@ static component levels_1_left[] = {
     },
 };
 
-static channel channel_levels_1_left = { 2, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { 2, levels_1_left,};
 
 
-static component levels_1_right[] = {
+static vu_component_t levels_1_right[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -730,10 +730,10 @@ static component levels_1_right[] = {
     },
 };
 
-static channel channel_levels_1_right = { 2, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { 2, levels_1_right,};
 
 
-static vumeter vumeters[] = {
+static vumeter_t vumeters[] = {
     {
         .name="PurpleTastic2",
         .background=&backgrounds[BG_PURPLETASTIC],
@@ -748,7 +748,7 @@ static vumeter vumeters[] = {
 
 
 // VU Meter properties
-vumeter_properties VuProperties = {
+vumeter_properties_t VuProperties = {
     .name="PurpleTastic",
     .volume_levels=49, .w=2198, .h=768,
     .vumeter_count=2, .vumeters=vumeters,

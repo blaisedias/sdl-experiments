@@ -58,13 +58,13 @@ static void center_vu_element(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst, f
 }
 
 
-void VUMeter_rebase(vumeter_properties* vu, SDL_Rect* enclosure) {
+void VUMeter_rebase(vumeter_properties_t* vu, SDL_Rect* enclosure) {
     if(!vu) {
         return;
     }
     int indx;
     {
-        vumeter_element *ve = vu->placements.elements;
+        vu_placement_t *ve = vu->placements.elements;
         SDL_Rect rbs = {
             .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
             .w=vu->w, .h=vu->h
@@ -78,14 +78,14 @@ void VUMeter_rebase(vumeter_properties* vu, SDL_Rect* enclosure) {
 }
  
 /*
-void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosure) {
+void VUMeter_orientate(vumeter_properties_t* vu, float rotation, SDL_Rect* enclosure) {
     if (!vu) {
         return;
     }
     int indx;
     vu->rotation = rotation;
     if (rotation == 0.0) {
-        vumeter_element *ve = vu->placements.elements;
+        vu_placement_t *ve = vu->placements.elements;
         SDL_Rect rbs = {
             .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
             .w=vu->w, .h=vu->h
@@ -96,7 +96,7 @@ void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosu
             center_vu_element(enclosure, &rbs, &ve->rect, 0.0);
         }
     } else if (rotation == 180.0) {
-        vumeter_element *ve = vu->placements.elements;
+        vu_placement_t *ve = vu->placements.elements;
         SDL_Rect rbs = {
             .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
             .w=vu->w, .h=vu->h
@@ -110,7 +110,7 @@ void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosu
             center_vu_element(enclosure, &rbs, &ve->rect, 180.0);
         }
     } else if (rotation == 90.0) {
-        vumeter_element *ve = vu->placements.elements;
+        vu_placement_t *ve = vu->placements.elements;
         SDL_Rect rbs = {
             .x=(enclosure->w-vu->h)/2, .y=(enclosure->h-vu->w)/2,
             .w=vu->h, .h=vu->w
@@ -126,7 +126,7 @@ void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosu
             center_vu_element(enclosure, &rbs, &ve->rect, 180.0);
         }
     } else if (rotation == 270.0) {
-        vumeter_element *ve = vu->placements.elements;
+        vu_placement_t *ve = vu->placements.elements;
         SDL_Rect rbs = {
             .x=(enclosure->w-vu->h)/2, .y=(enclosure->h-vu->w)/2,
             .w=vu->h, .h=vu->w
@@ -146,7 +146,7 @@ void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosu
 */
 
 static char load_buffer[4096];
-SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties* vu) {
+SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties_t* vu) {
     if (!vu) {
         return false;
     }
@@ -192,7 +192,7 @@ SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties* vu) {
     return ok;
 }
 
-void VUMeter_unload_media(vumeter_properties* vu) {
+void VUMeter_unload_media(vumeter_properties_t* vu) {
     if (vu) {
         load_printf("unload media: %p\n"
                 "resources: count=%d names=%p textures=%p\n",
@@ -208,7 +208,7 @@ void VUMeter_unload_media(vumeter_properties* vu) {
     }
 }
 
-static void release_properties(vumeter_properties*vu) {
+static void release_properties(vumeter_properties_t*vu) {
     if (vu) {
         VUMeter_unload_media(vu);
         free(vu->placements.elements);
@@ -219,7 +219,7 @@ static void release_properties(vumeter_properties*vu) {
     }
 }
 
-char* VUMeter_resource_path(const char *root, vumeter_properties* vu) {
+char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu) {
     if (!vu) {
         return strdup(root);
     }
@@ -239,7 +239,7 @@ char* VUMeter_resource_path(const char *root, vumeter_properties* vu) {
     return strdup(load_buffer);
 }
 
-vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const char* resource_path) {
+vumeter_properties_t* VUMeter_scale(vumeter_properties_t* vu, int w, int h, const char* resource_path) {
     if (!vu) {
         return NULL;
     }
@@ -265,7 +265,7 @@ vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const ch
             );
 
 
-    vumeter_properties* resized_vu = calloc(1, sizeof(*resized_vu));
+    vumeter_properties_t* resized_vu = calloc(1, sizeof(*resized_vu));
     if (NULL == resized_vu) {
         error_printf("OOM vumeter_properties\n");
         return NULL;
@@ -274,7 +274,7 @@ vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const ch
     {
         // initialise resized vu meter struct, this method preserves the const attributes
         // whilst allowing insitialisation of the dynamically allocated vu meter struct
-        vumeter_properties scaled_props = {
+        vumeter_properties_t scaled_props = {
             .name = vu->name,
             .volume_levels = vu->volume_levels,
             .w = scaled_w,
@@ -313,8 +313,8 @@ vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const ch
     }
 
     for(int indx = 0; indx < vu->placements.count; ++indx) {
-        vumeter_element *src_elem = vu->placements.elements + indx;
-        vumeter_element *dst_elem = resized_vu->placements.elements + indx;
+        vu_placement_t *src_elem = vu->placements.elements + indx;
+        vu_placement_t *dst_elem = resized_vu->placements.elements + indx;
         dst_elem->rect.x = dx + VU_SCALEV(src_elem->rect.x);
         dst_elem->rect.y = dy + VU_SCALEV(src_elem->rect.y);
         dst_elem->rect.w = VU_SCALEV(src_elem->rect.w);
@@ -381,9 +381,9 @@ static int64_t max_render_time;
 static int64_t ms_1;
 static int64_t ms_2;
 // to check and reset performance counters when vumeter is changed.
-static const vumeter* prev_vumeter;
+static const vumeter_t* prev_vumeter;
 
-static inline void renderPlacement(vumeter_element* pve, SDL_Rect* enclosure, vumeter_properties* vu, SDL_Renderer* renderer) {
+static inline void renderPlacement(vu_placement_t* pve, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer) {
     SDL_Rect render_rect;
     rebaseRect(enclosure, &pve->rect, &render_rect);
     SDL_RenderCopyEx(renderer,
@@ -395,7 +395,7 @@ static inline void renderPlacement(vumeter_element* pve, SDL_Rect* enclosure, vu
             flipValues[pve->flip]);
 }
 
-void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter* vumeter, int* vols, SDL_Rect* enclosure) {
+void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure) {
     if (!vu) {
         return;
     }
@@ -457,8 +457,8 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
 
     for(i=0; i<2; ++i) {
         vol_printf("%2d) ", i);
-        channel* channel = vumeter->channels[i];
-        const component* comp = channel->components;
+        vu_channel_t* channel = vumeter->channels[i];
+        const vu_component_t* comp = channel->components;
         runtime_volume *runtime = runtimes[i];
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
             switch(comp->render) {
@@ -576,7 +576,7 @@ void VUMeter_diag() {
 }
 
 
-void VUMeter_dump_props(const vumeter_properties* props) {
+void VUMeter_dump_props(const vumeter_properties_t* props) {
     if(!props) {
         return;
     }
@@ -603,10 +603,10 @@ void VUMeter_dump_props(const vumeter_properties* props) {
                  props->resources.names[indx]
                );
     }
-    const vumeter* vumeter = props->vumeters;
+    const vumeter_t* vumeter = props->vumeters;
     const int *bg = vumeter->background->bg;
     while(bg != NULL && 0 != *bg) {
-        vumeter_element *p = &props->placements.elements[*bg];
+        vu_placement_t *p = &props->placements.elements[*bg];
         printf("bg, texture_index=%02d texture=%d, rect=(%d, %d, %d, %d) flip=%d %s\n",
                 p->texture_index,
                 props->resources.textures[p->texture_index],
@@ -617,8 +617,8 @@ void VUMeter_dump_props(const vumeter_properties* props) {
         ++bg;
     }
     for(int i=0; i<2; ++i) {
-        channel* channel = vumeter->channels[i];
-        const component* comp = channel->components;
+        vu_channel_t* channel = vumeter->channels[i];
+        const vu_component_t* comp = channel->components;
         printf("channel %d, components count %d\n", i, channel->component_count);
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
             printf("channel %d), component %d) %d, %d %p\n", i, ic, comp->render, comp->peak, comp);

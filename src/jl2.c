@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
             }
 */            
         } else if (0 == strcmp(argv[i], "list") ){
-            const vumeter_properties *p = VUMeter_get_props_list();
+            const vumeter_properties_t *p = VUMeter_get_props_list();
             while(p != NULL) {
                 for(int iv=0; iv < p->vumeter_count;  ++iv) {
                     printf("%s\n", p->vumeters[iv].name);
@@ -300,7 +300,7 @@ printf("starting controller\n"); fflush(stdout);
 //            app_stop(app_ctx);
         } else {
             if (dump_vu) {
-                const vumeter_properties* vp = VUMeter_get_props_list();
+                const vumeter_properties_t* vp = VUMeter_get_props_list();
                 while(vp) {
                     VUMeter_dump_props(vp);
                     vp = vp->next;

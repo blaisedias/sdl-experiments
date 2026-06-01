@@ -16,7 +16,7 @@ typedef struct {
     SDL_RendererFlip flip;
     float       angle;
     SDL_Point   center;
-} vumeter_element;
+}vu_placement_t;
 
 typedef enum {
     SINGLE,
@@ -32,12 +32,6 @@ typedef enum {
 }peak_typ;
 
 typedef struct {
-    const char* imagefile;
-    int w;
-    int h;
-}resource;
-
-typedef struct {
     const int* bg;
 }background;
 
@@ -45,7 +39,7 @@ typedef struct {
     const render_typ  render;
     const peak_typ    peak;
     const int placements[50];
-}component;
+}vu_component_t;
 
 typedef struct {
     int vol;
@@ -58,15 +52,15 @@ typedef struct {
 
 typedef struct {
     const int component_count;
-    const component* components;
+    const vu_component_t* components;
     runtime_volume runtime;
-}channel;
+}vu_channel_t;
 
 typedef struct {
     const char* name;
     const background*   background;
-    channel*      channels[2];
-}vumeter;
+    vu_channel_t*      channels[2];
+}vumeter_t;
 
 typedef struct vu_props {
     struct vu_props* next;
@@ -76,7 +70,7 @@ typedef struct vu_props {
     const int w;
     const int h;
     const int vumeter_count;
-    const vumeter* vumeters;
+    const vumeter_t* vumeters;
     struct {
         const int count;
         const char** names;
@@ -84,10 +78,10 @@ typedef struct vu_props {
     }resources;
     struct {
         const int count;
-        vumeter_element* elements;
+        vu_placement_t* elements;
     }placements;
     float rotation;
     void * handle;
-}vumeter_properties;
+}vumeter_properties_t;
 
 #endif  // __jl_vumeterdef_h_

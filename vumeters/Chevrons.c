@@ -823,7 +823,7 @@ enum placements_enum {
 };
 
 
-static vumeter_element placements[] = {
+static vu_placement_t placements[] = {
    { .texture_index=RSRC_NULL, .rect={ 0, 0, 0, 0}, },
    { .texture_index=RSRC_WO_center, .rect={ 0, 274, 1918, 100}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_W_left, .rect={ 0, 0, 108, 260}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
@@ -1619,7 +1619,7 @@ static background backgrounds[] = {
 
 
 //Levels
-static component levels_quad_colour_left[] = {
+static vu_component_t levels_quad_colour_left[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -1732,10 +1732,10 @@ static component levels_quad_colour_left[] = {
     },
 };
 
-static channel channel_levels_quad_colour_left = { 2, levels_quad_colour_left,};
+static vu_channel_t channel_levels_quad_colour_left = { 2, levels_quad_colour_left,};
 
 
-static component levels_quad_colour_right[] = {
+static vu_component_t levels_quad_colour_right[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -1848,10 +1848,10 @@ static component levels_quad_colour_right[] = {
     },
 };
 
-static channel channel_levels_quad_colour_right = { 2, levels_quad_colour_right,};
+static vu_channel_t channel_levels_quad_colour_right = { 2, levels_quad_colour_right,};
 
 
-static component levels_white_orange_left[] = {
+static vu_component_t levels_white_orange_left[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -1964,10 +1964,10 @@ static component levels_white_orange_left[] = {
     },
 };
 
-static channel channel_levels_white_orange_left = { 2, levels_white_orange_left,};
+static vu_channel_t channel_levels_white_orange_left = { 2, levels_white_orange_left,};
 
 
-static component levels_white_orange_right[] = {
+static vu_component_t levels_white_orange_right[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2080,10 +2080,10 @@ static component levels_white_orange_right[] = {
     },
 };
 
-static channel channel_levels_white_orange_right = { 2, levels_white_orange_right,};
+static vu_channel_t channel_levels_white_orange_right = { 2, levels_white_orange_right,};
 
 
-static component levels_cyan_orange_left[] = {
+static vu_component_t levels_cyan_orange_left[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2196,10 +2196,10 @@ static component levels_cyan_orange_left[] = {
     },
 };
 
-static channel channel_levels_cyan_orange_left = { 2, levels_cyan_orange_left,};
+static vu_channel_t channel_levels_cyan_orange_left = { 2, levels_cyan_orange_left,};
 
 
-static component levels_cyan_orange_right[] = {
+static vu_component_t levels_cyan_orange_right[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2312,10 +2312,10 @@ static component levels_cyan_orange_right[] = {
     },
 };
 
-static channel channel_levels_cyan_orange_right = { 2, levels_cyan_orange_right,};
+static vu_channel_t channel_levels_cyan_orange_right = { 2, levels_cyan_orange_right,};
 
 
-static component levels_green_red_left[] = {
+static vu_component_t levels_green_red_left[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2428,10 +2428,10 @@ static component levels_green_red_left[] = {
     },
 };
 
-static channel channel_levels_green_red_left = { 2, levels_green_red_left,};
+static vu_channel_t channel_levels_green_red_left = { 2, levels_green_red_left,};
 
 
-static component levels_green_red_right[] = {
+static vu_component_t levels_green_red_right[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2544,10 +2544,10 @@ static component levels_green_red_right[] = {
     },
 };
 
-static channel channel_levels_green_red_right = { 2, levels_green_red_right,};
+static vu_channel_t channel_levels_green_red_right = { 2, levels_green_red_right,};
 
 
-static component levels_pastel_green_red_left[] = {
+static vu_component_t levels_pastel_green_red_left[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2660,10 +2660,10 @@ static component levels_pastel_green_red_left[] = {
     },
 };
 
-static channel channel_levels_pastel_green_red_left = { 2, levels_pastel_green_red_left,};
+static vu_channel_t channel_levels_pastel_green_red_left = { 2, levels_pastel_green_red_left,};
 
 
-static component levels_pastel_green_red_right[] = {
+static vu_component_t levels_pastel_green_red_right[] = {
     {
         .render=AGGREGATE, .peak=HOLD,
         .placements={
@@ -2776,10 +2776,10 @@ static component levels_pastel_green_red_right[] = {
     },
 };
 
-static channel channel_levels_pastel_green_red_right = { 2, levels_pastel_green_red_right,};
+static vu_channel_t channel_levels_pastel_green_red_right = { 2, levels_pastel_green_red_right,};
 
 
-static vumeter vumeters[] = {
+static vumeter_t vumeters[] = {
     {
         .name="Chevrons",
         .background=&backgrounds[BG_WHITE_ORANGE],
@@ -2809,7 +2809,7 @@ static vumeter vumeters[] = {
 
 
 // VU Meter properties
-vumeter_properties VuProperties = {
+vumeter_properties_t VuProperties = {
     .name="Chevrons",
     .volume_levels=50, .w=1935, .h=648,
     .vumeter_count=5, .vumeters=vumeters,

@@ -13,19 +13,19 @@
 #include "widgets.h"
 #include "visualizer.h"
 
-static vumeter_properties* vu_props_list;
+static vumeter_properties_t* vu_props_list;
 
 //static struct {
-//    vumeter_properties *props;
-//    const vumeter* meter;
+//    vumeter_properties_t *props;
+//    const vumeter_t* meter;
 //} meters[100];
 //static int num_meters=0;
 
 struct vumeter_widget {
-    vumeter_properties* props;
+    vumeter_properties_t* props;
     struct {
-        vumeter_properties *props;
-        const vumeter* meter;
+        vumeter_properties_t *props;
+        const vumeter_t* meter;
     } meters[100];
     int num_meters;
     int atomic_meter_indx;
@@ -40,7 +40,7 @@ static inline void vumeter_set_index(vumeter_widget* wdgt, int ix) {
      __atomic_store_n(&wdgt->atomic_meter_indx, ix, __ATOMIC_RELEASE);
 }
 
-const vumeter_properties* VUMeter_get_props_list() {
+const vumeter_properties_t* VUMeter_get_props_list() {
     return vu_props_list;
 }
 
@@ -52,7 +52,7 @@ bool VUMeter_loadlib(const char* path) {
 //        exit(EXIT_FAILURE);
         return false;
     }
-    vumeter_properties* vp = dlsym(handle, "VuProperties");
+    vumeter_properties_t* vp = dlsym(handle, "VuProperties");
     if (vp == NULL) {
         dlerror();
         dlclose(handle);
@@ -71,7 +71,7 @@ bool VUMeter_loadlib(const char* path) {
 }
 
 void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
-    vumeter_properties* base_props = vu_props_list;
+    vumeter_properties_t* base_props = vu_props_list;
     char buffer[1024];
     sprintf(buffer, "./images/runtime/%dx%d", wdgt->rect.w, wdgt->rect.h);
     vumeter_widget* vw = wdgt->sub.vu;
@@ -80,7 +80,7 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
     debug_printf("          rect = {%4d,%4d,%4d,%4d}\n", wdgt->rect.x, wdgt->rect.y, wdgt->rect.w, wdgt->rect.h);
     while(NULL != base_props) {
         base_props->resource_path = VUMeter_resource_path(resource_path, base_props);
-        vumeter_properties* props = VUMeter_scale(base_props,
+        vumeter_properties_t* props = VUMeter_scale(base_props,
                 wdgt->rect.w, wdgt->rect.h, buffer);
 #ifdef  VUMETERS_CHECK_ON_INIT
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
@@ -95,7 +95,7 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
 #ifdef  VUMETERS_CHECK_ON_INIT
         VUMeter_unload_media(props);
 #endif
-        const vumeter* meter = props->vumeters;
+        const vumeter_t* meter = props->vumeters;
         float decay_unit = (float)props->volume_levels/60;
         for(int ix = 0; ix < props->vumeter_count; ++ix, ++(vw->num_meters), ++meter) {
             for(int ch=0; ch < 2; ++ch) {
@@ -165,7 +165,7 @@ widget *widget_create_vumeter(const view_context* view) {
     return wdgt;
 }
 
-static void free_vumeter_widget_prop(vumeter_widget* vw, vumeter_properties* props) {
+static void free_vumeter_widget_prop(vumeter_widget* vw, vumeter_properties_t* props) {
     if (props) {
         // let texture cache handle release of textures on demand
         //VUMeter_unload_media(props);
@@ -203,7 +203,7 @@ static bool vumeter_select(widget *wdgt, int indx) {
     {
         // let texture cache handle release of textures on demand
         //VUMeter_unload_media(vw->meters[vumeter_index(vw)].props);
-        vumeter_properties* props = vw->meters[indx].props;
+        vumeter_properties_t* props = vw->meters[indx].props;
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
             exit(EXIT_FAILURE);
         }

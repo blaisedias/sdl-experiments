@@ -339,7 +339,7 @@ enum placements_enum {
 };
 
 
-static vumeter_element placements[] = {
+static vu_placement_t placements[] = {
    { .texture_index=RSRC_NULL, .rect={ 0, 0, 0, 0}, },
    { .texture_index=RSRC_L00, .rect={ 205, 319, 344, 396}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_L01, .rect={ 220, 315, 329, 399}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
@@ -467,7 +467,7 @@ static background backgrounds[] = {
 
 
 //Levels
-static component levels_1_left[] = {
+static vu_component_t levels_1_left[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -578,10 +578,10 @@ static component levels_1_left[] = {
     },
 };
 
-static channel channel_levels_1_left = { 2, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { 2, levels_1_left,};
 
 
-static component levels_1_right[] = {
+static vu_component_t levels_1_right[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -692,10 +692,10 @@ static component levels_1_right[] = {
     },
 };
 
-static channel channel_levels_1_right = { 2, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { 2, levels_1_right,};
 
 
-static vumeter vumeters[] = {
+static vumeter_t vumeters[] = {
     {
         .name="TubeD",
         .background=&backgrounds[BG_TUBED],
@@ -705,7 +705,7 @@ static vumeter vumeters[] = {
 
 
 // VU Meter properties
-vumeter_properties VuProperties = {
+vumeter_properties_t VuProperties = {
     .name="TubeD",
     .volume_levels=49, .w=2144, .h=768,
     .vumeter_count=1, .vumeters=vumeters,

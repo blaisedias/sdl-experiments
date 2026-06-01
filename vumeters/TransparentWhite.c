@@ -133,7 +133,7 @@ enum placements_enum {
 };
 
 
-static vumeter_element placements[] = {
+static vu_placement_t placements[] = {
    { .texture_index=RSRC_NULL, .rect={ 0, 0, 0, 0}, },
    { .texture_index=RSRC_LEFT_BG, .rect={ 50, 0, 1024, 600}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_RIGHT_BG, .rect={ 1124, 0, 1024, 600}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
@@ -257,7 +257,7 @@ static background backgrounds[] = {
 
 
 //Levels
-static component levels_1_left[] = {
+static vu_component_t levels_1_left[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -314,10 +314,10 @@ static component levels_1_left[] = {
     },
 };
 
-static channel channel_levels_1_left = { 1, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { 1, levels_1_left,};
 
 
-static component levels_1_right[] = {
+static vu_component_t levels_1_right[] = {
     {
         .render=SINGLE, .peak=DECAY,
         .placements={
@@ -374,10 +374,10 @@ static component levels_1_right[] = {
     },
 };
 
-static channel channel_levels_1_right = { 1, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { 1, levels_1_right,};
 
 
-static vumeter vumeters[] = {
+static vumeter_t vumeters[] = {
     {
         .name="Transparent White",
         .background=&backgrounds[BG_TSP_WHITE],
@@ -387,7 +387,7 @@ static vumeter vumeters[] = {
 
 
 // VU Meter properties
-vumeter_properties VuProperties = {
+vumeter_properties_t VuProperties = {
     .name="TransparentWhite",
     .volume_levels=49, .w=2198, .h=600,
     .vumeter_count=1, .vumeters=vumeters,
