@@ -48,6 +48,7 @@ void dummy_printf(char *format, ...) {
     va_end(args);
 }
 
+void (*log_printf)(char *format, ...) = logfprintf;
 void (*vol_printf)(char *format, ...) = dummy_printf;
 void (*perf_printf)(char *format, ...) = dummy_printf;
 void (*load_printf)(char *format, ...) = dummy_printf;

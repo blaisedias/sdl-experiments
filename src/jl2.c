@@ -63,11 +63,14 @@ static const char* help_text=""
 " - texture_cache_size <count>: maximum number of texture bytes\n"
 "\n"
 " - lms <name>: lyrion media server network name or ip address \n"
+"\n"
+" - monitor-tcache: print texture cache memory usage at regular intervals \n"
 "\n";  
 
 static volatile view_context_ptr view = NULL;
 static char *json_file = "npvu.json";
 static bool dump_vu = false;
+static bool monitor_tcache = false;
 
 static void my_render(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
@@ -198,6 +201,8 @@ int main(int argc, char** argv) {
             show_rects = true;
         } else if (0 == strcmp(argv[i], "showinputrects")) {
             show_input_rects = true;
+        } else if (0 == strcmp(argv[i], "monitor-tcache")) {
+            monitor_tcache = true;
         } else if (0 == strcmp(argv[i], "perf_level")) {
             if (argc > i+1) {
                 VUMeter_set_perf_level(atoi(argv[i+1]));
@@ -316,7 +321,11 @@ printf("starting controller\n"); fflush(stdout);
     if (next_vu_time) {
         next_vu_time += get_milli_seconds();
     }
+//    size_t num_texture_bytes = 0;
+//    size_t num_surface_bytes = 0;
+    unsigned iters = 0;
     while(app_running(app_ctx)) {
+        ++iters;
         sleep_milli_seconds(100);
         if (show_cursor) {
             if (0 >= --show_cursor) {
@@ -340,6 +349,20 @@ printf("starting controller\n"); fflush(stdout);
             SDL_Event next_visu_event = {.type = USEREVENT_NEXT_VISU };
             SDL_PushEvent(&next_visu_event);
             next_vu_time = app_ctx->cycle_secs * 1000 + get_milli_seconds();
+        }
+        size_t nt = tcache_get_texture_bytes_count();
+        size_t ns = tcache_get_surface_bytes_count();
+//        if (nt != num_texture_bytes || ns != num_surface_bytes)
+        if (monitor_tcache && 0 == (iters%50)) {
+//            printf("+++ t=%09lu %.02f s=%09lu %.02f (delta t=%ld s=%ld)\n",
+//                    nt, (float)nt/(1024*1024),
+//                    ns, (float)ns/(1024*1024),
+//                    (long)nt-(long)num_texture_bytes, (long)ns-(long)num_surface_bytes);
+            log_printf("textures:%.02f MiB surfaces:=%.02f MiB\n",
+                    (float)nt/(1024*1024),
+                    (float)ns/(1024*1024));
+//            num_texture_bytes = nt;
+//            num_surface_bytes = ns;
         }
     }
 }
