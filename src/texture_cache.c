@@ -679,8 +679,8 @@ void tcache_dump() {
                        tce->texture,
                        tce->w,
                        tce->h,
-                       tce->num_bytes,
-                       tce->num_surface_bytes,
+                       (long unsigned)tce->num_bytes,
+                       (long unsigned)tce->num_surface_bytes,
                        tce->path);
                 ++count;
                 last_ix = ix;
@@ -722,7 +722,7 @@ void tcache_dump() {
         printf("Sizeof cache_entry = %ld\n", (long)sizeof(tcache_entry));
         printf("Sizeof table = %ld\n", (long)sizeof(tbl));
         printf("Texture bytes = %lu %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
-                num_texture_bytes, (float)num_texture_bytes/(1024*1024),
+                (long unsigned)num_texture_bytes, (float)num_texture_bytes/(1024*1024),
                 (long)locked_texture_bytes, (float)locked_texture_bytes/(1024*1024),
                 (long)unlocked_texture_bytes, (float)unlocked_texture_bytes/(1024*1024),
                 (long)ejected_texture_bytes, (float)ejected_texture_bytes/(1024*1024));
