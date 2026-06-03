@@ -502,7 +502,7 @@ static int __lms_req(lyrion_player_ptr player, const char* prefix, const char* s
             }
             *data_ptr = strdup(io_ptr->buffer + hdr_len);
         } else {
-            error_printf("failed to send data over socket\n");
+            error_printf("failed to send data over socket %s\n", strerror(errno));
         }
     } else {
         fprintf(stderr, "cmd buff is too small!\n%s\n", io_ptr->cmd_buff);
@@ -529,12 +529,12 @@ int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
                 socklen_t err_len = sizeof(err);
                 getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &err_len);
                 if (err != 0) {
-                    error_printf("connect failed %s\n", strerror(err));
+                    error_printf("connect failed %s sockfd=%d\n", strerror(err), sockfd);
                     errno = err;
                 }
                 connected = err;
             } else {
-                error_printf("connect timedout\n");
+                error_printf("connect timedout sockfd=%d\n", sockfd);
             }
         }
     }
@@ -545,11 +545,11 @@ int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
 }
 
 static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* suffix, const char *format, va_list args, char** data_ptr) {
-    lms_io io;
+    lms_io io = {.fp=NULL, .sockfd=-1};
     *data_ptr = NULL;
     int rv = -6;
 
-    if ((io.sockfd = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
+    if ((io.sockfd = socket(AF_INET, SOCK_STREAM, 0)) > -1) {
         struct timeval  tv = { .tv_sec=3, .tv_usec = 0};
         if (setsockopt(io.sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) ) {
             error_printf("failed to set socket receive timeout on %d %s\n", io.sockfd, strerror(errno));
@@ -566,8 +566,13 @@ static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* su
             if (io.fp) {
                 rv = __lms_req(player, prefix, suffix, format, args, data_ptr, &io);
                 fclose(io.fp);
+                io.fp = NULL;
             } else {
-                error_printf("Failed to create input stream %s\n", strerror(errno));
+                error_printf("Failed to create input stream for sockfd=%d %s\n", io.sockfd, strerror(errno));
+                int err = 0;
+                socklen_t err_len = sizeof(err);
+                getsockopt(io.sockfd, SOL_SOCKET, SO_ERROR, &err, &err_len);
+                error_printf("socket error sockfd=%d %s\n", io.sockfd, strerror(err));
                 rv =  -5;
             }
         } else {
@@ -580,7 +585,7 @@ static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* su
         }
         close(io.sockfd);
     } else {
-        error_printf("Socket creation error\n");
+        error_printf("Socket creation error: %s\n", strerror(errno));
         rv = -3;
     }
     return rv;
