@@ -221,6 +221,9 @@ typedef enum {
     playlist_modified = 0x030b9954c,
     playlist_id = 0x03584a535,
 
+    buttons = 0x0108f9988,
+    repeating_stream = 0x02607597b,
+
     VOLUME = 0x022fa5670,
     ARTIST = 0x013d3211e,
     TITLE = 0x027895b9d,
@@ -865,6 +868,9 @@ static bool update_player_status(lyrion_player_ptr player) {
                     case playlist_name:
                     case playlist_modified:
                     case playlist_id:
+
+                    case buttons:
+                    case repeating_stream:
                         break;
 
                     // pseudo tokens
@@ -1303,6 +1309,8 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case playlist_name:
         case playlist_modified:
         case playlist_id:
+        case buttons:
+        case repeating_stream:
             puts("????????????");
             break;
 
