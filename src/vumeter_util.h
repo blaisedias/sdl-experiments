@@ -16,11 +16,7 @@ typedef struct {
 
 char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu);
 
-vumeter_properties_t* VUMeter_scale(vumeter_properties_t* vu, int w, int h, const char* path);
 float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h);
-//void VUMeter_orientate(vumeter_properties_t *vu, float rotation, SDL_Rect* rect);
-void VUMeter_rebase(vumeter_properties_t *vu, SDL_Rect* enclosure);
-
 SDL_bool VUMeter_load_media(SDL_Renderer *renderer, vumeter_properties_t *vu);
 void VUMeter_unload_media(vumeter_properties_t *vu);
 

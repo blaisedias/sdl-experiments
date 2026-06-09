@@ -83,8 +83,7 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
     debug_printf("          rect = {%4d,%4d,%4d,%4d}\n", wdgt->rect.x, wdgt->rect.y, wdgt->rect.w, wdgt->rect.h);
     while(NULL != base_props) {
         base_props->resource_path = VUMeter_resource_path(resource_path, base_props);
-        vumeter_properties_t* props = VUMeter_scale(base_props,
-                wdgt->rect.w, wdgt->rect.h, buffer);
+        vumeter_properties_t* props = base_props;
 #ifdef  VUMETERS_CHECK_ON_INIT
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
             error_printf("failed to load media for %s\n", props->name);
@@ -173,19 +172,6 @@ widget *widget_create_vumeter(const view_context* view) {
     return wdgt;
 }
 
-static void free_vumeter_widget_prop(vumeter_widget* vw, vumeter_properties_t* props) {
-    if (props) {
-        // let texture cache handle release of textures on demand
-        //VUMeter_unload_media(props);
-        for (int iix=0; iix < vw->num_meters; ++iix) {
-            if (props == vw->meters[iix].props) {
-                vw->meters[iix].props = NULL;
-            }
-        }
-        free(props);
-    }
-}
-
 widget *vumeter_widget_destroy(widget *wdgt) {
     if (wdgt == NULL) {
         return wdgt;
@@ -193,7 +179,7 @@ widget *vumeter_widget_destroy(widget *wdgt) {
     vumeter_widget* vw = wdgt->sub.vu;
     if (vw) {
         for (int ix=0; ix < vw->num_meters; ++ix) {
-            free_vumeter_widget_prop(vw, vw->meters[ix].props);
+            vw->meters[ix].props = NULL;
         }
         free(vw);
         wdgt->sub.vu = (void *)NULL;
