@@ -203,9 +203,9 @@ int main(int argc, char** argv) {
             show_input_rects = true;
         } else if (0 == strcmp(argv[i], "monitor-tcache")) {
             monitor_tcache = true;
-        } else if (0 == strcmp(argv[i], "perf_level")) {
+        } else if (0 == strcmp(argv[i], "profile_level")) {
             if (argc > i+1) {
-                VUMeter_set_perf_level(atoi(argv[i+1]));
+                VUMeter_set_profile_level(atoi(argv[i+1]));
                 i += 1;
             }
 /*            

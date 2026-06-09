@@ -22,17 +22,17 @@ void VUMeter_unload_media(vumeter_properties_t *vu);
 
 void VUMeter_draw(SDL_Renderer *renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit);
 
-void VUMeter_dump_props(const vumeter_properties_t* vu);
+void VUMeter_set_peak_hold(int peak_hold);
+void VUMeter_set_decay_hold(int decay_hold);
 
-void VUMeter_diag();
-
-void VUMeter_set_perf_level(int);
-
+// VUMeter load 
 bool VUMeter_loadlib(const char* path);
 const vumeter_properties_t* VUMeter_get_props_list();
 
-void VUMeter_set_peak_hold(int peak_hold);
-void VUMeter_set_decay_hold(int decay_hold);
+// instrumentation and metrics functions
+void VUMeter_dump_props(const vumeter_properties_t* vu);
+void VUMeter_diag();
+void VUMeter_set_profile_level(int);
 
 #endif  // __jl_vumeter_util_h_
 

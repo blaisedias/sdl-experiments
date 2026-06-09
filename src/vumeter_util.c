@@ -26,9 +26,9 @@ static int peak_hold_counter_init_value = 30;
 // @60 FPS 4 appears to be a reasonable value.
 static int decay_hold_counter_init_value = 0;
 
-static int perf_level;
-void VUMeter_set_perf_level(int l) {
-    perf_level = l;
+static int profile_level;
+void VUMeter_set_profile_level(int l) {
+    profile_level = l;
 }
 
 void VUMeter_set_peak_hold(int peak_hold) {
@@ -316,7 +316,7 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
     if (sample_frame_count >= 100) {
         ms_2 = get_micro_seconds();
         float fps = 1000000.0 * sample_frame_count/(ms_2-ms_1);
-        switch(perf_level) {
+        switch(profile_level) {
             case 3:
             case 2:
             default:
