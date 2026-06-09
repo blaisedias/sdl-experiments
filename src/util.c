@@ -187,6 +187,7 @@ void setup_orientation(float orientation, int w, int h, SDL_Rect *screen) {
 //    }
 }
 
+// src and dst can be the same rect, so order of rebasing is important
 void rebaseRect(SDL_Rect* origin, SDL_Rect* src, SDL_Rect* dst) {
     dst->x = origin->x + src->x;
     dst->y = origin->y + src->y;

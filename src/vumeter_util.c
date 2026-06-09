@@ -239,6 +239,13 @@ char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu) {
     return strdup(load_buffer);
 }
 
+float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h) {
+    if (!vu) {
+        return 1;
+    }
+    return MIN((float)w/(float)vu->w, (float)h/(float)vu->h);
+}
+
 vumeter_properties_t* VUMeter_scale(vumeter_properties_t* vu, int w, int h, const char* resource_path) {
     if (!vu) {
         return NULL;
@@ -315,14 +322,23 @@ vumeter_properties_t* VUMeter_scale(vumeter_properties_t* vu, int w, int h, cons
     for(int indx = 0; indx < vu->placements.count; ++indx) {
         vu_placement_t *src_elem = vu->placements.elements + indx;
         vu_placement_t *dst_elem = resized_vu->placements.elements + indx;
+/*
         dst_elem->rect.x = dx + VU_SCALEV(src_elem->rect.x);
         dst_elem->rect.y = dy + VU_SCALEV(src_elem->rect.y);
         dst_elem->rect.w = VU_SCALEV(src_elem->rect.w);
         dst_elem->rect.h = VU_SCALEV(src_elem->rect.h);
-        dst_elem->texture_index = src_elem->texture_index;
-        dst_elem->flip = src_elem->flip;
         dst_elem->center.x = VU_SCALEV(src_elem->center.x);
         dst_elem->center.y = VU_SCALEV(src_elem->center.y);
+*/        
+        dst_elem->rect.x = src_elem->rect.x;
+        dst_elem->rect.y = src_elem->rect.y;
+        dst_elem->rect.w = src_elem->rect.w;
+        dst_elem->rect.h = src_elem->rect.h;
+        dst_elem->center.x = src_elem->center.x;
+        dst_elem->center.y = src_elem->center.y;
+        
+        dst_elem->texture_index = src_elem->texture_index;
+        dst_elem->flip = src_elem->flip;
         dst_elem->angle = src_elem->angle;
     }
 #undef VU_SCALE
@@ -383,19 +399,30 @@ static int64_t ms_2;
 // to check and reset performance counters when vumeter is changed.
 static const vumeter_t* prev_vumeter;
 
-static inline void renderPlacement(vu_placement_t* pve, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer) {
-    SDL_Rect render_rect;
-    rebaseRect(enclosure, &pve->rect, &render_rect);
+static inline void renderPlacement(vu_placement_t* pve, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer, float scale_factor) {
+#define VU_SCALE(val) ((val)*scale_factor + 0.5)
+    SDL_Rect    render_rect= {
+        .x = VU_SCALE(pve->rect.x),
+        .y = VU_SCALE(pve->rect.y),
+        .w = VU_SCALE(pve->rect.w),
+        .h = VU_SCALE(pve->rect.h),
+    };
+    SDL_Point   center = {
+        .x = VU_SCALE(pve->center.x),
+        .y = VU_SCALE(pve->center.y),
+    };
+    rebaseRect(enclosure, &render_rect, &render_rect);
     SDL_RenderCopyEx(renderer,
             tcache_quick_get_texture(vu->resources.textures[pve->texture_index], renderer),
             NULL,
             &render_rect,
             vu->rotation + pve->angle,
-            &pve->center,
+            &center,
             flipValues[pve->flip]);
+#undef VU_SCALE
 }
 
-void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure) {
+void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit) {
     if (!vu) {
         return;
     }
@@ -413,33 +440,27 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
 
     int64_t ms0 = get_micro_seconds();
 
-    int i;
+    vol_runtimes[0].vol = vols[0];
+    vol_runtimes[1].vol = vols[1];
 
-    runtime_volume *runtimes[2] = {
-        &vumeter->channels[0]->runtime,
-        &vumeter->channels[1]->runtime,
-    };
-
-    runtimes[0]->vol = vols[0];
-    runtimes[1]->vol = vols[1];
-
-    for (i=0; i < 2; ++i) {
-        if (runtimes[i]->vol > runtimes[i]->peak_hold_vol) {
-//            runtimes[i].peak_hold_counter = peak_hold_counter_start;
-            runtimes[i]->peak_hold_counter = peak_hold_counter_init_value;
-            runtimes[i]->peak_hold_vol = runtimes[i]->vol;
+    for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        vol_runtimes[ix_chan].vol = vols[ix_chan];
+        if (vol_runtimes[ix_chan].vol > vol_runtimes[ix_chan].peak_hold_vol) {
+//            vol_runtimes[ix_chan].eak_hold_counter = peak_hold_counter_start;
+            vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
+            vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
         }
-        if (--runtimes[i]->peak_hold_counter < 0) {
-            runtimes[i]->peak_hold_vol = 0;
-            runtimes[i]->peak_hold_counter = 0;
+        if (--vol_runtimes[ix_chan].peak_hold_counter < 0) {
+            vol_runtimes[ix_chan].peak_hold_vol = 0;
+            vol_runtimes[ix_chan].peak_hold_counter = 0;
         }
-        if (runtimes[i]->vol > runtimes[i]->decay_vol) {
-            runtimes[i]->decay_vol = runtimes[i]->vol;
-            runtimes[i]->decay_hold_counter = decay_hold_counter_init_value;
+        if (vol_runtimes[ix_chan].vol > vol_runtimes[ix_chan].decay_vol) {
+            vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
+            vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
         } else {
-            if (--runtimes[i]->decay_hold_counter < 0) {
-                runtimes[i]->decay_vol -= runtimes[i]->decay_unit;
-                runtimes[i]->decay_hold_counter = 0;
+            if (--vol_runtimes[ix_chan].decay_hold_counter < 0) {
+                vol_runtimes[ix_chan].decay_vol -= decay_unit;
+                vol_runtimes[ix_chan].decay_hold_counter = 0;
             }
         }
     }
@@ -447,19 +468,22 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
     if (vumeter->background) {
         const int *bg = vumeter->background->bg;
         while(bg != NULL && 0 != *bg) {
-            renderPlacement(&vu->placements.elements[*bg], enclosure, vu, renderer);
+            renderPlacement(&vu->placements.elements[*bg], enclosure, vu, renderer,
+                    //FIXME: should be for the channel 
+                    channel_parms[0].scale_factor);
             ++bg;
         }
     }
 
-#define _RENDER_VOLUME_LEVEL_(value) \
-    renderPlacement(vu->placements.elements+comp->placements[value], enclosure, vu, renderer)
+#define _RENDER_VOLUME_LEVEL_(value, chn) \
+    renderPlacement(vu->placements.elements+comp->placements[value], enclosure, vu, renderer,\
+            channel_parms[chn].scale_factor)
 
-    for(i=0; i<2; ++i) {
-        vol_printf("%2d) ", i);
-        vu_channel_t* channel = vumeter->channels[i];
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        vol_printf("%2d) ", ix_chan);
+        vu_channel_t* channel = vumeter->channels[ix_chan];
         const vu_component_t* comp = channel->components;
-        runtime_volume *runtime = runtimes[i];
+        runtime_volume_ptr runtime = vol_runtimes + ix_chan;
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
             switch(comp->render) {
                 case SINGLE:
@@ -467,18 +491,18 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
                         switch(comp->peak) {
                             case PEAK_NONE:
                                 vol_printf("SPN:%02d ", runtime->vol);
-                                _RENDER_VOLUME_LEVEL_(runtime->vol);
+                                _RENDER_VOLUME_LEVEL_(runtime->vol, ix_chan);
                                 break;
                             case DECAY:
-                                vol_printf("SD:%02d ", (int)runtime->decay_vol);
-                                _RENDER_VOLUME_LEVEL_((int)runtime->decay_vol);
+                                vol_printf("SD:%02d ", (int)(runtime->decay_vol + 0.5));
+                                _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
                                 break;
                             case HOLD_DECAY:
-                                vol_printf("SHD:%02d ", (int)runtime->decay_vol);
-                                _RENDER_VOLUME_LEVEL_((int)runtime->decay_vol);
+                                vol_printf("SHD:%02d ", (int)(runtime->decay_vol + 0.5));
+                                _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
                             case HOLD:
                                 vol_printf("SH:%02d ", runtime->peak_hold_vol);
-                                _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol);
+                                _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol, ix_chan);
                                 break;
                         }
                     }break;
@@ -493,12 +517,12 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
                                 vol_printf("A v:%02d ", vol);
                                 break;
                             case HOLD_DECAY:
-                                vol = (int)runtime->decay_vol;
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
                                 break;
                             case DECAY:
-                                vol = (int)runtime->decay_vol;
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 peak_vol = 0;
                                 vol_printf("A v:%02d ", vol);
                                 break;
@@ -510,10 +534,10 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
                         }
 
                         for(int lvl=0; lvl <= vol; ++lvl) {
-                            _RENDER_VOLUME_LEVEL_(lvl);
+                            _RENDER_VOLUME_LEVEL_(lvl, ix_chan);
                         }
                         if (peak_vol > vol) {
-                           _RENDER_VOLUME_LEVEL_(peak_vol);
+                           _RENDER_VOLUME_LEVEL_(peak_vol, ix_chan);
                         }
                     }break;
                 case AGGREGATEOFF:
@@ -526,12 +550,12 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
                                 break;
                             case DECAY:
                             case HOLD_DECAY:
-                                vol = (int)runtime->decay_vol;
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 break;
                         }
                         vol_printf("a v:%02d ", vol);
                         for(int lvl=vol+1; lvl< vu->volume_levels; ++lvl) {
-                            _RENDER_VOLUME_LEVEL_(lvl);
+                            _RENDER_VOLUME_LEVEL_(lvl, ix_chan);
                         }
                     }break;
             }
@@ -616,12 +640,12 @@ void VUMeter_dump_props(const vumeter_properties_t* props) {
                );
         ++bg;
     }
-    for(int i=0; i<2; ++i) {
-        vu_channel_t* channel = vumeter->channels[i];
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        vu_channel_t* channel = vumeter->channels[ix_chan];
         const vu_component_t* comp = channel->components;
-        printf("channel %d, components count %d\n", i, channel->component_count);
+        printf("channel %d, components count %d\n", ix_chan, channel->component_count);
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
-            printf("channel %d), component %d) %d, %d %p\n", i, ic, comp->render, comp->peak, comp);
+            printf("channel %d), component %d) %d, %d %p\n", ix_chan, ic, comp->render, comp->peak, comp);
             for(int value =0; value < props->volume_levels; ++value) {
                 int pi = comp->placements[value];
                 int ti = props->placements.elements[pi].texture_index;

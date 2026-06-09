@@ -10,16 +10,21 @@
 #include "vumeterdef.h"
 #include "types.h"
 
+typedef struct {
+    float scale_factor;
+}vu_channel_params_t, *vu_channel_params_ptr;
+
 char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu);
 
 vumeter_properties_t* VUMeter_scale(vumeter_properties_t* vu, int w, int h, const char* path);
+float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h);
 //void VUMeter_orientate(vumeter_properties_t *vu, float rotation, SDL_Rect* rect);
 void VUMeter_rebase(vumeter_properties_t *vu, SDL_Rect* enclosure);
 
 SDL_bool VUMeter_load_media(SDL_Renderer *renderer, vumeter_properties_t *vu);
 void VUMeter_unload_media(vumeter_properties_t *vu);
 
-void VUMeter_draw(SDL_Renderer *renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure);
+void VUMeter_draw(SDL_Renderer *renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit);
 
 void VUMeter_dump_props(const vumeter_properties_t* vu);
 

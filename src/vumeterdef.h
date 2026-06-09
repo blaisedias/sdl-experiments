@@ -9,6 +9,8 @@
 #include <SDL2/SDL.h>
 #include "texture_cache.h"
 
+#define     NUM_VU_CHANNELS   2
+
 typedef struct {
 //    const char* image;
     int         texture_index;
@@ -47,13 +49,11 @@ typedef struct {
     int peak_hold_counter;
     int decay_hold_counter;
     float decay_vol;
-    float decay_unit;
-}runtime_volume;
+}runtime_volume_t, *runtime_volume_ptr;
 
 typedef struct {
     const int component_count;
     const vu_component_t* components;
-    runtime_volume runtime;
 }vu_channel_t;
 
 typedef struct {

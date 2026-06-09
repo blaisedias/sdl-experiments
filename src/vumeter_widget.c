@@ -24,12 +24,15 @@ static vumeter_properties_t* vu_props_list;
 struct vumeter_widget {
     vumeter_properties_t* props;
     struct {
-        vumeter_properties_t *props;
-        const vumeter_t* meter;
+        vumeter_properties_t    *props;
+        const                   vumeter_t* meter;
+        vu_channel_params_t     channel_parms[NUM_VU_CHANNELS];
+        float                   decay_unit;
     } meters[100];
-    int num_meters;
-    int atomic_meter_indx;
-    bool locked;
+    int     num_meters;
+    int     atomic_meter_indx;
+    bool    locked;
+    runtime_volume_t vol_runtimes[NUM_VU_CHANNELS];
 };
 
 static inline int vumeter_index(vumeter_widget* wdgt) {
@@ -91,21 +94,20 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
         translate_draw_rect(&draw_rect);
-        VUMeter_rebase(props, &draw_rect);
 #ifdef  VUMETERS_CHECK_ON_INIT
         VUMeter_unload_media(props);
 #endif
         const vumeter_t* meter = props->vumeters;
         float decay_unit = (float)props->volume_levels/60;
         for(int ix = 0; ix < props->vumeter_count; ++ix, ++(vw->num_meters), ++meter) {
-            for(int ch=0; ch < 2; ++ch) {
-                if (meter->channels[ch]) {
-                    meter->channels[ch]->runtime.decay_unit = decay_unit;
-                }
-            }
             vw->meters[vw->num_meters].props = props;
             vw->meters[vw->num_meters].meter = meter;
-            debug_printf("    %d) meter:%s decay_unit:%f\n", vw->num_meters, vw->meters[vw->num_meters].meter->name, decay_unit);
+            vw->meters[vw->num_meters].decay_unit = decay_unit;
+            //TODO: calculate scale factors for each channel.
+            for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+                vw->meters[vw->num_meters].channel_parms[ix_chan].scale_factor = VUMeter_scale_factor(base_props, wdgt->rect.w, wdgt->rect.h);
+            }
+            debug_printf("    %d) meter:%s decay_unit:%f volume_levels:%d\n", vw->num_meters, vw->meters[vw->num_meters].meter->name, decay_unit, props->volume_levels);
         }
         base_props = base_props->next;
     }
@@ -139,7 +141,13 @@ static void vumeter_render(widget* wdgt) {
             vols[0] = vols[0] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
             vols[1] = vols[1] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
         }
-        VUMeter_draw(wdgt->view->app->renderer, vw->meters[vumeter_index(vw)].props, vw->meters[vumeter_index(vw)].meter, vols, &draw_rect);
+        VUMeter_draw(wdgt->view->app->renderer,
+               vw->meters[vumeter_index(vw)].props,
+               vw->meters[vumeter_index(vw)].meter, vols,
+               &draw_rect,
+               vw->meters[vumeter_index(vw)].channel_parms,
+               vw->vol_runtimes,
+               vw->meters[vumeter_index(vw)].decay_unit);
     }
 }
 
