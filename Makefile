@@ -219,6 +219,10 @@ $(BIN_DIR)/local_player_test: $(SRC)/local_player_test.c $(SRC)/lyrion_player.c 
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
 
+$(BIN_DIR)/lyrion_player_strhash: $(SRC)/lyrion_player_strhash.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
+	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
+		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
+
 # directories
 $(BIN_DIR):
 	mkdir -p $@
