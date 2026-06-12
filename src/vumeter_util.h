@@ -11,7 +11,8 @@
 #include "types.h"
 
 typedef struct {
-    float scale_factor;
+    float       scale_factor;
+    SDL_Rect    channel_rect;
 }vu_channel_params_t, *vu_channel_params_ptr;
 
 char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu);
