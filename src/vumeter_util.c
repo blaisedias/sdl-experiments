@@ -185,7 +185,7 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
 
     for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
         vol_runtimes[ix_chan].vol = vols[ix_chan];
-        if (vol_runtimes[ix_chan].vol > vol_runtimes[ix_chan].peak_hold_vol) {
+        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
 //            vol_runtimes[ix_chan].eak_hold_counter = peak_hold_counter_start;
             vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
             vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
@@ -194,7 +194,7 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
             vol_runtimes[ix_chan].peak_hold_vol = 0;
             vol_runtimes[ix_chan].peak_hold_counter = 0;
         }
-        if (vol_runtimes[ix_chan].vol > vol_runtimes[ix_chan].decay_vol) {
+        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].decay_vol) {
             vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
             vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
         } else {
