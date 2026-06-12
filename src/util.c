@@ -261,3 +261,19 @@ void translate_image_rect_in_rect(SDL_Rect* container, SDL_Rect* rect) {
    }
 }
 */
+
+void center_rect(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst) {
+    int dx = (outer->w - inner->w)/2;
+    int dy = (outer->h - inner->h)/2;
+    dst->x = outer->x + dx;
+    dst->y = outer->y + dy;
+    dst->w = inner->w;
+    dst->h = inner->h;
+}
+
+void scale_rect_size(SDL_Rect* src, SDL_Rect* dst, float scalef) {
+    dst->x = src->x;
+    dst->y = src->y;
+    dst->w = (int)(src->w * scalef + 0.5);
+    dst->h = (int)(src->h * scalef + 0.5);
+}

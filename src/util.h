@@ -17,5 +17,7 @@ extern void copyRect(const SDL_Rect *src, SDL_Rect *dst);
 extern void copyPoint(const SDL_Point *src, SDL_Point *dst);
 void rebaseRect(SDL_Rect* origin, SDL_Rect* src, SDL_Rect* dst);
 void rebasePoint(SDL_Rect* origin, SDL_Point* src, SDL_Point* dst);
+void center_rect(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst);
+void scale_rect_size(SDL_Rect* src, SDL_Rect* dst, float scalef);
 
 #endif // __jl_util_h_
