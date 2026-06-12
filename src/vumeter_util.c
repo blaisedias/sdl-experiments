@@ -24,7 +24,7 @@ static const SDL_RendererFlip flipValues[4] = {
 static int peak_hold_counter_init_value = 30;
 // fine tune decay behaviour - default is 0 so decay immediately
 // @60 FPS 4 appears to be a reasonable value.
-static int decay_hold_counter_init_value = 0;
+static int decay_hold_counter_init_value = 3;
 
 static int profile_level;
 void VUMeter_set_profile_level(int l) {
