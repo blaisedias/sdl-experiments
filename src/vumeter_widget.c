@@ -111,28 +111,28 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
             vw->meters[vw->num_meters].vu_rect.x = vw->meters[vw->num_meters].vu_rect.y = 0;
             vw->meters[vw->num_meters].vu_rect.w = props->w;
             vw->meters[vw->num_meters].vu_rect.h = props->h;
-printf("meter:%s\n", vw->meters[vw->num_meters].meter->name);
+debug_printf("meter:%s\n", vw->meters[vw->num_meters].meter->name);
             scale_rect_size(&vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect, scalef);
-printf("    scaled  : (%d,%d,%d,%d)\n",
+debug_printf("    scaled  : (%d,%d,%d,%d)\n",
         vw->meters[vw->num_meters].vu_rect.x,
         vw->meters[vw->num_meters].vu_rect.y,
         vw->meters[vw->num_meters].vu_rect.w,
         vw->meters[vw->num_meters].vu_rect.h);
             center_rect(&wdgt->rect, &vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect);
-printf("    centered: (%d,%d,%d,%d)\n",
+debug_printf("    centered: (%d,%d,%d,%d)\n",
         vw->meters[vw->num_meters].vu_rect.x,
         vw->meters[vw->num_meters].vu_rect.y,
         vw->meters[vw->num_meters].vu_rect.w,
         vw->meters[vw->num_meters].vu_rect.h);
             //TODO: for now scale factor for each channel is identical, and s stuffed inside channel parameter struct, which is visible and defined for vumeter_util.c
             for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-printf("    channel :  %d\n", ix_chan);
+debug_printf("    channel :  %d\n", ix_chan);
                 vw->meters[vw->num_meters].channel_parms[ix_chan].scale_factor = scalef;
                 scale_rect(
                         &vw->meters[vw->num_meters].props->layout.rects[ix_chan+1],
                         &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
                         scalef);
-printf("        scaled  : (%d,%d,%d,%d)\n",
+debug_printf("        scaled  : (%d,%d,%d,%d)\n",
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
@@ -141,7 +141,7 @@ printf("        scaled  : (%d,%d,%d,%d)\n",
                         &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
                         &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect
                         );
-printf("        rebased : (%d,%d,%d,%d)\n",
+debug_printf("        rebased : (%d,%d,%d,%d)\n",
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
         vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
