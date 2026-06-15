@@ -126,7 +126,7 @@ float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h) {
     if (!vu) {
         return 1;
     }
-    return MIN((float)w/(float)vu->w, (float)h/(float)vu->h);
+    return MIN((float)w/(float)vu->layout.w, (float)h/(float)vu->layout.h);
 }
 
 
@@ -206,12 +206,12 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
     }
 
     if (vumeter->background) {
-        const int *bg = vumeter->background->bg;
-        while(bg != NULL && 0 != *bg) {
-            renderPlacement(&vu->placements.elements[*bg], enclosure, vu, renderer,
-                    //FIXME: should be for the channel 
+        const vu_background_t* bg = vumeter->background;
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(vu->placements.elements+bg->placements[ix],
+                    enclosure, vu, renderer,
+                    //FIXME: should be for the vumeter rectangle 
                     channel_parms[0].scale_factor);
-            ++bg;
         }
     }
 
@@ -219,9 +219,21 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
     renderPlacement(vu->placements.elements+comp->placements[value], enclosure, vu, renderer,\
             channel_parms[chn].scale_factor)
 
+/*    
+#define _RENDER_VOLUME_LEVEL_(value, chn) \
+    renderPlacement(vu->placements.elements+comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
+            channel_parms[chn].scale_factor)
+*/
+
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        const vu_background_t* bg = vumeter->backgrounds[ix_chan];
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(vu->placements.elements+bg->placements[ix],
+                    enclosure, vu, renderer,
+                    channel_parms[ix_chan].scale_factor);
+        }
         vol_printf("%2d) ", ix_chan);
-        vu_channel_t* channel = vumeter->channels[ix_chan];
+        const vu_channel_t* channel = vumeter->channels[ix_chan];
         const vu_component_t* comp = channel->components;
         runtime_volume_ptr runtime = vol_runtimes + ix_chan;
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
@@ -368,6 +380,7 @@ void VUMeter_dump_props(const vumeter_properties_t* props) {
                );
     }
     const vumeter_t* vumeter = props->vumeters;
+/*    
     const int *bg = vumeter->background->bg;
     while(bg != NULL && 0 != *bg) {
         vu_placement_t *p = &props->placements.elements[*bg];
@@ -380,8 +393,9 @@ void VUMeter_dump_props(const vumeter_properties_t* props) {
                );
         ++bg;
     }
+    */
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-        vu_channel_t* channel = vumeter->channels[ix_chan];
+        const vu_channel_t* channel = vumeter->channels[ix_chan];
         const vu_component_t* comp = channel->components;
         printf("channel %d, components count %d\n", ix_chan, channel->component_count);
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {

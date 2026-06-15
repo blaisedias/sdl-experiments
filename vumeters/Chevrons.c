@@ -1574,49 +1574,89 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const int white_orange[] = {
-    PLCMNT_WO_center,
-    PLCMNT_W_left,
-    PLCMNT_W_right,
-    0
+static const vu_background_t bg_shared_white_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_WO_center,
+    },
 };
 
-static const int cyan_orange[] = {
-    PLCMNT_CO_center,
-    PLCMNT_C_left,
-    PLCMNT_C_right,
-    0
+static const vu_background_t bg_left_white_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_W_left,
+    },
 };
 
-static const int green_red[] = {
-    PLCMNT_GR_center,
-    PLCMNT_G_left,
-    PLCMNT_G_right,
-    0
+static const vu_background_t bg_right_white_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_W_right,
+    },
 };
 
-static const int pastel_green_red[] = {
-    PLCMNT_PGR_center,
-    PLCMNT_PG_left,
-    PLCMNT_PG_right,
-    0
+static const vu_background_t bg_shared_cyan_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_CO_center,
+    },
 };
 
-enum backgrounds_enum {
-    BG_WHITE_ORANGE,
-    BG_CYAN_ORANGE,
-    BG_GREEN_RED,
-    BG_PASTEL_GREEN_RED,
-    BG_COUNT,
+static const vu_background_t bg_left_cyan_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_C_left,
+    },
 };
 
-static background backgrounds[] = {
-    {.bg=white_orange },
-    {.bg=cyan_orange },
-    {.bg=green_red },
-    {.bg=pastel_green_red },
+static const vu_background_t bg_right_cyan_orange = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_C_right,
+    },
 };
 
+static const vu_background_t bg_shared_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_GR_center,
+    },
+};
+
+static const vu_background_t bg_left_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_G_left,
+    },
+};
+
+static const vu_background_t bg_right_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_G_right,
+    },
+};
+
+static const vu_background_t bg_shared_pastel_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_PGR_center,
+    },
+};
+
+static const vu_background_t bg_left_pastel_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_PG_left,
+    },
+};
+
+static const vu_background_t bg_right_pastel_green_red = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_PG_right,
+    },
+};
 
 //Levels
 static vu_component_t levels_quad_colour_left[] = {
@@ -1732,7 +1772,7 @@ static vu_component_t levels_quad_colour_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_quad_colour_left = { 2, levels_quad_colour_left,};
+static vu_channel_t channel_levels_quad_colour_left = { .component_count=2,.components=levels_quad_colour_left,};
 
 
 static vu_component_t levels_quad_colour_right[] = {
@@ -1848,7 +1888,7 @@ static vu_component_t levels_quad_colour_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_quad_colour_right = { 2, levels_quad_colour_right,};
+static vu_channel_t channel_levels_quad_colour_right = { .component_count=2,.components=levels_quad_colour_right,};
 
 
 static vu_component_t levels_white_orange_left[] = {
@@ -1964,7 +2004,7 @@ static vu_component_t levels_white_orange_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_white_orange_left = { 2, levels_white_orange_left,};
+static vu_channel_t channel_levels_white_orange_left = { .component_count=2,.components=levels_white_orange_left,};
 
 
 static vu_component_t levels_white_orange_right[] = {
@@ -2080,7 +2120,7 @@ static vu_component_t levels_white_orange_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_white_orange_right = { 2, levels_white_orange_right,};
+static vu_channel_t channel_levels_white_orange_right = { .component_count=2,.components=levels_white_orange_right,};
 
 
 static vu_component_t levels_cyan_orange_left[] = {
@@ -2196,7 +2236,7 @@ static vu_component_t levels_cyan_orange_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_cyan_orange_left = { 2, levels_cyan_orange_left,};
+static vu_channel_t channel_levels_cyan_orange_left = { .component_count=2,.components=levels_cyan_orange_left,};
 
 
 static vu_component_t levels_cyan_orange_right[] = {
@@ -2312,7 +2352,7 @@ static vu_component_t levels_cyan_orange_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_cyan_orange_right = { 2, levels_cyan_orange_right,};
+static vu_channel_t channel_levels_cyan_orange_right = { .component_count=2,.components=levels_cyan_orange_right,};
 
 
 static vu_component_t levels_green_red_left[] = {
@@ -2428,7 +2468,7 @@ static vu_component_t levels_green_red_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_green_red_left = { 2, levels_green_red_left,};
+static vu_channel_t channel_levels_green_red_left = { .component_count=2,.components=levels_green_red_left,};
 
 
 static vu_component_t levels_green_red_right[] = {
@@ -2544,7 +2584,7 @@ static vu_component_t levels_green_red_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_green_red_right = { 2, levels_green_red_right,};
+static vu_channel_t channel_levels_green_red_right = { .component_count=2,.components=levels_green_red_right,};
 
 
 static vu_component_t levels_pastel_green_red_left[] = {
@@ -2660,7 +2700,7 @@ static vu_component_t levels_pastel_green_red_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_pastel_green_red_left = { 2, levels_pastel_green_red_left,};
+static vu_channel_t channel_levels_pastel_green_red_left = { .component_count=2,.components=levels_pastel_green_red_left,};
 
 
 static vu_component_t levels_pastel_green_red_right[] = {
@@ -2776,33 +2816,38 @@ static vu_component_t levels_pastel_green_red_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_pastel_green_red_right = { 2, levels_pastel_green_red_right,};
+static vu_channel_t channel_levels_pastel_green_red_right = { .component_count=2,.components=levels_pastel_green_red_right,};
 
 
 static vumeter_t vumeters[] = {
     {
         .name="Chevrons",
-        .background=&backgrounds[BG_WHITE_ORANGE],
+        .background= &bg_shared_white_orange,
+        .backgrounds={ &bg_left_white_orange, &bg_right_white_orange, },
         .channels={ &channel_levels_quad_colour_left, &channel_levels_quad_colour_right, }
     },
     {
         .name="Chevrons WhiteOrange",
-        .background=&backgrounds[BG_WHITE_ORANGE],
+        .background= &bg_shared_white_orange,
+        .backgrounds={ &bg_left_white_orange, &bg_right_white_orange, },
         .channels={ &channel_levels_white_orange_left, &channel_levels_white_orange_right, }
     },
     {
         .name="Chevrons CyanOrange",
-        .background=&backgrounds[BG_CYAN_ORANGE],
+        .background= &bg_shared_cyan_orange,
+        .backgrounds={ &bg_left_cyan_orange, &bg_right_cyan_orange, },
         .channels={ &channel_levels_cyan_orange_left, &channel_levels_cyan_orange_right, }
     },
     {
         .name="Chevrons GreenRed",
-        .background=&backgrounds[BG_GREEN_RED],
+        .background= &bg_shared_green_red,
+        .backgrounds={ &bg_left_green_red, &bg_right_green_red, },
         .channels={ &channel_levels_green_red_left, &channel_levels_green_red_right, }
     },
     {
         .name="Chevrons PastelGreenRed",
-        .background=&backgrounds[BG_PASTEL_GREEN_RED],
+        .background= &bg_shared_pastel_green_red,
+        .backgrounds={ &bg_left_pastel_green_red, &bg_right_pastel_green_red, },
         .channels={ &channel_levels_pastel_green_red_left, &channel_levels_pastel_green_red_right, }
     },
 };
@@ -2813,6 +2858,13 @@ vumeter_properties_t VuProperties = {
     .name="Chevrons",
     .volume_levels=50, .w=1935, .h=648,
     .vumeter_count=5, .vumeters=vumeters,
+    .layout={ .w=1935,.h=648,
+        .rects={
+            { .x=10,  .y=274,  .w=1918,  .h=100 }, 
+            { .x=0,  .y=0,  .w=1915,  .h=260 }, 
+            { .x=0,  .y=388,  .w=1915,  .h=260 }, 
+        },
+    },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
 };

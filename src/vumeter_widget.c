@@ -29,7 +29,7 @@ struct vumeter_widget {
         vu_channel_params_t     channel_parms[NUM_VU_CHANNELS];
         float                   decay_unit;
         // rectangle to scale and centred within the widget rectangle
-        SDL_Rect                rect;
+        SDL_Rect                vu_rect;
     } meters[100];
     int     num_meters;
     int     atomic_meter_indx;
@@ -108,14 +108,44 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
             vw->meters[vw->num_meters].decay_unit = decay_unit;
             float scalef = VUMeter_scale_factor(base_props, wdgt->rect.w, wdgt->rect.h);
             //set x and y to 0, they will be changed appropriately when  the rectangle is centred
-            vw->meters[vw->num_meters].rect.x = vw->meters[vw->num_meters].rect.y = 0;
-            vw->meters[vw->num_meters].rect.w = props->w;
-            vw->meters[vw->num_meters].rect.h = props->h;
-            scale_rect_size(&vw->meters[vw->num_meters].rect, &vw->meters[vw->num_meters].rect, scalef);
-            center_rect(&wdgt->rect, &vw->meters[vw->num_meters].rect, &vw->meters[vw->num_meters].rect);
+            vw->meters[vw->num_meters].vu_rect.x = vw->meters[vw->num_meters].vu_rect.y = 0;
+            vw->meters[vw->num_meters].vu_rect.w = props->w;
+            vw->meters[vw->num_meters].vu_rect.h = props->h;
+printf("meter:%s\n", vw->meters[vw->num_meters].meter->name);
+            scale_rect_size(&vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect, scalef);
+printf("    scaled  : (%d,%d,%d,%d)\n",
+        vw->meters[vw->num_meters].vu_rect.x,
+        vw->meters[vw->num_meters].vu_rect.y,
+        vw->meters[vw->num_meters].vu_rect.w,
+        vw->meters[vw->num_meters].vu_rect.h);
+            center_rect(&wdgt->rect, &vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect);
+printf("    centered: (%d,%d,%d,%d)\n",
+        vw->meters[vw->num_meters].vu_rect.x,
+        vw->meters[vw->num_meters].vu_rect.y,
+        vw->meters[vw->num_meters].vu_rect.w,
+        vw->meters[vw->num_meters].vu_rect.h);
             //TODO: for now scale factor for each channel is identical, and s stuffed inside channel parameter struct, which is visible and defined for vumeter_util.c
             for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+printf("    channel :  %d\n", ix_chan);
                 vw->meters[vw->num_meters].channel_parms[ix_chan].scale_factor = scalef;
+                scale_rect(
+                        &vw->meters[vw->num_meters].props->layout.rects[ix_chan+1],
+                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
+                        scalef);
+printf("        scaled  : (%d,%d,%d,%d)\n",
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.h);
+                rebaseRect(&vw->meters[vw->num_meters].vu_rect,
+                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
+                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect
+                        );
+printf("        rebased : (%d,%d,%d,%d)\n",
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
+        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.h);
             }
             debug_printf("    %d) meter:%s decay_unit:%f volume_levels:%d\n", vw->num_meters, vw->meters[vw->num_meters].meter->name, decay_unit, props->volume_levels);
         }
@@ -157,7 +187,7 @@ static void vumeter_render(widget* wdgt) {
                vw->meters[vumeter_index(vw)].props,
                vw->meters[vumeter_index(vw)].meter, vols,
 //               &draw_rect,
-               &vw->meters[vumeter_index(vw)].rect,
+               &vw->meters[vumeter_index(vw)].vu_rect,
                vw->meters[vumeter_index(vw)].channel_parms,
                vw->vol_runtimes,
                vw->meters[vumeter_index(vw)].decay_unit);

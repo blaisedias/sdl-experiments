@@ -188,19 +188,19 @@ void setup_orientation(float orientation, int w, int h, SDL_Rect *screen) {
 }
 
 // src and dst can be the same rect, so order of rebasing is important
-void rebaseRect(SDL_Rect* origin, SDL_Rect* src, SDL_Rect* dst) {
+void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst) {
     dst->x = origin->x + src->x;
     dst->y = origin->y + src->y;
     dst->w = src->w;
     dst->h = src->h;
 }
 
-void rebasePoint(SDL_Rect* origin, SDL_Point* src, SDL_Point* dst) {
+void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst) {
     dst->x = origin->x + src->x;
     dst->y = origin->y + src->y;
 }
 
-void translate_axle(SDL_Rect* enclosure, SDL_Point* axle, SDL_Rect* rect) {
+void translate_axle(const SDL_Rect* enclosure, const SDL_Point* axle, SDL_Rect* rect) {
     SDL_Rect u_enclosure;
     SDL_Point u_axle;
     copyRect(enclosure, &u_enclosure);
@@ -262,7 +262,7 @@ void translate_image_rect_in_rect(SDL_Rect* container, SDL_Rect* rect) {
 }
 */
 
-void center_rect(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst) {
+void center_rect(const SDL_Rect* outer, const SDL_Rect* inner, SDL_Rect* dst) {
     int dx = (outer->w - inner->w)/2;
     int dy = (outer->h - inner->h)/2;
     dst->x = outer->x + dx;
@@ -271,9 +271,16 @@ void center_rect(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst) {
     dst->h = inner->h;
 }
 
-void scale_rect_size(SDL_Rect* src, SDL_Rect* dst, float scalef) {
+void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef) {
     dst->x = src->x;
     dst->y = src->y;
+    dst->w = (int)(src->w * scalef + 0.5);
+    dst->h = (int)(src->h * scalef + 0.5);
+}
+
+void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef) {
+    dst->x = (int)(src->x * scalef + 0.5);
+    dst->y = (int)(src->y * scalef + 0.5);
     dst->w = (int)(src->w * scalef + 0.5);
     dst->h = (int)(src->h * scalef + 0.5);
 }

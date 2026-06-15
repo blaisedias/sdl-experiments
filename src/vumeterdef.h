@@ -9,16 +9,9 @@
 #include <SDL2/SDL.h>
 #include "texture_cache.h"
 
+// For now the number of channels is fix at 2
+// a future change will remove this hard-coding
 #define     NUM_VU_CHANNELS   2
-
-typedef struct {
-//    const char* image;
-    int         texture_index;
-    SDL_Rect    rect;
-    SDL_RendererFlip flip;
-    float       angle;
-    SDL_Point   center;
-}vu_placement_t;
 
 typedef enum {
     SINGLE,
@@ -34,14 +27,25 @@ typedef enum {
 }peak_typ;
 
 typedef struct {
-    const int* bg;
-}background;
+//    const char* image;
+    int                 texture_index;
+    SDL_Rect            rect;
+    SDL_RendererFlip    flip;
+    float               angle;
+    SDL_Point           center;
+}vu_placement_t;
 
 typedef struct {
-    const render_typ  render;
-    const peak_typ    peak;
-    const int placements[50];
+    const render_typ    render;
+    const peak_typ      peak;
+    const int           placement_count;
+    const int           placements[50];
 }vu_component_t;
+
+typedef struct {
+    const int           placement_count;
+    const int           placements[10];
+}vu_background_t;
 
 typedef struct {
     int vol;
@@ -52,34 +56,43 @@ typedef struct {
 }runtime_volume_t, *runtime_volume_ptr;
 
 typedef struct {
-    const int component_count;
-    const vu_component_t* components;
+    const vu_background_t*  background;
+    const int               component_count;
+    const vu_component_t*   components;
 }vu_channel_t;
 
 typedef struct {
     const char* name;
-    const background*   background;
-    vu_channel_t*      channels[2];
+    const int              channel_count;
+    const vu_background_t* background;
+    const vu_background_t* backgrounds[NUM_VU_CHANNELS];
+    const vu_channel_t*    channels[NUM_VU_CHANNELS];
 }vumeter_t;
 
 typedef struct vu_props {
-    struct vu_props* next;
-    const char* resource_path;
-    const char* name;
-    const int volume_levels;
-    const int w;
-    const int h;
-    const int vumeter_count;
-    const vumeter_t* vumeters;
+    struct vu_props*    next;
+    const char*         resource_path;
+    const char*         name;
+    const int           volume_levels;
+    const int           w;
+    const int           h;
+    const int           vumeter_count;
+    const vumeter_t*    vumeters;
     struct {
-        const int count;
-        const char** names;
-        texture_id_t* textures;
+        const int       count;
+        const char**    names;
+        texture_id_t*   textures;
     }resources;
     struct {
-        const int count;
+        const int       count;
         vu_placement_t* elements;
     }placements;
+    struct {
+        const int       w;
+        const int       h;
+        // common + channels, common = 0, left=1, right=2
+        const SDL_Rect  rects[3];
+    }layout;
     float rotation;
     void * handle;
 }vumeter_properties_t;

@@ -240,21 +240,19 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const int tsp_white[] = {
-    PLCMNT_LEFT_BG,
-    PLCMNT_RIGHT_BG,
-    0
+static const vu_background_t bg_left_tsp_white = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_LEFT_BG,
+    },
 };
 
-enum backgrounds_enum {
-    BG_TSP_WHITE,
-    BG_COUNT,
+static const vu_background_t bg_right_tsp_white = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_RIGHT_BG,
+    },
 };
-
-static background backgrounds[] = {
-    {.bg=tsp_white },
-};
-
 
 //Levels
 static vu_component_t levels_1_left[] = {
@@ -314,7 +312,7 @@ static vu_component_t levels_1_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_left = { 1, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { .component_count=1,.components=levels_1_left,};
 
 
 static vu_component_t levels_1_right[] = {
@@ -374,13 +372,13 @@ static vu_component_t levels_1_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_right = { 1, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { .component_count=1,.components=levels_1_right,};
 
 
 static vumeter_t vumeters[] = {
     {
         .name="Transparent White",
-        .background=&backgrounds[BG_TSP_WHITE],
+        .backgrounds={ &bg_left_tsp_white, &bg_right_tsp_white, },
         .channels={ &channel_levels_1_left, &channel_levels_1_right, }
     },
 };
@@ -389,8 +387,15 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="TransparentWhite",
-    .volume_levels=49, .w=2198, .h=600,
+    .volume_levels=49, .w=2144, .h=600,
     .vumeter_count=1, .vumeters=vumeters,
+    .layout={ .w=2144,.h=600,
+        .rects={
+            { .x=0,  .y=0,  .w=0,  .h=0 }, 
+            { .x=32,  .y=0,  .w=1024,  .h=600 }, 
+            { .x=1088,  .y=0,  .w=1024,  .h=600 }, 
+        },
+    },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
 };

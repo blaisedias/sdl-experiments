@@ -450,21 +450,19 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const int tubeD[] = {
-    PLCMNT_LEFT_BG,
-    PLCMNT_RIGHT_BG,
-    0
+static const vu_background_t bg_left_tubeD = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_LEFT_BG,
+    },
 };
 
-enum backgrounds_enum {
-    BG_TUBED,
-    BG_COUNT,
+static const vu_background_t bg_right_tubeD = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_RIGHT_BG,
+    },
 };
-
-static background backgrounds[] = {
-    {.bg=tubeD },
-};
-
 
 //Levels
 static vu_component_t levels_1_left[] = {
@@ -578,7 +576,7 @@ static vu_component_t levels_1_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_left = { 2, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { .component_count=2,.components=levels_1_left,};
 
 
 static vu_component_t levels_1_right[] = {
@@ -692,13 +690,13 @@ static vu_component_t levels_1_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_right = { 2, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { .component_count=2,.components=levels_1_right,};
 
 
 static vumeter_t vumeters[] = {
     {
         .name="TubeD",
-        .background=&backgrounds[BG_TUBED],
+        .backgrounds={ &bg_left_tubeD, &bg_right_tubeD, },
         .channels={ &channel_levels_1_left, &channel_levels_1_right, }
     },
 };
@@ -709,6 +707,13 @@ vumeter_properties_t VuProperties = {
     .name="TubeD",
     .volume_levels=49, .w=2144, .h=768,
     .vumeter_count=1, .vumeters=vumeters,
+    .layout={ .w=2144,.h=768,
+        .rects={
+            { .x=0,  .y=0,  .w=0,  .h=0 }, 
+            { .x=32,  .y=0,  .w=1024,  .h=768 }, 
+            { .x=1088,  .y=0,  .w=1024,  .h=768 }, 
+        },
+    },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
 };

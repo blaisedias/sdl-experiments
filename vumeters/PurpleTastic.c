@@ -474,35 +474,39 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const int purpletastic[] = {
-    PLCMNT_LEFT_BG,
-    PLCMNT_L_DIAL,
-    PLCMNT_L_LEFT_LEGEND,
-    PLCMNT_RIGHT_BG,
-    PLCMNT_R_DIAL,
-    PLCMNT_R_RIGHT_LEGEND,
-    0
+static const vu_background_t bg_left_purpletastic = {
+    .placement_count=3,
+    .placements={
+        PLCMNT_LEFT_BG,
+        PLCMNT_L_DIAL,
+        PLCMNT_L_LEFT_LEGEND,
+    },
 };
 
-static const int dial[] = {
-    PLCMNT_L_DIAL,
-    PLCMNT_L_LEFT_LEGEND,
-    PLCMNT_R_DIAL,
-    PLCMNT_R_RIGHT_LEGEND,
-    0
+static const vu_background_t bg_right_purpletastic = {
+    .placement_count=3,
+    .placements={
+        PLCMNT_RIGHT_BG,
+        PLCMNT_R_DIAL,
+        PLCMNT_R_RIGHT_LEGEND,
+    },
 };
 
-enum backgrounds_enum {
-    BG_PURPLETASTIC,
-    BG_DIAL,
-    BG_COUNT,
+static const vu_background_t bg_left_dial = {
+    .placement_count=2,
+    .placements={
+        PLCMNT_L_DIAL,
+        PLCMNT_L_LEFT_LEGEND,
+    },
 };
 
-static background backgrounds[] = {
-    {.bg=purpletastic },
-    {.bg=dial },
+static const vu_background_t bg_right_dial = {
+    .placement_count=2,
+    .placements={
+        PLCMNT_R_DIAL,
+        PLCMNT_R_RIGHT_LEGEND,
+    },
 };
-
 
 //Levels
 static vu_component_t levels_1_left[] = {
@@ -616,7 +620,7 @@ static vu_component_t levels_1_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_left = { 2, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { .component_count=2,.components=levels_1_left,};
 
 
 static vu_component_t levels_1_right[] = {
@@ -730,18 +734,18 @@ static vu_component_t levels_1_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_right = { 2, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { .component_count=2,.components=levels_1_right,};
 
 
 static vumeter_t vumeters[] = {
     {
         .name="PurpleTastic2",
-        .background=&backgrounds[BG_PURPLETASTIC],
+        .backgrounds={ &bg_left_purpletastic, &bg_right_purpletastic, },
         .channels={ &channel_levels_1_left, &channel_levels_1_right, }
     },
     {
         .name="PurpleTastic2Transparent",
-        .background=&backgrounds[BG_DIAL],
+        .backgrounds={ &bg_left_dial, &bg_right_dial, },
         .channels={ &channel_levels_1_left, &channel_levels_1_right, }
     },
 };
@@ -750,8 +754,15 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="PurpleTastic",
-    .volume_levels=49, .w=2198, .h=768,
+    .volume_levels=49, .w=2144, .h=768,
     .vumeter_count=2, .vumeters=vumeters,
+    .layout={ .w=2144,.h=768,
+        .rects={
+            { .x=0,  .y=0,  .w=0,  .h=0 }, 
+            { .x=32,  .y=0,  .w=1024,  .h=768 }, 
+            { .x=1088,  .y=0,  .w=1024,  .h=768 }, 
+        },
+    },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
 };

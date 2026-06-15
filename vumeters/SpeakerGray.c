@@ -434,21 +434,19 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const int speakerGray[] = {
-    PLCMNT_LEFT_BG,
-    PLCMNT_RIGHT_BG,
-    0
+static const vu_background_t bg_left_speakerGray = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_LEFT_BG,
+    },
 };
 
-enum backgrounds_enum {
-    BG_SPEAKERGRAY,
-    BG_COUNT,
+static const vu_background_t bg_right_speakerGray = {
+    .placement_count=1,
+    .placements={
+        PLCMNT_RIGHT_BG,
+    },
 };
-
-static background backgrounds[] = {
-    {.bg=speakerGray },
-};
-
 
 //Levels
 static vu_component_t levels_1_left[] = {
@@ -507,7 +505,7 @@ static vu_component_t levels_1_left[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_left = { 1, levels_1_left,};
+static vu_channel_t channel_levels_1_left = { .component_count=1,.components=levels_1_left,};
 
 
 static vu_component_t levels_1_right[] = {
@@ -566,13 +564,13 @@ static vu_component_t levels_1_right[] = {
     },
 };
 
-static vu_channel_t channel_levels_1_right = { 1, levels_1_right,};
+static vu_channel_t channel_levels_1_right = { .component_count=1,.components=levels_1_right,};
 
 
 static vumeter_t vumeters[] = {
     {
         .name="SpeakerGray",
-        .background=&backgrounds[BG_SPEAKERGRAY],
+        .backgrounds={ &bg_left_speakerGray, &bg_right_speakerGray, },
         .channels={ &channel_levels_1_left, &channel_levels_1_right, }
     },
 };
@@ -583,6 +581,13 @@ vumeter_properties_t VuProperties = {
     .name="SpeakerGray",
     .volume_levels=48, .w=4200, .h=2000,
     .vumeter_count=1, .vumeters=vumeters,
+    .layout={ .w=4200,.h=2000,
+        .rects={
+            { .x=0,  .y=0,  .w=0,  .h=0 }, 
+            { .x=50,  .y=0,  .w=2000,  .h=2000 }, 
+            { .x=2150,  .y=0,  .w=2000,  .h=2000 }, 
+        },
+    },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
 };
