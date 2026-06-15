@@ -45,7 +45,8 @@ typedef struct {
 
 void ___app_input_loop(app_context* app_ctx);
 
-#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC|SDL_INIT_GAMECONTROLLER|SDL_INIT_EVENTS
+//#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC|SDL_INIT_GAMECONTROLLER|SDL_INIT_EVENTS
+#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_EVENTS
 
 bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
     app_context* app_ctx = (app_context*)app_ctx_in;
