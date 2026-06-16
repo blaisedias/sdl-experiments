@@ -109,8 +109,8 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
             float scalef = VUMeter_scale_factor(base_props, wdgt->rect.w, wdgt->rect.h);
             //set x and y to 0, they will be changed appropriately when  the rectangle is centred
             vw->meters[vw->num_meters].vu_rect.x = vw->meters[vw->num_meters].vu_rect.y = 0;
-            vw->meters[vw->num_meters].vu_rect.w = props->w;
-            vw->meters[vw->num_meters].vu_rect.h = props->h;
+            vw->meters[vw->num_meters].vu_rect.w = vw->meters[vw->num_meters].props->layout.w;
+            vw->meters[vw->num_meters].vu_rect.h = vw->meters[vw->num_meters].props->layout.h;
 debug_printf("meter:%s\n", vw->meters[vw->num_meters].meter->name);
             scale_rect_size(&vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect, scalef);
 debug_printf("    scaled  : (%d,%d,%d,%d)\n",

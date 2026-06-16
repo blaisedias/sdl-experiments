@@ -216,20 +216,14 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
     }
 
 #define _RENDER_VOLUME_LEVEL_(value, chn) \
-    renderPlacement(vu->placements.elements+comp->placements[value], enclosure, vu, renderer,\
-            channel_parms[chn].scale_factor)
-
-/*    
-#define _RENDER_VOLUME_LEVEL_(value, chn) \
     renderPlacement(vu->placements.elements+comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
             channel_parms[chn].scale_factor)
-*/
 
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
         const vu_background_t* bg = vumeter->backgrounds[ix_chan];
         for(int ix=0; ix < bg->placement_count; ++ix) {
             renderPlacement(vu->placements.elements+bg->placements[ix],
-                    enclosure, vu, renderer,
+                    &channel_parms[ix_chan].channel_rect, vu, renderer,
                     channel_parms[ix_chan].scale_factor);
         }
         vol_printf("%2d) ", ix_chan);
