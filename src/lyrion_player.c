@@ -329,6 +329,7 @@ struct lyrion_player {
     int volume;
     int64_t connection_failed_ts;
     int notified_failed_player_id;
+    int volume_step;
 };
 
 static inline void free_ex(void** tgt) {
@@ -1100,6 +1101,7 @@ void player_command(lyrion_player_ptr player, const char* command) {
 lyrion_player_ptr open_local_player(const char *lms_addr) {
     lyrion_player_ptr player = calloc(1, sizeof(*player));
     if (player) {
+        player->volume_step = 3;
         if (lms_addr) {
             player->lms = strdup(lms_addr);
         }
@@ -1713,9 +1715,8 @@ void player_volume_set(lyrion_player_ptr player, int level) {
     lms_command(player, "mixer volume %d", level);
 }
 
-void player_volume_nudge(lyrion_player_ptr player, int delta) {
-    int volume = player->volume + delta;
-    player_volume_set(player, volume);
+void player_volume_step(lyrion_player_ptr player, bool up) {
+    player_volume_set(player, player->volume + (up ? player->volume_step : -player->volume_step));
 }
 
 void player_seek(lyrion_player_ptr player, int seek_time) {
@@ -1726,3 +1727,13 @@ void player_seek(lyrion_player_ptr player, int seek_time) {
         }
     }
 }
+
+int player_set_volume_step(lyrion_player_ptr player, int step) {
+    int prev = -1;
+    if (player) {
+        prev = player->volume_step;
+        player->volume_step = step;
+    }
+    return prev;
+}
+
