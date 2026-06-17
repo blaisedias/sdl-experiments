@@ -382,10 +382,10 @@ void app_render_loop(app_context_ptr app_ctx_in) {
     input_loop = false;
     app_printf("*** render loop done ****\n");
     SDL_WaitThread(app_ctx->input_thread, NULL);
-    printf("low_fps_count=%u/%ld %f\n", low_fps_count, (long)render_iters, (float)low_fps_count*100/render_iters);
+    profile_printf("low_fps_count=%u/%ld %f\n", low_fps_count, (long)render_iters, (float)low_fps_count*100/render_iters);
     for(int i =0; i < sizeof(fps_distribution)/sizeof(fps_distribution[0]); ++i) {
         if (fps_distribution[i]) {
-            printf("    %d -> %d\n", i, fps_distribution[i]);
+            profile_printf("    %d -> %d\n", i, fps_distribution[i]);
         }
     }
 }
