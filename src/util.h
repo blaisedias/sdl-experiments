@@ -20,5 +20,6 @@ void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst);
 void center_rect(const SDL_Rect* outer, const SDL_Rect* inner, SDL_Rect* dst);
 void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef);
 void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef);
+void print_sdl_key_scancode(SDL_Scancode scancode);
 
 #endif // __jl_util_h_

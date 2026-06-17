@@ -405,7 +405,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 puts("");
                 app_stop(app_ctx);
                 break;
-            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                print_sdl_key_scancode(eventp->key.keysym.scancode);
                 switch (eventp->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE: 
                     puts("");
