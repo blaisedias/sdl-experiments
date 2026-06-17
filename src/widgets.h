@@ -214,6 +214,7 @@ widget *widget_vumeter_select_next(widget *wdgt);
 widget *widget_vumeter_select_prev(widget *wdgt);
 widget *widget_vumeter_select_by_name(widget *wdgt, const char* name);
 widget *widget_vumeter_select_lock(widget *wdgt, bool lock);
+widget *widget_vumeter_equal_horizontal_spacing(widget *wdgt, bool val);
 
 widget *widget_create_slider(const view_context*);
 widget *widget_slider_range(widget* , int start, int end);

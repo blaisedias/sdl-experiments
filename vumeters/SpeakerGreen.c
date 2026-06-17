@@ -579,17 +579,17 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="SpeakerGreen",
-    .volume_levels=48, .w=4200, .h=2000,
-    .vumeter_count=1, .vumeters=vumeters,
-    .layout={ .w=4200,.h=2000,
+    .volume_levels=48,    .vumeter_count=1, .vumeters=vumeters,
+    .layout={ .w=4150,.h=2000, .arrangement=HORIZONTAL_ARRANGEMENT,
         .rects={
             { .x=0,  .y=0,  .w=0,  .h=0 }, 
             { .x=50,  .y=0,  .w=2000,  .h=2000 }, 
-            { .x=2150,  .y=0,  .w=2000,  .h=2000 }, 
+            { .x=2100,  .y=0,  .w=2000,  .h=2000 }, 
         },
     },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
+
 };
 
 

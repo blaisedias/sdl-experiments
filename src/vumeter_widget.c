@@ -21,19 +21,22 @@ static vumeter_properties_t* vu_props_list;
 //} meters[100];
 //static int num_meters=0;
 
+typedef struct {
+    vumeter_properties_t    *props;
+    const                   vumeter_t* meter;
+    vu_channel_params_t     channel_parms[NUM_VU_CHANNELS];
+    float                   decay_unit;
+    // rectangle to scale and centred within the widget rectangle
+    SDL_Rect                vu_rect;
+}_vw_meter_t;
+
 struct vumeter_widget {
     vumeter_properties_t* props;
-    struct {
-        vumeter_properties_t    *props;
-        const                   vumeter_t* meter;
-        vu_channel_params_t     channel_parms[NUM_VU_CHANNELS];
-        float                   decay_unit;
-        // rectangle to scale and centred within the widget rectangle
-        SDL_Rect                vu_rect;
-    } meters[100];
+    _vw_meter_t meters[100];
     int     num_meters;
     int     atomic_meter_indx;
     bool    locked;
+    bool    equal_horizontal_spacing;
     runtime_volume_t vol_runtimes[NUM_VU_CHANNELS];
 };
 
@@ -92,60 +95,55 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
             continue;
         }
 #endif
-/*        
-        SDL_Rect draw_rect;
-        copyRect(&wdgt->rect, &draw_rect);
-        translate_draw_rect(&draw_rect);
-*/        
 #ifdef  VUMETERS_CHECK_ON_INIT
         VUMeter_unload_media(props);
 #endif
         const vumeter_t* meter = props->vumeters;
         float decay_unit = (float)props->volume_levels/60;
         for(int ix = 0; ix < props->vumeter_count; ++ix, ++(vw->num_meters), ++meter) {
-            vw->meters[vw->num_meters].props = props;
-            vw->meters[vw->num_meters].meter = meter;
-            vw->meters[vw->num_meters].decay_unit = decay_unit;
+            _vw_meter_t* vwmeter_ptr = vw->meters + vw->num_meters;
+            vwmeter_ptr->props = props;
+            vwmeter_ptr->meter = meter;
+            vwmeter_ptr->decay_unit = decay_unit;
             float scalef = VUMeter_scale_factor(base_props, wdgt->rect.w, wdgt->rect.h);
             //set x and y to 0, they will be changed appropriately when  the rectangle is centred
-            vw->meters[vw->num_meters].vu_rect.x = vw->meters[vw->num_meters].vu_rect.y = 0;
-            vw->meters[vw->num_meters].vu_rect.w = vw->meters[vw->num_meters].props->layout.w;
-            vw->meters[vw->num_meters].vu_rect.h = vw->meters[vw->num_meters].props->layout.h;
-debug_printf("meter:%s\n", vw->meters[vw->num_meters].meter->name);
-            scale_rect_size(&vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect, scalef);
-debug_printf("    scaled  : (%d,%d,%d,%d)\n",
-        vw->meters[vw->num_meters].vu_rect.x,
-        vw->meters[vw->num_meters].vu_rect.y,
-        vw->meters[vw->num_meters].vu_rect.w,
-        vw->meters[vw->num_meters].vu_rect.h);
-            center_rect(&wdgt->rect, &vw->meters[vw->num_meters].vu_rect, &vw->meters[vw->num_meters].vu_rect);
-debug_printf("    centered: (%d,%d,%d,%d)\n",
-        vw->meters[vw->num_meters].vu_rect.x,
-        vw->meters[vw->num_meters].vu_rect.y,
-        vw->meters[vw->num_meters].vu_rect.w,
-        vw->meters[vw->num_meters].vu_rect.h);
-            //TODO: for now scale factor for each channel is identical, and s stuffed inside channel parameter struct, which is visible and defined for vumeter_util.c
+            vwmeter_ptr->vu_rect.x = vwmeter_ptr->vu_rect.y = 0;
+            vwmeter_ptr->vu_rect.w = vwmeter_ptr->props->layout.w;
+            vwmeter_ptr->vu_rect.h = vwmeter_ptr->props->layout.h;
+            scale_rect_size(&vwmeter_ptr->vu_rect, &vwmeter_ptr->vu_rect, scalef);
+            center_rect(&wdgt->rect, &vwmeter_ptr->vu_rect, &vwmeter_ptr->vu_rect);
+            //TODO: for now scale factor for each channel is identical, and is stuffed inside channel parameter struct, which is visible and defined for vumeter_util.c
             for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-debug_printf("    channel :  %d\n", ix_chan);
-                vw->meters[vw->num_meters].channel_parms[ix_chan].scale_factor = scalef;
+                vwmeter_ptr->channel_parms[ix_chan].scale_factor = scalef;
                 scale_rect(
-                        &vw->meters[vw->num_meters].props->layout.rects[ix_chan+1],
-                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
+                        &vwmeter_ptr->props->layout.rects[ix_chan+1],
+                        &vwmeter_ptr->channel_parms[ix_chan].channel_rect,
                         scalef);
-debug_printf("        scaled  : (%d,%d,%d,%d)\n",
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.h);
-                rebaseRect(&vw->meters[vw->num_meters].vu_rect,
-                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect,
-                        &vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect
+                rebaseRect(&vwmeter_ptr->vu_rect,
+                        &vwmeter_ptr->channel_parms[ix_chan].channel_rect,
+                        &vwmeter_ptr->channel_parms[ix_chan].channel_rect
                         );
-debug_printf("        rebased : (%d,%d,%d,%d)\n",
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.x,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.y,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.w,
-        vw->meters[vw->num_meters].channel_parms[ix_chan].channel_rect.h);
+            }
+            // TODO: make equidistant spacing selectable by widget property
+            // TODO: support spacing distribution based on sequence of integers
+            // TODO: support shared component
+            // TODO: vertical spacing
+            if (vwmeter_ptr->props->layout.arrangement == HORIZONTAL_ARRANGEMENT && vw->equal_horizontal_spacing)
+            {
+#define FUZZ_DOWN(v) 2*((v)/2)
+                int lead = FUZZ_DOWN(vwmeter_ptr->channel_parms[0].channel_rect.x - vwmeter_ptr->vu_rect.x);
+                int trail = FUZZ_DOWN(vwmeter_ptr->vu_rect.x + vwmeter_ptr->vu_rect.w - ( vwmeter_ptr->channel_parms[1].channel_rect.x +  vwmeter_ptr->channel_parms[1].channel_rect.w));
+                int middle = FUZZ_DOWN(vwmeter_ptr->channel_parms[1].channel_rect.x - (vwmeter_ptr->channel_parms[0].channel_rect.x +  vwmeter_ptr->channel_parms[0].channel_rect.w));
+                float avail = ( vwmeter_ptr->channel_parms[0].channel_rect.x 
+                        + wdgt->rect.w - (vwmeter_ptr->channel_parms[1].channel_rect.x + vwmeter_ptr->channel_parms[1].channel_rect.w)
+                        + middle);
+                avail /= (lead+trail+middle);
+                int l = avail*lead;
+                int m = avail*middle;
+//                int t = avail*trail;
+                vwmeter_ptr->channel_parms[0].channel_rect.x = l;
+                vwmeter_ptr->channel_parms[1].channel_rect.x = l + vwmeter_ptr->channel_parms[0].channel_rect.w + m;
+#undef FUZZ_DOWN
             }
             debug_printf("    %d) meter:%s decay_unit:%f volume_levels:%d\n", vw->num_meters, vw->meters[vw->num_meters].meter->name, decay_unit, props->volume_levels);
         }
@@ -297,4 +295,8 @@ widget *widget_vumeter_select_lock(widget *wdgt, bool lock) {
     return wdgt;
 }
 
-
+widget *widget_vumeter_equal_horizontal_spacing(widget *wdgt, bool val) {
+    vumeter_widget* vw = wdgt->sub.vu;
+    vw->equal_horizontal_spacing = val;
+    return wdgt;
+}

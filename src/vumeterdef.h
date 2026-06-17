@@ -14,6 +14,11 @@
 #define     NUM_VU_CHANNELS   2
 
 typedef enum {
+    HORIZONTAL_ARRANGEMENT,
+    VERTICAL_ARRANGEMENT,
+} layout_arrangement;
+
+typedef enum {
     SINGLE,
     AGGREGATE,
     AGGREGATEOFF,
@@ -74,8 +79,13 @@ typedef struct vu_props {
     const char*         resource_path;
     const char*         name;
     const int           volume_levels;
-    const int           w;
-    const int           h;
+    struct {
+        const int           w;
+        const int           h;
+        // common + channels, common = 0, left=1, right=2
+        const SDL_Rect      rects[3];
+        layout_arrangement  arrangement;
+    }layout;
     const int           vumeter_count;
     const vumeter_t*    vumeters;
     struct {
@@ -87,12 +97,6 @@ typedef struct vu_props {
         const int       count;
         vu_placement_t* elements;
     }placements;
-    struct {
-        const int       w;
-        const int       h;
-        // common + channels, common = 0, left=1, right=2
-        const SDL_Rect  rects[3];
-    }layout;
     float rotation;
     void * handle;
 }vumeter_properties_t;

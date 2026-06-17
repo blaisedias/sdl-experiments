@@ -497,9 +497,8 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="TubeD",
-    .volume_levels=49, .w=2144, .h=768,
-    .vumeter_count=1, .vumeters=vumeters,
-    .layout={ .w=2144,.h=768,
+    .volume_levels=49,    .vumeter_count=1, .vumeters=vumeters,
+    .layout={ .w=2144,.h=768, .arrangement=HORIZONTAL_ARRANGEMENT,
         .rects={
             { .x=0,  .y=0,  .w=0,  .h=0 }, 
             { .x=32,  .y=0,  .w=1024,  .h=768 }, 
@@ -508,6 +507,7 @@ vumeter_properties_t VuProperties = {
     },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
+
 };
 
 

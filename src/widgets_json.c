@@ -93,6 +93,8 @@ typedef enum {
     JT_PLAYER_RANGE_VALUE,
     JT_RUNTIME_VALUE,
 
+    JT_EQUAL_HORIZONTAL_SPACING,
+
     JT_END,
 
 } json_token;
@@ -152,6 +154,8 @@ static const char* json_token_strings[]= {
     "player_value",
     "player_range_value",
     "runtime_value",
+
+    "equal_horizontal_spacing",
 
     "",
 };
@@ -562,6 +566,8 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 widget = widget_create_vumeter(ctx);
                 // TODO remove this feature?
                 widget_vumeter_select_by_name(widget, get_object_string_value(value, JT_SELECT, NULL));
+                widget_vumeter_equal_horizontal_spacing(widget, get_object_boolean_value(value, JT_EQUAL_HORIZONTAL_SPACING, false));
+
             }break;
         case WIDGET_SLIDER:
             {

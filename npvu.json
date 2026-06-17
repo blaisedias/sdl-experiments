@@ -17,7 +17,7 @@
                         "h": 0
                     }
                 },
-                "image": "./images/wallpapers/HD_MilkyWay.png",
+                "image": "./images/wallpapers/HD_IceCold2.png",
                 "#comment": "image_scaling is one of [fit, center, stretch]",
                 "image_scaling": "center",
                 "focus_enable": false
@@ -109,7 +109,8 @@
                         "h": -114
                     }
                 },
-                "select" : "PurpleTastic2Transparent"
+                "select" : "PurpleTastic2Transparent",
+                "equal_horizontal_spacing": true
             }
         },
         {

@@ -354,7 +354,7 @@ void VUMeter_dump_props(const vumeter_properties_t* props) {
             props,
             props->resource_path,
             props->name,
-            props->volume_levels, props->w, props->h,
+            props->volume_levels, props->layout.w, props->layout.h,
             props->vumeters
            );
     printf("resources: count=%d names=%p textures=%p\n",

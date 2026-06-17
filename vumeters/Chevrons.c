@@ -2124,9 +2124,8 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="Chevrons",
-    .volume_levels=50, .w=1935, .h=648,
-    .vumeter_count=5, .vumeters=vumeters,
-    .layout={ .w=1935,.h=648,
+    .volume_levels=50,    .vumeter_count=5, .vumeters=vumeters,
+    .layout={ .w=1935,.h=648, .arrangement=VERTICAL_ARRANGEMENT,
         .rects={
             { .x=10,  .y=274,  .w=1918,  .h=100 }, 
             { .x=0,  .y=0,  .w=1915,  .h=260 }, 
@@ -2135,6 +2134,7 @@ vumeter_properties_t VuProperties = {
     },
     .resources={.count=RSRC_COUNT, .names=resource_names, .textures=textures },
     .placements={.count=PLCMNT_COUNT,.elements=placements },
+
 };
 
 
