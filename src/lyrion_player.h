@@ -129,10 +129,10 @@ void player_command(lyrion_player_ptr player, const char* command);
 #define player_power_on(player) player_command(player, "button power_on")
 #define player_power_off(player) player_command(player, "button power_off")
 
-void player_volume_set(lyrion_player_ptr player, int delta);
+void player_volume_set(lyrion_player_ptr player, int level);
 void player_volume_nudge(lyrion_player_ptr player, int delta);
-#define player_volume_inc(player) player_volume_change(player, step)
-#define player_volume_dec(player) player_volume_change(player, step*-1)
+#define player_volume_inc(player, step) player_volume_nudge(player, (step))
+#define player_volume_dec(player, step) player_volume_nudge(player, (step)*-1)
 void player_seek(lyrion_player_ptr player, int time);
 
 #endif // _lyrion_player_h_
