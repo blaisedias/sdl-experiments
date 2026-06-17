@@ -18,6 +18,8 @@
 #include "widgets_json.h"
 #include "vumeter_util.h"
 
+lyrion_player_ptr get_player();
+
 #define WINDOW_TITLE "Tsp"
 #define HIDE_CURSOR_COUNT 50
 static int show_cursor = 0;
@@ -422,6 +424,42 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 case SDL_SCANCODE_T:
                     tcache_dump();
                     break;
+                case SDL_SCANCODE_LEFT:
+                case SDL_SCANCODE_KP_4:
+                    dispatch_action(ACTION_PREV_VISU);
+                    break;
+                case SDL_SCANCODE_RIGHT:
+                case SDL_SCANCODE_KP_6:
+                    dispatch_action(ACTION_NEXT_VISU);
+                    break;
+                case SDL_SCANCODE_AUDIOPLAY:
+                    dispatch_action(ACTION_PLAY);
+                    break;
+                case SDL_SCANCODE_AUDIOSTOP:
+                    dispatch_action(ACTION_STOP);
+                    break;
+                case SDL_SCANCODE_AUDIOPREV:
+                    dispatch_action(ACTION_PREV_TRACK);
+                    break;
+                case SDL_SCANCODE_AUDIONEXT:
+                    dispatch_action(ACTION_NEXT_TRACK);
+                    break;
+                case SDL_SCANCODE_AUDIOREWIND:
+                    error_printf("rewind is not supported\n");
+                    break;
+                case SDL_SCANCODE_AUDIOFASTFORWARD:
+                    error_printf("fastforward is not supported\n");
+                    break;
+                case SDL_SCANCODE_VOLUMEUP:
+                    player_volume_inc(get_player());
+                    break;
+                case SDL_SCANCODE_VOLUMEDOWN:
+                    player_volume_dec(get_player());
+                    break;
+                case SDL_SCANCODE_MUTE:
+                    // TODO
+                    puts("TODO volume mute\n"); fflush(stdout);
+                    break;
                 default:
                     break;
                 }
@@ -521,6 +559,8 @@ static void player_poll_loop(app_context_ptr app_ctx) {
     app_wait_ready();
 
     player = open_local_player(app_ctx->lms);
+    //TODO: configure volume step
+    player_set_volume_step(player, 3);
 
 //debug
 printf("starting player_poll_loop\n"); fflush(stdout);

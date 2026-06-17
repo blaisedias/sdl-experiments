@@ -168,6 +168,13 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
             }
             break;
 
+        case ACTION_INCREMENT_VOLUME:
+            player_volume_inc(get_player());
+            break;
+        case ACTION_DECREMENT_VOLUME:
+            player_volume_dec(get_player());
+            break;
+
         case ACTION_SEEK:
             if (wdgt->type == WIDGET_SLIDER) {
                 int track_time;
@@ -269,3 +276,108 @@ const char* action_to_string(action action) {
     if (action == ACTION_END) return "ACTION_NONE(END)";
     return "ACTION_UNKNOWN";
 }
+
+void dispatch_action(action act) {
+    switch(act) {
+        case ACTION_NONE:
+            break;
+        case ACTION_QUIT:
+            SDL_PushEvent(&quit_event);
+            break;
+        case ACTION_NEXT_VISU:
+            SDL_PushEvent(&next_visu_event);
+            break;
+        case ACTION_PREV_VISU:
+            SDL_PushEvent(&prev_visu_event);
+            break;
+        case ACTION_NEXT_VU:
+            SDL_PushEvent(&next_vu_event);
+            break;
+        case ACTION_PREV_VU:
+            SDL_PushEvent(&prev_vu_event);
+            break;
+        case ACTION_NEXT_SP:
+            SDL_PushEvent(&next_sp_event);
+            break;
+        case ACTION_PREV_SP:
+            SDL_PushEvent(&prev_sp_event);
+            break;
+        case ACTION_LOCK_VUMETER:
+            // TODO
+            break;
+        case ACTION_UNLOCK_VUMETER:
+            // TODO
+            break;
+        case ACTION_LOCK_VISU:
+            // TODO
+            break;
+        case ACTION_UNLOCK_VISU:
+            // TODO
+            break;
+        case ACTION_MULTISTATE_BUTTON:
+            // NOTHING TO DO
+            break;
+
+        case ACTION_PLAY:
+            player_play(get_player());
+            break;
+        case ACTION_PAUSE:
+            player_pause(get_player());
+            break;
+        case ACTION_STOP:
+            player_stop(get_player());
+            break;
+
+        case ACTION_NEXT_TRACK:
+            player_fwd(get_player());
+            break;
+        case ACTION_PREV_TRACK:
+            player_rew(get_player());
+            break;
+
+        case ACTION_REPEAT_ONCE:
+            player_repeat_one(get_player());
+            break;
+        case ACTION_REPEAT:
+            player_repeat_toggle(get_player());
+            break;
+        case ACTION_REPEAT_OFF:
+            player_repeat_off(get_player());
+            break;
+
+        case ACTION_SHUFFLE:
+            player_shuffle_on(get_player());
+            break;
+        case ACTION_SHUFFLE_ALBUM:
+            player_shuffle_on(get_player());
+            player_shuffle_toggle(get_player());
+            break;
+        case ACTION_SHUFFLE_OFF:
+            player_shuffle_off(get_player());
+            break;
+
+        case ACTION_MUSIC_INFORMATION:
+            // TODO
+            break;
+
+        case ACTION_SET_VOLUME:
+            // TODO nothing?
+            break;
+
+        case ACTION_INCREMENT_VOLUME:
+            player_volume_inc(get_player());
+            break;
+        case ACTION_DECREMENT_VOLUME:
+            player_volume_dec(get_player());
+            break;
+
+        case ACTION_SEEK:
+            // TODO nothing?
+            break;
+
+        case ACTION_END:
+            break;
+    }
+}
+
+

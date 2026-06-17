@@ -50,6 +50,8 @@ typedef enum {
     ACTION_MUSIC_INFORMATION,
 
     ACTION_SET_VOLUME,
+    ACTION_INCREMENT_VOLUME,
+    ACTION_DECREMENT_VOLUME,
 
     ACTION_SEEK,
 
@@ -58,4 +60,5 @@ typedef enum {
 
 action action_from_string(const char* str);
 const char* action_to_string(action action);
+void dispatch_action(action act);
 #endif // __jl_action_h_
