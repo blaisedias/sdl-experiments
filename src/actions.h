@@ -55,6 +55,9 @@ typedef enum {
 
     ACTION_SEEK,
 
+    ACTION_NEXT_NP_VIEW,
+    ACTION_PREV_NP_VIEW,
+
     ACTION_END,
 } action;
 

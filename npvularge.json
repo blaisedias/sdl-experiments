@@ -49,55 +49,16 @@
                         "x": 50,
                         "w": -50,
                         "y": 0,
-                        "h": 65
-                    }
-                },
-                "content": "title",
-                "format": "[{disc}.][{tracknum:02} • ]{TITLE}",
-                "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
-                "font_size": 48,
-                "colour": {
-                    "green" : 255
-                }
-            }
-        },
-        {
-            "text": {
-                "location": {
-                    "position": {
-                        "x": 50,
-                        "w": -50,
-                        "y": 65,
-                        "h": 40
-                    }
-                },
-                "content": "artist album year",
-                "format": "[{ARTIST} • ][{ALBUM_OR_REMOTE_TITLE} ][({YEAR})]",
-                "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
-                "font_size": 30,
-                "colour": {
-                    "red" : 255,
-                    "green" : 255
-                }
-            }
-        },
-        {
-            "text": {
-                "location": {
-                    "position": {
-                        "x": 50,
-                        "w": -50,
-                        "y": -104,
                         "h": 25
                     }
                 },
                 "content": "audio meta data",
-                "format": "[{PLAYLIST_CURRENT}/][{PLAYLIST_TRACKS}][ • {GENRES}][ • {type}][ • {BITRATE}][ • {samplerate} Hz][ • {samplesize} bits]",
+                "format": "[{disc}.][{tracknum:02} • ]{TITLE} • [{ARTIST} • ][{ALBUM_OR_REMOTE_TITLE} ][({YEAR})] • [{PLAYLIST_CURRENT}/][{PLAYLIST_TRACKS}][ • {GENRES}][ • {type}][ • {BITRATE}][ • {samplerate} Hz][ • {samplesize} bits]",
                 "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
                 "font_size": 14,
                 "colour": {
                     "green" : 255,
-                    "blue" : 255
+                    "red" : 255
                 }
             }
         },
@@ -105,8 +66,8 @@
             "vumeter": {
                 "location": {
                     "position": {
-                        "y": 110,
-                        "h": -114
+                        "y": 25,
+                        "h": -55
                     }
                 },
                 "select" : "PurpleTastic2Transparent",
@@ -118,7 +79,7 @@
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 110,
+                        "y": 25,
                         "w": 0,
                         "h": -50
                     },
@@ -149,9 +110,9 @@
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 25,
                         "w": 0,
-                        "h": -50
+                        "h": -55
                     },
                     "position" : {
                         "x": "right",
@@ -171,9 +132,9 @@
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 25,
                         "w": 0,
-                        "h": -50
+                        "h": -55
                     },
                     "position": {
                         "x": "left",
@@ -195,9 +156,9 @@
                 "location": {
                     "position": {
                         "x": 10,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "image": "./images/sd/skip-previous.png",
@@ -210,9 +171,9 @@
                 "location": {
                     "position": {
                         "x": 80,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "states": [
@@ -237,9 +198,9 @@
                 "location": {
                     "position": {
                         "x": 150,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "image": "./images/sd/skip-next.png",
@@ -252,9 +213,9 @@
                 "location": {
                     "position": {
                         "x": 220,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "image": "./images/sd/stop-circle.png",
@@ -266,9 +227,9 @@
                 "location": {
                     "position": {
                         "x": 290,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "states": [
@@ -293,9 +254,9 @@
                 "location": {
                     "position": {
                         "x": 360,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "states": [
@@ -320,9 +281,9 @@
                 "location": {
                     "position": {
                         "x": 430,
-                        "y": -60,
-                        "w": 50,
-                        "h": 50
+                        "y": -30,
+                        "w": 25,
+                        "h": 25
                     }
                 },
                 "image": "./images/sd/music-information.png",
@@ -334,16 +295,16 @@
                 "location": {
                     "position": {
                         "x": 500,
-                        "y": -60,
+                        "y": -30,
                         "w": -10,
-                        "h": 50
+                        "h": 25
                     }
                 },
                 "interactive": true,
                 "pick": {
                     "image": "./images/sd/slider-pick-circle.png",
-                    "width": 16,
-                    "height": 16
+                    "width": 8,
+                    "height": 8
                 },
                 "bar": {
                     "image": [
@@ -373,15 +334,15 @@
                     "position": {
                         "x": 10,
                         "w": 70,
-                        "y": -100,
-                        "h": 50
+                        "y": -50,
+                        "h": 25
                     }
                 },
                 "content": "start",
                 "format": "[{time}]",
                 "justification": "right",
                 "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
-                "font_size": 18,
+                "font_size": 14,
                 "colour": {
                     "green" : 255
                 },
@@ -394,15 +355,15 @@
                     "position": {
                         "x": -80,
                         "w": 70,
-                        "y": -100,
-                        "h": 50
+                        "y": -50,
+                        "h": 25
                     }
                 },
                 "content": "end",
                 "format": "[{DURATION}]",
                 "justification": "left",
                 "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
-                "font_size": 18,
+                "font_size": 14,
                 "colour": {
                     "green" : 255
                 },
@@ -414,16 +375,16 @@
                 "location": {
                     "position": {
                         "x": 85,
-                        "y": -100,
+                        "y": -50,
                         "w": -85,
-                        "h": 50
+                        "h": 25
                     }
                 },
                 "interactive": true,
                 "pick": {
                     "image": "./images/sd/slider-pick-circle.png",
-                    "width": 16,
-                    "height": 16
+                    "width": 8,
+                    "height": 8
                 },
                 "bar": {
                     "image": [
@@ -455,7 +416,7 @@
                         "x": 350,
                         "y": 0,
                         "w": -350,
-                        "h": 32 
+                        "h": 32
                     },
                     "position" : {
                         "x": "center",

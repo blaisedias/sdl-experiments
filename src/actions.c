@@ -3,8 +3,7 @@
 #include "widgets.h"
 #include "logging.h"
 #include "lyrion_player.h"
-
-extern lyrion_player_ptr get_player();
+#include "nowplaying.h"
 
 static SDL_Event quit_event = {.type = SDL_QUIT };
 static SDL_Event next_visu_event = {.type = USEREVENT_NEXT_VISU };
@@ -184,6 +183,14 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
             }
             break;
 
+        case ACTION_NEXT_NP_VIEW:
+            next_np_view();
+            break;
+        case ACTION_PREV_NP_VIEW:
+            prev_np_view();
+            break;
+
+
         case ACTION_END:
             break;
         default:
@@ -248,8 +255,13 @@ static const char* action_strings[] = {
         "music-information",
 
         "set-volume-level",
+        "increment-volume",
+        "decrement-volume",
 
         "seek",
+
+        "next-nowplaying-view",
+        "prev-nowplaying-view",
 
         "",                 /* END */
 };
@@ -373,6 +385,13 @@ void dispatch_action(action act) {
 
         case ACTION_SEEK:
             // TODO nothing?
+            break;
+
+        case ACTION_NEXT_NP_VIEW:
+            next_np_view();
+            break;
+        case ACTION_PREV_NP_VIEW:
+            prev_np_view();
             break;
 
         case ACTION_END:

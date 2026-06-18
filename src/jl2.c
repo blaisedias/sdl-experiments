@@ -17,6 +17,7 @@
 #include "widgets.h"
 #include "widgets_json.h"
 #include "vumeter_util.h"
+#include "nowplaying.h"
 
 lyrion_player_ptr get_player();
 
@@ -69,16 +70,25 @@ static const char* help_text=""
 " - monitor-tcache: print texture cache memory usage at regular intervals \n"
 "\n";  
 
-static volatile view_context_ptr view = NULL;
-static char *json_file = "npvu.json";
+static char *json_files = "npvu.json,npvularge.json";
 static bool dump_vu = false;
 static bool monitor_tcache = false;
+
+#define MAX_NP_VIEWS   10
+static volatile view_context_ptr view = NULL;
+static view_context_ptr non_np_view = NULL;
+static view_context_ptr np_views[MAX_NP_VIEWS];
+static volatile int np_view_indx=0;
+static volatile bool refresh_widget_contents = false;
+// TODO make value configurable, if true, visualiser change actions
+// are propagated to all views
+static volatile bool propagate_visualiser_change = true;
+static SDL_sem* controller_sem;
 
 static void my_render(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
 
-static SDL_sem* controller_sem;
 
 static app_context app_ctx = {
 //        .window = NULL,
@@ -233,7 +243,7 @@ int main(int argc, char** argv) {
             }
         } else if (0 == strcmp(argv[i], "json")) {
             if (argc > i+1) {
-                json_file = argv[i+1];
+                json_files = argv[i+1];
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "peakhold")) {
@@ -286,6 +296,38 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+void next_np_view() {
+    if (view != non_np_view) {
+        for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
+            int indx = (np_view_indx + ix) % MAX_NP_VIEWS;
+            if (np_views[indx]) {
+                view = np_views[indx];
+                np_view_indx = indx;
+                refresh_widget_contents = true;
+                return;
+            }
+        }
+    }
+}
+
+void prev_np_view() {
+    if (view != non_np_view) {
+        for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
+            int indx = (np_view_indx - ix);
+            if (indx < 0) {
+                indx += MAX_NP_VIEWS;
+            }
+            if (np_views[indx]) {
+                view = np_views[indx];
+                np_view_indx = indx;
+                refresh_widget_contents = true;
+                return;
+            }
+        }
+    }
+}
+
+
 static void controller(app_context_ptr app_ctx) {
     app_wait_ready();
 //debug    
@@ -295,29 +337,63 @@ printf("starting controller\n"); fflush(stdout);
     if (endtime) {
         endtime += get_milli_seconds();
     }
-    view_context vw = { .app = app_ctx, .list=create_widget_list(&vw) };
+    view_context_ptr vw = calloc(sizeof(*vw),1);
+    if(NULL == vw) {
+        return;
+    }
+    vw->app = app_ctx;
+    vw->list = create_widget_list(vw);
+    non_np_view = vw;
+
     if (VUMeter_get_props_list() == NULL) {
         error_printf("No VU Meters found\n");
 //        app_stop(app_ctx);
     }
 
-    if (json_file && strlen(json_file)) {
-        if ( 0 != deserialise_widgets_file(json_file, &vw)) {
-            error_printf("failed to deserialise widgets from file %s\n", json_file);
-//            app_stop(app_ctx);
-        } else {
-            if (dump_vu) {
-                const vumeter_properties_t* vp = VUMeter_get_props_list();
-                while(vp) {
-                    VUMeter_dump_props(vp);
-                    vp = vp->next;
-                }
+    if (json_files && strlen(json_files)) {
+        char *tmp = strdup(json_files);
+        char *json_file = tmp;
+        char *comma_p = NULL;
+        do {
+            comma_p = strchr(json_file, ',');
+            if (comma_p) {
+                *comma_p = 0;
             }
-    
-            widget_list_load_media(vw.list, "./images");
-        }
-        view = &vw;
+            vw = calloc(sizeof(*vw),1);
+            if(NULL == vw) {
+                return;
+            }
+            vw->app = app_ctx;
+            vw->list = create_widget_list(vw);
+
+            if ( 0 != deserialise_widgets_file(json_file, vw)) {
+                error_printf("failed to deserialise widgets from file %s\n", json_file);
+                destroy_widget_list(vw->list);
+                free(vw);
+    //            app_stop(app_ctx);
+            } else {
+                if (dump_vu) {
+                    const vumeter_properties_t* vp = VUMeter_get_props_list();
+                    while(vp) {
+                        VUMeter_dump_props(vp);
+                        vp = vp->next;
+                    }
+                }
+                widget_list_load_media(vw->list, "./images");
+                np_views[np_view_indx] = vw;
+                ++np_view_indx;
+            }
+            if (comma_p) {
+                json_file = comma_p+1;
+            }
+        }while(comma_p);
+        free(tmp);
     }
+
+    np_view_indx = 0;
+    view = np_views[np_view_indx];
+
+    //TODO select view when previously shutdown
     
     int64_t next_vu_time = app_ctx->cycle_secs * 1000;
     if (next_vu_time) {
@@ -367,6 +443,19 @@ printf("starting controller\n"); fflush(stdout);
 //            num_surface_bytes = ns;
         }
     }
+    SDL_SemWait(controller_sem);
+    view = NULL;
+    for(int ix = 0; ix < MAX_NP_VIEWS; ++ix) {
+        if(np_views[ix]) {
+            destroy_widget_list(np_views[ix]->list);
+            free(np_views[ix]);
+            np_views[ix] = NULL;
+        }
+    }
+    if(non_np_view) {
+        destroy_widget_list(non_np_view->list);
+        free(non_np_view);
+    }
 }
 
 static void my_render(app_context_ptr app_ctx) {
@@ -391,6 +480,16 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             }
                         }
                     }
+                    for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
+                        view_context_ptr pv = np_views[ix];
+                        if (pv && pv != view) {
+                            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                                if (t->type == WIDGET_VUMETER) {
+                                    widget_vumeter_select_next(t);
+                                }
+                            }
+                        }
+                    }
                 }break;
             case USEREVENT_PREV_VISU:
             case USEREVENT_PREV_VU:
@@ -399,6 +498,16 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
                             if (t->type == WIDGET_VUMETER) {
                                 widget_vumeter_select_prev(t);
+                            }
+                        }
+                    }
+                    for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
+                        view_context_ptr pv = np_views[ix];
+                        if (pv && pv != view) {
+                            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                                if (t->type == WIDGET_VUMETER) {
+                                    widget_vumeter_select_prev(t);
+                                }
                             }
                         }
                     }
@@ -411,8 +520,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 print_sdl_key_scancode(eventp->key.keysym.scancode);
                 switch (eventp->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE: 
-                    puts("");
-                    app_stop(app_ctx);
+                    if (view == non_np_view) {
+                        puts("");
+                        app_stop(app_ctx);
+                    } else {
+                        view = non_np_view;
+                    }
                     break;
                 case SDL_SCANCODE_SPACE:
                     {
@@ -427,6 +540,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 case SDL_SCANCODE_LEFT:
                 case SDL_SCANCODE_KP_4:
                     dispatch_action(ACTION_PREV_VISU);
+                    break;
+                case SDL_SCANCODE_UP:
+                    dispatch_action(ACTION_NEXT_NP_VIEW);
+                    break;
+                case SDL_SCANCODE_DOWN:
+                    dispatch_action(ACTION_PREV_NP_VIEW);
                     break;
                 case SDL_SCANCODE_RIGHT:
                 case SDL_SCANCODE_KP_6:
@@ -569,7 +688,8 @@ printf("starting player_poll_loop\n"); fflush(stdout);
     while(app_running(app_ctx)) {
         sleep_milli_seconds(500);
         // ensure that the player is initialised - if possible, nop if the player is initialised
-        if (poll_player(player, &pts)) {
+        if (poll_player(player, &pts) || refresh_widget_contents) {
+            refresh_widget_contents = false;
 //            puts("P poll data");
             bool can_seek = true;
             {
