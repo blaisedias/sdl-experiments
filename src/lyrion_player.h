@@ -108,6 +108,7 @@ void player_command(lyrion_player_ptr player, const char* command);
 #define player_play(player) player_command(player, "play")
 #define player_stop(player) player_command(player, "stop")
 #define player_pause(player) player_command(player, "pause")
+void player_play_pause_toggle(lyrion_player_ptr player);
 
 //#define player_play(player) player_command(player, "button play.single")
 //#define player_stop(player) player_command(player, "button pause.hold")

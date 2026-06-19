@@ -126,6 +126,8 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
         case ACTION_STOP:
             player_stop(get_player());
             break;
+        case ACTION_PLAY_PAUSE:
+            player_play_pause_toggle(get_player());
 
         case ACTION_NEXT_TRACK:
             player_fwd(get_player());
@@ -240,6 +242,7 @@ static const char* action_strings[] = {
         "play",
         "pause",
         "stop",
+        "play_pause",
 
         "next-track",
         "previous-track",
@@ -338,6 +341,9 @@ void dispatch_action(action act) {
             break;
         case ACTION_STOP:
             player_stop(get_player());
+            break;
+        case ACTION_PLAY_PAUSE:
+            player_play_pause_toggle(get_player());
             break;
 
         case ACTION_NEXT_TRACK:

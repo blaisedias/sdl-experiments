@@ -1737,3 +1737,12 @@ int player_set_volume_step(lyrion_player_ptr player, int step) {
     return prev;
 }
 
+void player_play_pause_toggle(lyrion_player_ptr player) {
+    if (player && player->status.mode) {
+        if (!strcmp(player->status.mode, "play")) {
+            player_command(player, "pause");
+        } else {
+            player_command(player, "play");
+        }
+    }
+}

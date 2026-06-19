@@ -528,6 +528,9 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     }
                     break;
                 case SDL_SCANCODE_SPACE:
+                    dispatch_action(ACTION_PLAY_PAUSE);
+                    break;
+                case SDL_SCANCODE_TAB:
                     {
                         unsigned texture_bytes = tcache_get_texture_bytes_count();
                         unsigned surface_bytes = tcache_get_surface_bytes_count();
@@ -552,7 +555,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     dispatch_action(ACTION_NEXT_VISU);
                     break;
                 case SDL_SCANCODE_AUDIOPLAY:
-                    dispatch_action(ACTION_PLAY);
+                    dispatch_action(ACTION_PLAY_PAUSE);
                     break;
                 case SDL_SCANCODE_AUDIOSTOP:
                     dispatch_action(ACTION_STOP);
