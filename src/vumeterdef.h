@@ -49,7 +49,7 @@ typedef struct {
 
 typedef struct {
     const int           placement_count;
-    const int           placements[10];
+    const int           placements[100];
 }vu_background_t;
 
 typedef struct {
