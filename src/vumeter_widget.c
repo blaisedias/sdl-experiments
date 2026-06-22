@@ -153,6 +153,7 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
         if (!VUMeter_load_media(wdgt->view->app->renderer, vw->meters[vumeter_index(vw)].props)) {
             error_printf("failed to load media for %s\n",  vw->meters[vumeter_index(vw)].props->name);
         }
+        wdgt->redraw_required = true;
     } else {
             error_printf("no VU meters loaded\n");
     }
@@ -162,7 +163,19 @@ extern void _debug_draw_rect(widget* wdgt);
 extern void _show_draw_rect(widget* wdgt);
 extern void _show_input_rect(widget* wdgt);
 
-static void vumeter_render(widget* wdgt) {
+static void vumeter_render_bg(widget* wdgt) {
+    if (true) {
+        vumeter_widget* vw = wdgt->sub.vu;
+        VUMeter_draw_background(wdgt->view->app->renderer,
+            vw->meters[vumeter_index(vw)].props,
+            vw->meters[vumeter_index(vw)].meter,
+            &vw->meters[vumeter_index(vw)].vu_rect,
+            vw->meters[vumeter_index(vw)].channel_parms);
+    }
+    wdgt->redraw_required = false;
+}
+
+static void vumeter_render_fg(widget* wdgt) {
     if (debug_rects) { _debug_draw_rect(wdgt); }
     if (widget_highlight(wdgt)) {
         if (show_rects) { _show_draw_rect(wdgt); }
@@ -181,7 +194,7 @@ static void vumeter_render(widget* wdgt) {
             vols[0] = vols[0] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
             vols[1] = vols[1] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
         }
-        VUMeter_draw(wdgt->view->app->renderer,
+        VUMeter_draw_foreground(wdgt->view->app->renderer,
                vw->meters[vumeter_index(vw)].props,
                vw->meters[vumeter_index(vw)].meter, vols,
 //               &draw_rect,
@@ -197,7 +210,8 @@ widget *widget_create_vumeter(const view_context* view) {
     if (wdgt) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
-        wdgt->render = vumeter_render;
+        wdgt->render = vumeter_render_bg;
+        wdgt->render_hf = vumeter_render_fg;
         wdgt->sub.vu = calloc(1, sizeof(vumeter_widget));
         if (wdgt->sub.vu == NULL) {
             widget_destroy(wdgt);
@@ -243,6 +257,7 @@ static bool vumeter_select(widget *wdgt, int indx) {
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
             exit(EXIT_FAILURE);
         }
+        wdgt->redraw_required = true;
     }
     vumeter_set_index(vw, indx);
     debug_printf("vumeter: %s\n", vw->meters[vumeter_index(vw)].meter->name);

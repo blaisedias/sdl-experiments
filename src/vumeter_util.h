@@ -21,7 +21,8 @@ float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h);
 SDL_bool VUMeter_load_media(SDL_Renderer *renderer, vumeter_properties_t *vu);
 void VUMeter_unload_media(vumeter_properties_t *vu);
 
-void VUMeter_draw(SDL_Renderer *renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit);
+void VUMeter_draw_background(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms );
+void VUMeter_draw_foreground(SDL_Renderer *renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit);
 
 void VUMeter_set_peak_hold(int peak_hold);
 void VUMeter_set_decay_hold(int decay_hold);

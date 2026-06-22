@@ -86,6 +86,8 @@ static volatile bool propagate_visualiser_change = true;
 static SDL_sem* controller_sem;
 
 static void my_render(app_context_ptr app_ctx);
+static void my_render_hf(app_context_ptr app_ctx);
+static bool my_query_render(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
 
@@ -99,6 +101,8 @@ static app_context app_ctx = {
         .vsync = true,
         .input_loop_sleep_millis = 100,
         .cb_render = my_render,
+        .cb_render_hf = my_render_hf,
+        .cb_query_render = my_query_render,
         .cb_input = my_event_handler,
     };
 
@@ -380,6 +384,16 @@ printf("starting controller\n"); fflush(stdout);
                     }
                 }
                 widget_list_load_media(vw->list, "./images");
+                for(widget* t = vw->list->tail.prev; t != NULL; t = t->prev) {
+                    if ((t->player_value_key && 0 == strcmp("time", t->player_value_key))
+                       || 
+                       (t->runtime_value_key && 0 == strcmp("fps", t->runtime_value_key))
+                       ||
+                       t->hotspot) {
+                        widget_set_renderhf(t);
+                        log_printf("widget_set_renderhf %d\n", t->type);
+                    }
+                }
                 np_views[np_view_indx] = vw;
                 ++np_view_indx;
             }
@@ -458,11 +472,36 @@ printf("starting controller\n"); fflush(stdout);
     }
 }
 
+static bool my_query_render(app_context_ptr app_ctx) {
+    bool redraw_required = false;
+    if (view) {
+        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
+            if (widget->render) {
+                redraw_required |= widget->redraw_required;
+            }
+        }
+    }
+    return redraw_required;
+}
+
 static void my_render(app_context_ptr app_ctx) {
     if (view) {
         for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (!widget->hidden) {
+            if (!widget->hidden && widget->render) {
                 widget->render(widget);
+            }
+        }
+        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
+            if (widget->render != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
+        }
+    }
+}
+
+static void my_render_hf(app_context_ptr app_ctx) {
+    if (view) {
+        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
+            if (!widget->hidden && widget->render_hf) {
+                widget->render_hf(widget);
             }
         }
     }

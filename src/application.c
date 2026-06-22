@@ -251,7 +251,18 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
     }
 
     setup_orientation(app_ctx->orientation, app_ctx->screen_width, app_ctx->screen_height, &app_ctx->window_rect);
-    app_ctx->target_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
+
+#ifdef OPTIMISE_ORIENTATION_0
+    if (app_ctx->orientation != 0.0) {
+        app_ctx->target_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
+    } else {
+        log_printf("Optimised unrotated view: not using intermediate target texture\n");
+        app_ctx->target_texture = NULL;
+    }
+#else
+    app_ctx->backdrop_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
+#endif  // OPTIMISE_ORIENTATION_0
+
     app_printf("target_texture = %p %d x %d\n", app_ctx->target_texture, app_ctx->window_rect.w, app_ctx->window_rect.h);
     {
         SDL_RendererInfo info;
@@ -297,6 +308,10 @@ void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
         SDL_DestroyTexture(app_ctx->target_texture);
         app_ctx->target_texture = NULL;
     }
+    if (app_ctx->backdrop_texture) {
+        SDL_DestroyTexture(app_ctx->backdrop_texture);
+        app_ctx->backdrop_texture = NULL;
+    }
     SDL_DestroyRenderer(app_ctx->renderer);
     SDL_DestroyWindow(app_ctx->window);
     TTF_Quit();
@@ -341,15 +356,32 @@ void app_render_loop(app_context_ptr app_ctx_in) {
         }
         tcache_render_prep(app_ctx->renderer);
         SDL_RenderClear(app_ctx->renderer);
-        SDL_SetRenderTarget(app_ctx->renderer, app_ctx->target_texture);
-        SDL_RenderClear(app_ctx->renderer);
+        if (app_ctx->target_texture) {
+            SDL_SetRenderTarget(app_ctx->renderer, app_ctx->target_texture);
+            SDL_RenderClear(app_ctx->renderer);
+        }
 
-        app_ctx->cb_render(app_ctx);
+        if (app_ctx->cb_query_render(app_ctx)) {
+            SDL_SetRenderTarget(app_ctx->renderer, app_ctx->backdrop_texture);
+            SDL_RenderClear(app_ctx->renderer);
+            app_ctx->cb_render(app_ctx);
+            log_printf("redraw_all\n");
+            SDL_SetRenderTarget(app_ctx->renderer, NULL);
+        }
 
-        SDL_SetRenderTarget(app_ctx->renderer, NULL);
-        SDL_RenderCopyEx(app_ctx->renderer,
+        if (app_ctx->target_texture) {
+            SDL_SetRenderTarget(app_ctx->renderer, app_ctx->target_texture);
+        }
+        SDL_RenderCopy(app_ctx->renderer, app_ctx->backdrop_texture, NULL, NULL);
+
+        app_ctx->cb_render_hf(app_ctx);
+
+        if (app_ctx->target_texture) {
+            SDL_SetRenderTarget(app_ctx->renderer, NULL);
+            SDL_RenderCopyEx(app_ctx->renderer,
                     app_ctx->target_texture,
                     NULL, &dst_rect, app_ctx->orientation, NULL, SDL_FLIP_NONE);
+        }
         
         SDL_RenderPresent(app_ctx->renderer);
         int64_t ms_6 = get_micro_seconds();

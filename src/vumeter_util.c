@@ -162,7 +162,31 @@ static inline void renderPlacement(vu_placement_t* pve, SDL_Rect* enclosure, vum
 #undef VU_SCALE
 }
 
-void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit) {
+
+void VUMeter_draw_background(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms ) {
+    if (!vu) {
+        return;
+    }
+    if (vumeter->background) {
+        const vu_background_t* bg = vumeter->background;
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(vu->placements.elements+bg->placements[ix],
+                    enclosure, vu, renderer,
+                    //FIXME: should be for the vumeter rectangle 
+                    channel_parms[0].scale_factor);
+        }
+    }
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        const vu_background_t* bg = vumeter->backgrounds[ix_chan];
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(vu->placements.elements+bg->placements[ix],
+                    &channel_parms[ix_chan].channel_rect, vu, renderer,
+                    channel_parms[ix_chan].scale_factor);
+        }
+    }
+}
+
+void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit) {
     if (!vu) {
         return;
     }
@@ -205,27 +229,11 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
         }
     }
 
-    if (vumeter->background) {
-        const vu_background_t* bg = vumeter->background;
-        for(int ix=0; ix < bg->placement_count; ++ix) {
-            renderPlacement(vu->placements.elements+bg->placements[ix],
-                    enclosure, vu, renderer,
-                    //FIXME: should be for the vumeter rectangle 
-                    channel_parms[0].scale_factor);
-        }
-    }
-
 #define _RENDER_VOLUME_LEVEL_(value, chn) \
     renderPlacement(vu->placements.elements+comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
             channel_parms[chn].scale_factor)
 
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-        const vu_background_t* bg = vumeter->backgrounds[ix_chan];
-        for(int ix=0; ix < bg->placement_count; ++ix) {
-            renderPlacement(vu->placements.elements+bg->placements[ix],
-                    &channel_parms[ix_chan].channel_rect, vu, renderer,
-                    channel_parms[ix_chan].scale_factor);
-        }
         vol_printf("%2d) ", ix_chan);
         const vu_channel_t* channel = vumeter->channels[ix_chan];
         const vu_component_t* comp = channel->components;
@@ -344,7 +352,6 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumete
 void VUMeter_diag() {
     printf("visualizer rate= %u\n", vis_get_rate());
 }
-
 
 void VUMeter_dump_props(const vumeter_properties_t* props) {
     if(!props) {

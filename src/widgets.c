@@ -93,7 +93,7 @@ void _show_input_rect(widget* wdgt) {
         SDL_Rect input_rect;
         copyRect(&wdgt->input_rect, &input_rect);
         translate_draw_rect(&input_rect);
-        SDL_SetRenderDrawColor(wdgt->view->app->renderer, 128, 0, 0, 128);
+        SDL_SetRenderDrawColor(wdgt->view->app->renderer, 128, 128, 0, 128);
         SDL_RenderDrawRect(wdgt->view->app->renderer, &input_rect);
         SDL_SetRenderDrawColor(wdgt->view->app->renderer, 0, 0, 0, 0);
     }
@@ -101,6 +101,7 @@ void _show_input_rect(widget* wdgt) {
 
 static void button_widget_render(widget* wdgt) {
     DEBUG_RECT(wdgt);
+    wdgt->redraw_required = false;
     if (widget_pressed(wdgt)&& !wdgt->hotspot) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -186,6 +187,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
                         if (tcache_quick_get_texture_dimensions(wdgt->sub.image.texture_id, &wdgt->sub.image.w, &wdgt->sub.image.h)) {
                             setup_image_fit_src_rect(wdgt);
                         }
+                        wdgt->redraw_required = true;
                     } else {
                         error_printf("widget_load_media: image failed to load %s\n", wdgt->image_path);
                     }
@@ -196,6 +198,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
                     wdgt->sub.button.texture_id = tcache_load_media(wdgt->image_path, wdgt->view->app->renderer, &loaded, NULL);
                     if (loaded) {
                         tcache_lock_texture(wdgt->sub.button.texture_id);
+                        wdgt->redraw_required = true;
                     } else {
                         error_printf("widget_load_media: button failed to load %s\n", wdgt->image_path);
                     }
@@ -211,6 +214,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
                     } else {
                         error_printf("widget_load_media: multistate button failed to load %s\n", res->resource_path);
                     }
+                    wdgt->redraw_required = true;
                 }
                 break;
             case WIDGET_SLIDER:
@@ -230,6 +234,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
                         }
                     }
                 }
+                wdgt->redraw_required = true;
                 break;
             case WIDGET_TEXT:
                 {
@@ -241,6 +246,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
                     } else {
                         error_printf("widget_load_media: text failed to create texture_id %s\n", txt_w->name);
                     }
+                    wdgt->redraw_required = true;
                 }
                 break;
         }
@@ -380,6 +386,7 @@ static widget* widget_create(const view_context *view) {
             wdgt->prev = view->list->tail.prev;
             wdgt->prev->next = wdgt->next->prev = wdgt;
         }
+        wdgt->redraw_required = true;
     }
     return wdgt;
 }
@@ -465,8 +472,30 @@ widget* widget_create_button(const view_context* view) {
     return wdgt;
 }
 
+widget* widget_set_renderhf(widget* wdgt) {
+    if (wdgt) {
+        if (NULL == wdgt->render_hf && wdgt->render) {
+            wdgt->render_hf = wdgt->render;
+            wdgt->render = NULL;
+        }
+    }
+    return wdgt;
+}
+
+widget* widget_unset_renderhf(widget* wdgt) {
+    if (wdgt) {
+        if (wdgt->render_hf && wdgt->render == NULL) {
+            wdgt->render = wdgt->render_hf;
+            wdgt->render_hf = NULL;
+        }
+    }
+    return wdgt;
+}
+
+
 static void image_widget_render(widget* wdgt) {
     DEBUG_RECT(wdgt);
+    wdgt->redraw_required = false;
     if (widget_highlight(wdgt)) {
         if (show_rects) { _show_draw_rect(wdgt); }
         if (show_input_rects) { _show_input_rect(wdgt); }
@@ -564,6 +593,7 @@ widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r) {
 
 static void multistate_button_widget_render(widget* wdgt) {
     DEBUG_RECT(wdgt);
+    wdgt->redraw_required = false;
     if (widget_pressed(wdgt) && !wdgt->hotspot) {
     SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -633,6 +663,7 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
 widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum < wdgt->sub.multistate_button.state_count) {
         wdgt->sub.multistate_button.state = statenum;
+        wdgt->redraw_required = true;
     }
     return wdgt;
 }
@@ -717,6 +748,7 @@ static _slider_workspace* slider_widget_init_workspace(widget* wdgt) {
 
 static void slider_widget_render(widget* wdgt) {
     DEBUG_RECT(wdgt);
+    wdgt->redraw_required = false;
     if (widget_highlight(wdgt)) {
         if (show_rects) { _show_draw_rect(wdgt); }
         if (show_input_rects) { _show_input_rect(wdgt); }
@@ -813,7 +845,6 @@ static void slider_widget_render(widget* wdgt) {
                 0.0,
                 NULL, flip);
     }
-
 }
 
 widget *widget_create_slider(const view_context* view) {
@@ -915,6 +946,7 @@ static widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
                     wk->drag_pos = pt->x;
                 }
             }
+            wdgt->redraw_required = true;
         }
     }
     return wdgt;
@@ -998,6 +1030,7 @@ widget *widget_slider_get_value(widget* wdgt, int* value) {
 
 static void text_widget_render(widget* wdgt) {
     DEBUG_RECT(wdgt);
+    wdgt->redraw_required = false;
     _text_data_ptr txt_w = &wdgt->sub.text;
     if (widget_pressed(wdgt)&& !wdgt->hotspot) {
         SDL_Rect draw_rect;
@@ -1025,6 +1058,7 @@ static void text_widget_render(widget* wdgt) {
                 0.0,
                 NULL, flip);
     }
+    wdgt->redraw_required = false;
 }
 
 widget* widget_create_text(const view_context* view) {
@@ -1114,6 +1148,7 @@ static void text_render_surface(widget* wdgt) {
                 }
             }
         }
+        wdgt->redraw_required = true;
     }
 }
 

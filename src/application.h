@@ -11,6 +11,7 @@ typedef struct {
 typedef struct app_context app_context;
 typedef const struct app_context* app_context_ptr;
 
+typedef bool (*query_renderfn)(app_context_ptr app_ctx);
 typedef void (*renderfn)(app_context_ptr app_ctx);
 typedef void (*inputfn)(app_context_ptr app_ctx, SDL_Event* event);
 
@@ -23,7 +24,10 @@ struct app_context {
     SDL_Renderer*       renderer;
     const SDL_threadID  renderer_tid;
     renderfn            cb_render;
+    renderfn            cb_render_hf;
+    query_renderfn      cb_query_render;
     SDL_Texture*        target_texture;
+    SDL_Texture*        backdrop_texture;
 
     Uint32          pixelFormat;
     unsigned        bytes_per_pixel;
