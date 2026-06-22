@@ -37,9 +37,8 @@ static inline void free_ex(void** tgt) {
 }
 
 #define FREE(x) free_ex((void **)(&x))
-#define DEBUG_RECT(w) if (debug_rects) { _debug_draw_rect(w); }
 
-bool widget_highlight(widget* wdgt) {
+bool widget_highlighted(widget* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_highlight, __ATOMIC_ACQUIRE);
 }
 
@@ -53,6 +52,7 @@ bool widget_pressed(widget* wdgt) {
 
 void widget_set_pressed(widget* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_pressed, onoff, __ATOMIC_RELEASE);
+     wdgt->redraw_required = wdgt->render_hf == NULL;
 }
 
 
@@ -66,7 +66,7 @@ const char* widget_type_name(widget_type typ) {
 void render_none(widget* btn) {
 }
 
-void _debug_draw_rect(widget* wdgt) {
+static void _debug_draw_rect(widget* wdgt) {
     if (wdgt) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -77,7 +77,7 @@ void _debug_draw_rect(widget* wdgt) {
     }
 }
 
-void _show_draw_rect(widget* wdgt) {
+static void _show_draw_rect(widget* wdgt) {
     if (wdgt) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -88,7 +88,7 @@ void _show_draw_rect(widget* wdgt) {
     }
 }
 
-void _show_input_rect(widget* wdgt) {
+static void _show_input_rect(widget* wdgt) {
     if (wdgt) {
         SDL_Rect input_rect;
         copyRect(&wdgt->input_rect, &input_rect);
@@ -99,10 +99,22 @@ void _show_input_rect(widget* wdgt) {
     }
 }
 
+void widget_render_foreground_default(widget* wdgt) {
+    if (debug_rects) {
+       _debug_draw_rect(wdgt);
+    }
+    if (widget_highlighted(wdgt) && wdgt->hotspot == false && show_rects) {
+        _show_draw_rect(wdgt);
+    }
+    if (widget_highlighted(wdgt) && show_input_rects) {
+        _show_input_rect(wdgt);
+    }
+}
+
+
 static void button_widget_render(widget* wdgt) {
-    DEBUG_RECT(wdgt);
     wdgt->redraw_required = false;
-    if (widget_pressed(wdgt)&& !wdgt->hotspot) {
+    if (widget_pressed(wdgt) && !wdgt->hotspot) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
         translate_draw_rect(&draw_rect);
@@ -110,13 +122,7 @@ static void button_widget_render(widget* wdgt) {
         SDL_RenderFillRect(wdgt->view->app->renderer, &draw_rect);
         SDL_SetRenderDrawColor(wdgt->view->app->renderer, 0, 0, 0, 0);
     }
-    if (widget_highlight(wdgt) && wdgt->hotspot == false && show_rects) {
-        _show_draw_rect(wdgt);
-    }
-    if (widget_highlight(wdgt) && show_input_rects) {
-        _show_input_rect(wdgt);
-    }
-    if (wdgt->hotspot == false || widget_highlight(wdgt))  {
+    if (wdgt->hotspot == false || widget_highlighted(wdgt))  {
         SDL_Rect image_rect;
         copyRect(&wdgt->rect, &image_rect);
         translate_image_rect(&image_rect);
@@ -494,12 +500,7 @@ widget* widget_unset_renderhf(widget* wdgt) {
 
 
 static void image_widget_render(widget* wdgt) {
-    DEBUG_RECT(wdgt);
     wdgt->redraw_required = false;
-    if (widget_highlight(wdgt)) {
-        if (show_rects) { _show_draw_rect(wdgt); }
-        if (show_input_rects) { _show_input_rect(wdgt); }
-    }
     SDL_Rect image_rect;
     copyRect(&wdgt->rect, &image_rect);
     translate_image_rect(&image_rect);
@@ -592,7 +593,6 @@ widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r) {
 }
 
 static void multistate_button_widget_render(widget* wdgt) {
-    DEBUG_RECT(wdgt);
     wdgt->redraw_required = false;
     if (widget_pressed(wdgt) && !wdgt->hotspot) {
     SDL_Rect draw_rect;
@@ -602,13 +602,7 @@ static void multistate_button_widget_render(widget* wdgt) {
         SDL_RenderFillRect(wdgt->view->app->renderer, &draw_rect);
         SDL_SetRenderDrawColor(wdgt->view->app->renderer, 0, 0, 0, 0);
     }
-    if (widget_highlight(wdgt) && wdgt->hotspot == false && show_rects) {
-        _show_draw_rect(wdgt);
-    }
-    if (widget_highlight(wdgt) && show_input_rects) {
-        _show_input_rect(wdgt);
-    }
-    if (wdgt->hotspot == false || widget_highlight(wdgt))  {
+    if (wdgt->hotspot == false || widget_highlighted(wdgt))  {
         SDL_Rect image_rect;
         copyRect(&wdgt->rect, &image_rect);
         translate_image_rect(&image_rect);
@@ -663,7 +657,7 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
 widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum < wdgt->sub.multistate_button.state_count) {
         wdgt->sub.multistate_button.state = statenum;
-        wdgt->redraw_required = true;
+        wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
     }
     return wdgt;
 }
@@ -747,12 +741,7 @@ static _slider_workspace* slider_widget_init_workspace(widget* wdgt) {
 }
 
 static void slider_widget_render(widget* wdgt) {
-    DEBUG_RECT(wdgt);
     wdgt->redraw_required = false;
-    if (widget_highlight(wdgt)) {
-        if (show_rects) { _show_draw_rect(wdgt); }
-        if (show_input_rects) { _show_input_rect(wdgt); }
-    }
     _slider_workspace* wk = slider_widget_init_workspace(wdgt);
 /*    
     if (wk == NULL) {
@@ -946,7 +935,7 @@ static widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
                     wk->drag_pos = pt->x;
                 }
             }
-            wdgt->redraw_required = true;
+            wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
         }
     }
     return wdgt;
@@ -1029,7 +1018,6 @@ widget *widget_slider_get_value(widget* wdgt, int* value) {
 }
 
 static void text_widget_render(widget* wdgt) {
-    DEBUG_RECT(wdgt);
     wdgt->redraw_required = false;
     _text_data_ptr txt_w = &wdgt->sub.text;
     if (widget_pressed(wdgt)&& !wdgt->hotspot) {
@@ -1040,13 +1028,7 @@ static void text_widget_render(widget* wdgt) {
         SDL_RenderFillRect(wdgt->view->app->renderer, &draw_rect);
         SDL_SetRenderDrawColor(wdgt->view->app->renderer, 0, 0, 0, 0);
     }
-    if (widget_highlight(wdgt) && wdgt->hotspot == false && show_rects) {
-        _show_draw_rect(wdgt);
-    }
-    if (widget_highlight(wdgt) && show_input_rects) {
-        _show_input_rect(wdgt);
-    }
-    if (wdgt->hotspot == false || widget_highlight(wdgt))  {
+    if (wdgt->hotspot == false || widget_highlighted(wdgt))  {
         SDL_Rect image_rect;
         copyRect(&txt_w->dst_rect, &image_rect);
         translate_image_rect(&image_rect);
@@ -1058,7 +1040,6 @@ static void text_widget_render(widget* wdgt) {
                 0.0,
                 NULL, flip);
     }
-    wdgt->redraw_required = false;
 }
 
 widget* widget_create_text(const view_context* view) {
@@ -1148,7 +1129,7 @@ static void text_render_surface(widget* wdgt) {
                 }
             }
         }
-        wdgt->redraw_required = true;
+        wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
     }
 }
 
@@ -1306,7 +1287,7 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
                 if (widget->hidden) { continue;}
                 if (!selected) {
                     widget_set_highlight(widget, SDL_PointInRect(pt, &widget->input_rect) && (!widget->focus_disabled));
-                    selected = widget_highlight(widget);
+                    selected = widget_highlighted(widget);
                     if (selected) {
                         if (widget->type == WIDGET_SLIDER) {
                             widget_slider_track(widget, pt);

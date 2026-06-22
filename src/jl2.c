@@ -473,15 +473,14 @@ printf("starting controller\n"); fflush(stdout);
 }
 
 static bool my_query_render(app_context_ptr app_ctx) {
-    bool redraw_required = false;
     if (view) {
         for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (widget->render) {
-                redraw_required |= widget->redraw_required;
+            if (widget->redraw_required) {
+                return true;
             }
         }
     }
-    return redraw_required;
+    return false;
 }
 
 static void my_render(app_context_ptr app_ctx) {
@@ -500,8 +499,11 @@ static void my_render(app_context_ptr app_ctx) {
 static void my_render_hf(app_context_ptr app_ctx) {
     if (view) {
         for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (!widget->hidden && widget->render_hf) {
-                widget->render_hf(widget);
+            if (!widget->hidden) {
+                if (widget->render_hf) {
+                    widget->render_hf(widget);
+                }
+                widget_render_foreground_default(widget);
             }
         }
     }

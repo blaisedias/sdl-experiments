@@ -169,7 +169,7 @@ struct widget {
     }sub;
 };
 
-bool widget_highlight(widget* wdgt); 
+bool widget_highlighted(widget* wdgt); 
 void widget_set_highlight(widget* wdgt, bool onoff);
 bool widget_pressed(widget* wdgt);
 void widget_set_pressed(widget* wdgt, bool onoff);
@@ -254,4 +254,5 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
 
 widget* widget_set_renderhf(widget* wdgt);
 widget* widget_unset_renderhf(widget* wdgt);
+void widget_render_foreground_default(widget* wdgt);
 #endif // __jl_widgets_h_
