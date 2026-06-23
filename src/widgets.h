@@ -106,8 +106,9 @@ struct widget {
     
 //    void        (*action)(widget* wdgt);
     action         action;
-    void        (*render)(struct widget*);
-    void        (*render_hf)(struct widget*);
+    void        (*render_backdrop)(struct widget*);
+    void        (*render_foreground)(struct widget*);
+    bool        render_as_foreground;
     bool        focussed;
     // 
     bool        atomic_highlight;
@@ -251,6 +252,9 @@ widget_list* destroy_widgets_in_list(widget_list*);
 void widget_dispatch_action(widget* wdgt);
 void widget_list_load_media(const widget_list* list, const char* resource_path);
 void widget_list_react(const widget_list* list, const pointer_input input, SDL_Point* pt);
+bool widget_list_query_render_backdrop(const widget_list* wdgt_list);
+void widget_list_render_backdrop(const widget_list* wdgt_list);
+void widget_list_render_foreground(const widget_list* wdgt_list);
 
 widget* widget_set_renderhf(widget* wdgt);
 widget* widget_unset_renderhf(widget* wdgt);

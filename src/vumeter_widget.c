@@ -201,8 +201,8 @@ widget *widget_create_vumeter(const view_context* view) {
     if (wdgt) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
-        wdgt->render = vumeter_render_bg;
-        wdgt->render_hf = vumeter_render_fg;
+        wdgt->render_backdrop = vumeter_render_bg;
+        wdgt->render_foreground = vumeter_render_fg;
         wdgt->sub.vu = calloc(1, sizeof(vumeter_widget));
         if (wdgt->sub.vu == NULL) {
             widget_destroy(wdgt);

@@ -85,9 +85,9 @@ static volatile bool refresh_widget_contents = false;
 static volatile bool propagate_visualiser_change = true;
 static SDL_sem* controller_sem;
 
-static void my_render(app_context_ptr app_ctx);
-static void my_render_hf(app_context_ptr app_ctx);
-static bool my_query_render(app_context_ptr app_ctx);
+static void my_render_backdrop(app_context_ptr app_ctx);
+static void my_render_foreground(app_context_ptr app_ctx);
+static bool my_query_render_backdrop(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
 
@@ -100,9 +100,9 @@ static app_context app_ctx = {
 //        .orientation = 0,
         .vsync = true,
         .input_loop_sleep_millis = 100,
-        .cb_render = my_render,
-        .cb_render_hf = my_render_hf,
-        .cb_query_render = my_query_render,
+        .cb_query_render_backdrop = my_query_render_backdrop,
+        .cb_render_backdrop = my_render_backdrop,
+        .cb_render_foreground = my_render_foreground,
         .cb_input = my_event_handler,
     };
 
@@ -472,40 +472,22 @@ printf("starting controller\n"); fflush(stdout);
     }
 }
 
-static bool my_query_render(app_context_ptr app_ctx) {
+static bool my_query_render_backdrop(app_context_ptr app_ctx) {
     if (view) {
-        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (widget->redraw_required) {
-                return true;
-            }
-        }
+        return widget_list_query_render_backdrop(view->list);
     }
     return false;
 }
 
-static void my_render(app_context_ptr app_ctx) {
+static void my_render_backdrop(app_context_ptr app_ctx) {
     if (view) {
-        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (!widget->hidden && widget->render) {
-                widget->render(widget);
-            }
-        }
-        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (widget->render != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
-        }
+        widget_list_render_backdrop(view->list);
     }
 }
 
-static void my_render_hf(app_context_ptr app_ctx) {
+static void my_render_foreground(app_context_ptr app_ctx) {
     if (view) {
-        for(widget* widget=view->list->head.next; widget != NULL; widget=widget->next) {
-            if (!widget->hidden) {
-                if (widget->render_hf) {
-                    widget->render_hf(widget);
-                }
-                widget_render_foreground_default(widget);
-            }
-        }
+        widget_list_render_foreground(view->list);
     }
 }
 

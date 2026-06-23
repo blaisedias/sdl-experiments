@@ -23,9 +23,9 @@ struct app_context {
 
     SDL_Renderer*       renderer;
     const SDL_threadID  renderer_tid;
-    renderfn            cb_render;
-    renderfn            cb_render_hf;
-    query_renderfn      cb_query_render;
+    query_renderfn      cb_query_render_backdrop;
+    renderfn            cb_render_backdrop;
+    renderfn            cb_render_foreground;
     SDL_Texture*        target_texture;
     SDL_Texture*        backdrop_texture;
 

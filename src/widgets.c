@@ -52,7 +52,7 @@ bool widget_pressed(widget* wdgt) {
 
 void widget_set_pressed(widget* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_pressed, onoff, __ATOMIC_RELEASE);
-     wdgt->redraw_required = wdgt->render_hf == NULL;
+     wdgt->redraw_required = !wdgt->render_as_foreground;
 }
 
 
@@ -386,7 +386,8 @@ static widget* widget_create(const view_context *view) {
     if (wdgt) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
-        wdgt->render = render_none;
+        wdgt->render_backdrop = render_none;
+        wdgt->render_foreground = render_none;
         if (view->list) {
             wdgt->next = &view->list->tail;
             wdgt->prev = view->list->tail.prev;
@@ -473,26 +474,28 @@ widget* widget_create_button(const view_context* view) {
     if (wdgt) {
         *((widget_type*)&wdgt->type) = WIDGET_BUTTON;
         wdgt->action = ACTION_NONE;
-        wdgt->render = button_widget_render;
+        wdgt->render_backdrop = button_widget_render;
     }
     return wdgt;
 }
 
 widget* widget_set_renderhf(widget* wdgt) {
-    if (wdgt) {
-        if (NULL == wdgt->render_hf && wdgt->render) {
-            wdgt->render_hf = wdgt->render;
-            wdgt->render = NULL;
+    if (wdgt && ! wdgt->render_as_foreground) {
+        wdgt->render_as_foreground = true;
+        if (render_none == wdgt->render_foreground && render_none != wdgt->render_backdrop) {
+            wdgt->render_foreground = wdgt->render_backdrop;
+            wdgt->render_backdrop = render_none;
         }
     }
     return wdgt;
 }
 
 widget* widget_unset_renderhf(widget* wdgt) {
-    if (wdgt) {
-        if (wdgt->render_hf && wdgt->render == NULL) {
-            wdgt->render = wdgt->render_hf;
-            wdgt->render_hf = NULL;
+    if (wdgt && wdgt->render_as_foreground) {
+        wdgt->render_as_foreground = false;
+        if (render_none != wdgt->render_foreground && wdgt->render_backdrop == render_none) {
+            wdgt->render_backdrop = wdgt->render_foreground;
+            wdgt->render_foreground = render_none;
         }
     }
     return wdgt;
@@ -538,7 +541,7 @@ widget* widget_create_image(const view_context* view) {
     if (wdgt) {
         *((widget_type*)&wdgt->type) = WIDGET_IMAGE;
         wdgt->action = ACTION_NONE;
-        wdgt->render = image_widget_render;
+        wdgt->render_backdrop = image_widget_render;
     }
     return wdgt;
 }
@@ -627,7 +630,7 @@ widget* widget_create_multistate_button(const view_context* view, int state_coun
         wdgt->sub.multistate_button.state_count = state_count;
         wdgt->sub.multistate_button.res = res;
         wdgt->action = ACTION_MULTISTATE_BUTTON;
-        wdgt->render = multistate_button_widget_render;
+        wdgt->render_backdrop = multistate_button_widget_render;
     }
     return wdgt;
 }
@@ -657,7 +660,7 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
 widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum < wdgt->sub.multistate_button.state_count) {
         wdgt->sub.multistate_button.state = statenum;
-        wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
+        wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
     }
     return wdgt;
 }
@@ -841,7 +844,7 @@ widget *widget_create_slider(const view_context* view) {
     if (wdgt) {
         *((widget_type*)&wdgt->type) = WIDGET_SLIDER;
         wdgt->action = ACTION_NONE;
-        wdgt->render = slider_widget_render;
+        wdgt->render_backdrop = slider_widget_render;
         wdgt->sub.slider.interactive = true;
         wdgt->sub.slider.defined_interactive = true;
     }
@@ -935,7 +938,7 @@ static widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
                     wk->drag_pos = pt->x;
                 }
             }
-            wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
+            wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
         }
     }
     return wdgt;
@@ -1049,7 +1052,7 @@ widget* widget_create_text(const view_context* view) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         *((widget_type*)&wdgt->type) = WIDGET_TEXT;
         wdgt->action = ACTION_NONE;
-        wdgt->render = text_widget_render;
+        wdgt->render_backdrop = text_widget_render;
         char buffer[64];
         sprintf(buffer, "\\-text-%x-\\", __atomic_fetch_add(&text_widget_id, 1, __ATOMIC_ACQ_REL));
         txt_w->name = strdup(buffer);
@@ -1129,7 +1132,7 @@ static void text_render_surface(widget* wdgt) {
                 }
             }
         }
-        wdgt->redraw_required = wdgt->render_hf == NULL && !wdgt->hotspot;
+        wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
     }
 }
 
@@ -1193,7 +1196,7 @@ static widget_list* widget_list_initialise(widget_list* list, view_context* view
             w->rect.w = w->rect.h =  0;
             w->input_rect.x = w->input_rect.y =  -100000;
             w->input_rect.w = w->input_rect.h =  0;
-            w->render = render_none;
+            w->render_backdrop = render_none;
         }
     }
     return list;
@@ -1298,6 +1301,44 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
                 }
             }
             break;
+    }
+}
+
+
+bool widget_list_query_render_backdrop(const widget_list* wdgt_list) {
+    if (wdgt_list) {
+        for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+            if (widget->redraw_required) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void widget_list_render_backdrop(const widget_list* wdgt_list) {
+    if (NULL == wdgt_list) {
+        return;
+    }
+    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+        if (!widget->hidden) {
+            widget->render_backdrop(widget);
+        }
+    }
+    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+        if (widget->render_backdrop != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
+    }
+}
+
+void widget_list_render_foreground(const widget_list* wdgt_list) {
+    if (NULL == wdgt_list) {
+        return;
+    }
+    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+        if (!widget->hidden) {
+            widget->render_foreground(widget);
+            widget_render_foreground_default(widget);
+        }
     }
 }
 
