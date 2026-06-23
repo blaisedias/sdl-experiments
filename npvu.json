@@ -125,8 +125,8 @@
                     "position": {
                         "x": "center",
                         "y": "top",
-                        "w": 100,
-                        "h": 50
+                        "w": 64,
+                        "h": 32
                     }
                 },
                 "hotspot": true,
@@ -149,9 +149,9 @@
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 110,
                         "w": 0,
-                        "h": -50
+                        "h": -114
                     },
                     "position" : {
                         "x": "right",
@@ -171,9 +171,9 @@
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 110,
                         "w": 0,
-                        "h": -50
+                        "h": -114
                     },
                     "position": {
                         "x": "left",

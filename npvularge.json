@@ -86,8 +86,8 @@
                     "position": {
                         "x": "center",
                         "y": "top",
-                        "w": 100,
-                        "h": 50
+                        "w": 64,
+                        "h": 32
                     }
                 },
                 "hotspot": true,
