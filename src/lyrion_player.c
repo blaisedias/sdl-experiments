@@ -1544,7 +1544,7 @@ static int snprintf_time(char *buff, size_t bufflen, int seconds, bool suppress0
 }
 
 void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const char *format) {
-    char* pre;
+    char* pre="";
     char* post;
     char* pprint = buff;
     int   wr;
@@ -1703,9 +1703,8 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
         }
     }
 END:
-    if (fmt) {
-        free(fmt);
-    }
+    SNPRINTF(pre);
+    FREE(fmt);
     unlock_player_status(player);
 }
 
