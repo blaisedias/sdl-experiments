@@ -45,36 +45,22 @@ static void action_none(widget* wdgt) {
 }
 
 static void action_lock_vumeter(widget* wdgt) {
-    widget *w = &wdgt->view->list->head;
-    while(w != NULL) {
-        if (w->type == WIDGET_VUMETER) {
-            widget_vumeter_select_lock(w, true);
-        }
-        w = w->next;
-    }
-    widget_multistate_button_set_state(wdgt, 1);
+    lock_vu_meters();
 }
 
 static void action_unlock_vumeter(widget* wdgt) {
-    widget *w = &wdgt->view->list->head;
-    while(w != NULL) {
-        if (w->type == WIDGET_VUMETER) {
-            widget_vumeter_select_lock(w, false);
-        }
-        w = w->next;
-    }
-    widget_multistate_button_set_state(wdgt, 0);
+    unlock_vu_meters();
 }
 
 static void action_lock_visu(widget* wdgt) {
-    action_lock_vumeter(wdgt);
+    lock_visualisers();
 }
 
 static void action_unlock_visu(widget* wdgt) {
-    action_unlock_vumeter(wdgt);
+    unlock_visualisers();
 }
 
-static void widget_dispatch_action_explicit(widget* wdgt, action act) {
+static void widget_dispatch_action_explicit(widget* wdgt, action_t act) {
     action_printf("%p %d %s\n", wdgt, act, action_to_string(act));
     switch(act) {
         case ACTION_NONE:
@@ -204,9 +190,9 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
 static void action_multi_state_button(widget* wdgt) {
     action_printf("action_multistate_button action state=%d %d %s\n", 
             wdgt->sub.multistate_button.state,
-            wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action,
-            action_to_string( wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action));
-    widget_dispatch_action_explicit(wdgt, wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action);
+            wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action,
+            action_to_string( wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action));
+    widget_dispatch_action_explicit(wdgt, wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action);
 //    wdgt->sub.multistate_button.state = (wdgt->sub.multistate_button.state + 1) % wdgt->sub.multistate_button.state_count;
 }
 
@@ -269,9 +255,9 @@ static const char* action_strings[] = {
         "",                 /* END */
 };
 
-action action_from_string(const char* str) {
+action_t action_from_string(const char* str) {
     if (str != NULL ) {
-        for(int a=0; a < sizeof(action_strings)/sizeof(action_strings[0]); a++) {
+        for(int a=0; a < sizeof(action_strings)/sizeof(action_strings[0]); ++a) {
             if (0 == strcmp(action_strings[a], str)) {
                 return a;
             }
@@ -283,7 +269,7 @@ action action_from_string(const char* str) {
     return ACTION_NONE;
 }
 
-const char* action_to_string(action action) {
+const char* action_to_string(action_t action) {
     if (action > ACTION_NONE && action < ACTION_END ) {
         return action_strings[action];
     }
@@ -292,7 +278,7 @@ const char* action_to_string(action action) {
     return "ACTION_UNKNOWN";
 }
 
-void dispatch_action(action act) {
+void dispatch_action(action_t act) {
     switch(act) {
         case ACTION_NONE:
             break;
@@ -318,16 +304,16 @@ void dispatch_action(action act) {
             SDL_PushEvent(&prev_sp_event);
             break;
         case ACTION_LOCK_VUMETER:
-            // TODO
+            lock_vu_meters();
             break;
         case ACTION_UNLOCK_VUMETER:
-            // TODO
+            unlock_vu_meters();
             break;
         case ACTION_LOCK_VISU:
-            // TODO
+            lock_visualisers();
             break;
         case ACTION_UNLOCK_VISU:
-            // TODO
+            unlock_visualisers();
             break;
         case ACTION_MULTISTATE_BUTTON:
             // NOTHING TO DO

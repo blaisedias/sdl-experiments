@@ -343,7 +343,7 @@ widget* widget_set_runtime_value_key(widget* wdgt, const char* key) {
 }
 
 
-widget* widget_action(widget* wdgt, action action) {
+widget* widget_action(widget* wdgt, action_t action) {
     if (wdgt) {
         if (wdgt->type != WIDGET_MULTISTATE_BUTTON) {
             wdgt->action = action;
@@ -635,7 +635,7 @@ widget* widget_create_multistate_button(const view_context* view, int state_coun
     return wdgt;
 }
 
-widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const char* image_name, action action) {
+widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const char* image_name, action_t dispatch_action, action_t sync_on_action) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum <  wdgt->sub.multistate_button.state_count) {
         _btn_resource* res = wdgt->sub.multistate_button.res + statenum;
         // cleanup
@@ -652,7 +652,8 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
             res->texture_id = 0;
         }
         res->resource_path = strdup(image_name);
-        res->action = action;
+        res->dispatch_action = dispatch_action;
+        res->sync_on_action = sync_on_action;
     }
     return wdgt;
 }
@@ -671,6 +672,18 @@ widget* widget_multistate_button_get_state(widget* wdgt, unsigned* statenum) {
     }
     return wdgt;
 }
+
+widget* widget_multistate_button_sync_on_action(widget* wdgt, action_t act) {
+    if (wdgt->type == WIDGET_MULTISTATE_BUTTON) {
+        for(int ix_state=0; ix_state<wdgt->sub.multistate_button.state_count; ++ix_state) {
+            if (act == wdgt->sub.multistate_button.res[ix_state].sync_on_action) {
+                widget_multistate_button_set_state(wdgt, ix_state);
+            }
+        }
+    }
+    return wdgt;
+}
+
 
 widget* widget_hotspot(widget* wdgt, bool hotspot) {
     wdgt->hotspot = hotspot;

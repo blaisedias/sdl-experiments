@@ -94,6 +94,7 @@ typedef enum {
     JT_RUNTIME_VALUE,
 
     JT_EQUAL_HORIZONTAL_SPACING,
+    JT_SYNC_ON_ACTION,
 
     JT_END,
 
@@ -156,6 +157,8 @@ static const char* json_token_strings[]= {
     "runtime_value",
 
     "equal_horizontal_spacing",
+
+    "sync_on_action",
 
     "",
 };
@@ -551,10 +554,14 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                         json_value* svalue = jstates->u.array.values[x];
                         widget_multistate_button_addstate(widget, x, 
                                 get_object_string_value(svalue, JT_IMAGE, NULL),
-                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)));
-                        json_printf("              %d %s %s\n",
+                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
+                                action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL))
+                                );
+                        json_printf("              %d %s, %d %s, %s\n",
                                 action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
                                 get_object_string_value(svalue, JT_ACTION, NULL),
+                                action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL)),
+                                get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL),
                                 get_object_string_value(svalue, JT_IMAGE, NULL));
                     }
                 } else {

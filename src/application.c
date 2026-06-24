@@ -367,7 +367,7 @@ void app_render_loop(app_context_ptr app_ctx_in) {
             SDL_SetRenderTarget(app_ctx->renderer, app_ctx->backdrop_texture);
             SDL_RenderClear(app_ctx->renderer);
             app_ctx->cb_render_backdrop(app_ctx);
-            log_printf("redraw_all\n");
+            // log_printf("redraw_backdrop\n");
         }
 
         if (app_ctx->target_texture == NULL) {

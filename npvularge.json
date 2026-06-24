@@ -96,11 +96,13 @@
                 "states": [
                     {
                         "image": "./images/sd/hotspot-pin-offon.png",
-                        "action": "lock_visu"
+                        "action": "lock_visu",
+                        "sync_on_action": "unlock_visu"
                     },
                     {
                         "image": "./images/sd/hotspot-pin-onoff.png",
-                        "action": "unlock_visu"
+                        "action": "unlock_visu",
+                        "sync_on_action": "lock_visu"
                     }
                 ]
             }

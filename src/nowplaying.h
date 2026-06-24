@@ -9,5 +9,12 @@ void next_np_view();
 void prev_np_view();
 // get pointer to the current player
 lyrion_player_ptr get_player();
-
+// lock vumeters on all views
+void lock_vu_meters();
+// unlock vumeters on all views
+void unlock_vu_meters();
+// lock visualisers on all views
+void lock_visualisers();
+// unlock visualisers on all views
+void unlock_visualisers();
 #endif

@@ -60,9 +60,9 @@ typedef enum {
     ACTION_PREV_NP_VIEW,
 
     ACTION_END,
-} action;
+} action_t;
 
-action action_from_string(const char* str);
-const char* action_to_string(action action);
-void dispatch_action(action act);
+action_t action_from_string(const char* str);
+const char* action_to_string(action_t action);
+void dispatch_action(action_t act);
 #endif // __jl_action_h_

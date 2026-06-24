@@ -589,6 +589,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 case SDL_SCANCODE_AUDIONEXT:
                     dispatch_action(ACTION_NEXT_TRACK);
                     break;
+                case SDL_SCANCODE_F9:
+                    dispatch_action(ACTION_LOCK_VISU);
+                    break;
+                case SDL_SCANCODE_F10:
+                    dispatch_action(ACTION_UNLOCK_VISU);
+                    break;
                 case SDL_SCANCODE_AUDIOREWIND:
                     error_printf("rewind is not supported\n");
                     break;
@@ -857,5 +863,39 @@ printf("starting player_poll_loop\n"); fflush(stdout);
     close_local_player(player);
     player = NULL;
     puts("\n\n");
+}
+
+static void set_visualiser_lock(bool lock, action_t action) {
+    for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
+        view_context_ptr pv = np_views[ix];
+        if (pv) {
+            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                if (t->type == WIDGET_VUMETER) {
+                    widget_vumeter_select_lock(t, lock);
+                }
+                if (t->type == WIDGET_MULTISTATE_BUTTON) {
+                    widget_multistate_button_sync_on_action(t, action);
+                }
+            }
+        }
+    }
+}
+
+void lock_vu_meters() {
+    set_visualiser_lock(true, ACTION_LOCK_VUMETER);
+}
+
+void unlock_vu_meters() {
+    set_visualiser_lock(false, ACTION_UNLOCK_VUMETER);
+}
+
+void lock_visualisers() {
+    set_visualiser_lock(true, ACTION_LOCK_VUMETER);
+    set_visualiser_lock(true, ACTION_LOCK_VISU);
+}
+
+void unlock_visualisers() {
+    set_visualiser_lock(false, ACTION_UNLOCK_VUMETER);
+    set_visualiser_lock(false, ACTION_UNLOCK_VISU);
 }
 
