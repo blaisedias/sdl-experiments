@@ -56,7 +56,7 @@ SANITIZE =
 #SANITIZE =  -fsanitize=memory -fno-omit-frame-pointer -fsanitize=undefined
 GLOBAL_DEPS = ./Makefile
 #CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE)
-CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS)
+CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
 CCP = g++
 CC = gcc
 CF_PIC = $(CF) -fpic
