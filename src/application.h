@@ -6,6 +6,7 @@
 
 typedef struct {
     unsigned        reported_fps;
+    bool            have_multiple_views;
 } app_workspace_t;
 
 typedef struct app_context app_context;
@@ -71,5 +72,6 @@ int app_render_rotated(app_context* app_ctx,  SDL_Texture * texture, const SDL_R
 bool app_running(app_context_ptr app_ctx);
 void app_wait_ready();
 int64_t app_get_render_count();
+void app_set_multiple_views(app_context_ptr app_ctx, bool val);
 
 #endif // __jl_application_h_

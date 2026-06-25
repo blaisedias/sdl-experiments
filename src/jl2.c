@@ -404,6 +404,22 @@ printf("starting controller\n"); fflush(stdout);
         free(tmp);
     }
 
+    if (np_view_indx > 1) {
+        app_set_multiple_views(app_ctx, np_view_indx > 1);
+    } else {
+        for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
+            view_context_ptr pv = np_views[ix];
+            if (pv) {
+                for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                    if (widget_has_action(t, ACTION_NEXT_NP_VIEW)
+                           ||
+                           widget_has_action(t, ACTION_PREV_NP_VIEW)) {
+                        widget_hide(t, true);
+                    }
+                }
+            }
+        }
+    }
     np_view_indx = 0;
     view = np_views[np_view_indx];
 

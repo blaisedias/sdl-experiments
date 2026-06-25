@@ -491,3 +491,8 @@ void app_wait_ready() {
 int64_t app_get_render_count() {
     return render_iters;
 }
+
+void app_set_multiple_views(app_context_ptr app_ctx_in, bool val) {
+    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_ctx->workspace.have_multiple_views = val;
+}

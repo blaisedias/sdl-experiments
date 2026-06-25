@@ -197,6 +197,7 @@ widget* widget_prev(widget *wdgt, widget* prev);
 widget* widget_load_media(widget* wdgt, const char* resource_path);
 widget* widget_destroy(widget* wdgt);
 widget* widget_action(widget* wdgt, action_t action);
+bool widget_has_action(widget* wdgt, action_t action);
 widget* widget_hide(widget* wdgt, bool hide);
 widget* widget_hotspot(widget* wdgt, bool hotspot);
 widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r);

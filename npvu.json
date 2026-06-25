@@ -250,7 +250,7 @@
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 220,
@@ -259,8 +259,21 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/stop-circle.png",
-                "action": "stop"
+                "states": [
+                    {
+                        "image": "./images/sd/stop-circle.png",
+                        "action": "stop"
+                    },
+                    {
+                        "image": "./images/sd/stop-circle.png",
+                        "action": "stop"
+                    },
+                    {
+                        "image": "./images/sd/stop-circle-disabled.png",
+                        "action": "none"
+                    }
+                ],
+                "player_value": "MODE"
             }
         },
         {

@@ -52,7 +52,7 @@ bool widget_pressed(widget* wdgt) {
 
 void widget_set_pressed(widget* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_pressed, onoff, __ATOMIC_RELEASE);
-     wdgt->redraw_required = !wdgt->render_as_foreground;
+     wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hidden;
 }
 
 
@@ -355,6 +355,22 @@ widget* widget_action(widget* wdgt, action_t action) {
     }
     return wdgt;
 }
+
+bool widget_has_action(widget* wdgt, action_t action) {
+    if (wdgt) {
+        if (wdgt->type != WIDGET_MULTISTATE_BUTTON) {
+            return wdgt->action == action;
+        } else {
+            for(int ix_state=0; ix_state<wdgt->sub.multistate_button.state_count; ++ix_state) {
+                if (action == wdgt->sub.multistate_button.res[ix_state].dispatch_action) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
 widget* widget_hide(widget* wdgt, bool hide) {
     if (wdgt) {
@@ -1334,7 +1350,9 @@ void widget_list_render_backdrop(const widget_list* wdgt_list) {
         return;
     }
     for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
-        if (!widget->hidden) {
+        if (widget->hidden) {
+            widget->redraw_required = false;
+        } else {
             widget->render_backdrop(widget);
         }
     }
