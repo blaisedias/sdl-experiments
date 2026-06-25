@@ -44,6 +44,12 @@ typedef enum {
     POINTER_MOTION
 } pointer_input;
 
+typedef enum {
+    TXT_CENTRED,
+    TXT_LEFT,
+    TXT_RIGHT
+} text_justification;
+
 typedef struct vumeter_widget vumeter_widget;
 typedef struct spmeter_widget spmeter_widget;
 
@@ -94,9 +100,10 @@ typedef struct {
     const char* name;   // name is used for texture cache
     const char* format; // player format string, can be NULL
     const char* content;
-    SDL_Rect content_dim;
+//    SDL_Rect content_dim;
     SDL_Color colour;
     SDL_Rect dst_rect;
+    text_justification justification;
 }_text_data,*_text_data_ptr;
 
 struct widget {
@@ -236,6 +243,7 @@ widget* widget_text_set_format(widget*, const char* format);
 widget* widget_text_set_content(widget*, const char* content);
 widget* widget_text_set_font(widget*, const char* font_path, int size);
 widget* widget_text_set_colour(widget*, SDL_Color colour);
+widget* widget_text_set_justification(widget*, const char*);
 
 struct widget_list {
     widget head;

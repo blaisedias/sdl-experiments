@@ -1108,7 +1108,7 @@ widget* widget_text_set_format(widget* wdgt, const char* format) {
 static void text_render_surface(widget* wdgt) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
-        txt_w->content_dim.x = txt_w->content_dim.y = txt_w->content_dim.w = txt_w->content_dim.h = 0;
+//        txt_w->content_dim.x = txt_w->content_dim.y = txt_w->content_dim.w = txt_w->content_dim.h = 0;
         if (txt_w->texture_id) {
             SDL_Surface *surface = TTF_RenderUTF8_Blended(txt_w->font, txt_w->content, txt_w->colour);
             if (surface) {
@@ -1134,12 +1134,26 @@ static void text_render_surface(widget* wdgt) {
                     }
                 }
                 tcache_set_surface(txt_w->texture_id, surface);
-                txt_w->content_dim.w = surface->w;
-                txt_w->content_dim.h = surface->h;
-                txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - surface->w)/2);
-                txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
+//                txt_w->content_dim.w = surface->w;
+//                txt_w->content_dim.h = surface->h;
+
                 txt_w->dst_rect.w = surface->w;
                 txt_w->dst_rect.h = surface->h;
+                switch(txt_w->justification) {
+                    case TXT_LEFT:
+                        txt_w->dst_rect.x = wdgt->rect.x;
+                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
+                        break;
+                    case TXT_RIGHT:
+                        txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - surface->w));
+                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
+                        break;
+                    case TXT_CENTRED:
+                    default:
+                        txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - surface->w)/2);
+                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
+                        break;
+                }
                 
                 // for now scale text to fit content.
                 float scale_x = (float)surface->w/wdgt->rect.w;
@@ -1158,6 +1172,22 @@ static void text_render_surface(widget* wdgt) {
                     txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
                     txt_w->dst_rect.w = scaled_w;
                     txt_w->dst_rect.h = scaled_h;
+                    
+                    switch(txt_w->justification) {
+                        case TXT_LEFT:
+                            txt_w->dst_rect.x = wdgt->rect.x;
+                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
+                            break;
+                        case TXT_RIGHT:
+                            txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - scaled_w));
+                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
+                            break;
+                        case TXT_CENTRED:
+                        default:
+                            txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - scaled_w)/2);
+                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
+                            break;
+                    }
                 }
             }
         }
@@ -1179,7 +1209,7 @@ widget* widget_text_set_content(widget* wdgt, const char* content) {
             }
             free((void *)txt_w->content);
             txt_w->content = NULL;
-            txt_w->content_dim.w = txt_w->content_dim.h = 0;
+//            txt_w->content_dim.w = txt_w->content_dim.h = 0;
         }
         txt_w->content = strdup(content);
         text_render_surface(wdgt);
@@ -1208,6 +1238,19 @@ widget* widget_text_set_colour(widget* wdgt, SDL_Color colour) {
         txt_w->colour.a = colour.a;
     }
     text_render_surface(wdgt);
+    return wdgt;
+}
+
+widget* widget_text_set_justification(widget* wdgt, const char* justif_name) {
+    if (wdgt && wdgt->type == WIDGET_TEXT) {
+        if (justif_name) {
+            if (0 == strcmp("center", justif_name)) { wdgt->sub.text.justification = TXT_CENTRED;}
+            else if (0 == strcmp("left", justif_name)) { wdgt->sub.text.justification = TXT_LEFT;}
+            else if (0 == strcmp("right", justif_name)) { wdgt->sub.text.justification = TXT_RIGHT;}
+            else error_printf("unsupported text justification %s\n", justif_name);
+            text_render_surface(wdgt);
+        }
+    }
     return wdgt;
 }
 

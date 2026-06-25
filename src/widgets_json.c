@@ -83,6 +83,7 @@ typedef enum {
     JT_TEXT_FONT,
     JT_TEXT_FONT_SIZE,
     JT_TEXT_COLOUR,
+    JT_TEXT_JUSTIFICATION,
 
     JT_RED,
     JT_GREEN,
@@ -146,6 +147,7 @@ static const char* json_token_strings[]= {
     "font",
     "font_size",
     "colour",
+    "justification",
 
     "red",
     "green",
@@ -534,6 +536,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 widget_text_set_font(widget, get_object_string_value(value, JT_TEXT_FONT, ctx->app->default_font_path), font_size);
                 json_printf("     font       %p\n", widget->sub.text.font);
                 json_printf("     fontsize   %p\n", font_size);
+                widget_text_set_justification(widget, get_object_string_value(value, JT_TEXT_JUSTIFICATION, NULL));
                 json_value* jcolour = get_object_object_value(value, JT_TEXT_COLOUR);
                 if (jcolour) {
                     SDL_Color sdlcolour = { 0, 0, 0, 255};
