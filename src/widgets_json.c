@@ -759,5 +759,5 @@ int deserialise_widgets_file(const char* filepath, view_context* ctx) {
     if (rv != 0) {
         error_printf("deserialise_widgets_file: failed to parse json file %s\n", filepath);
     }
-    return 0;
+    return rv;
 }
