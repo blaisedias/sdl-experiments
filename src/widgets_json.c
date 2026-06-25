@@ -79,6 +79,7 @@ typedef enum {
     JT_HEIGHT,
 
     JT_TEXT_FORMAT,
+    JT_TEXT_TIMEDATE_FORMAT,
     JT_TEXT_CONTENT,
     JT_TEXT_FONT,
     JT_TEXT_FONT_SIZE,
@@ -143,6 +144,7 @@ static const char* json_token_strings[]= {
     "height",
 
     "format",
+    "timedate-format",
     "content",
     "font",
     "font_size",
@@ -532,6 +534,8 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 json_printf("     content    %s\n", widget->sub.text.content);
                 widget_text_set_format(widget, get_object_string_value(value, JT_TEXT_FORMAT, NULL));
                 json_printf("     format     %s\n", widget->sub.text.format);
+                widget_text_set_timedate_format(widget, get_object_string_value(value, JT_TEXT_TIMEDATE_FORMAT, NULL));
+                json_printf("     tdformat   %s\n", widget->sub.text.timedate_format);
                 int font_size = get_scaled_object_int_value(value, JT_TEXT_FONT_SIZE, 12);
                 widget_text_set_font(widget, get_object_string_value(value, JT_TEXT_FONT, ctx->app->default_font_path), font_size);
                 json_printf("     font       %p\n", widget->sub.text.font);

@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "nowplaying.h"
+
 typedef enum {
     TD_WEEKDAY,
     TD_MONTH,

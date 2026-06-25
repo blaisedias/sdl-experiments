@@ -99,6 +99,7 @@ typedef struct {
     TTF_Font* font;
     const char* name;   // name is used for texture cache
     const char* format; // player format string, can be NULL
+    const char* timedate_format; // time date format string, can be NULL
     const char* content;
 //    SDL_Rect content_dim;
     SDL_Color colour;
@@ -240,6 +241,7 @@ widget *widget_slider_image_height(widget* , slider_resource_ID id, int height);
 
 widget* widget_create_text(const view_context*);
 widget* widget_text_set_format(widget*, const char* format);
+widget* widget_text_set_timedate_format(widget*, const char* format);
 widget* widget_text_set_content(widget*, const char* content);
 widget* widget_text_set_font(widget*, const char* font_path, int size);
 widget* widget_text_set_colour(widget*, SDL_Color colour);

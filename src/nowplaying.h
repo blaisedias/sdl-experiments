@@ -17,4 +17,6 @@ void unlock_vu_meters();
 void lock_visualisers();
 // unlock visualisers on all views
 void unlock_visualisers();
+
+void timedate_sprintf(char* buff, size_t bufflen, const char *format);
 #endif

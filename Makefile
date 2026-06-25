@@ -102,6 +102,7 @@ TSP_OBJS =  \
 		  $(OBJS_DIR)/platform_linux.o \
    		  $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/city.o \
 		  $(OBJS_DIR)/lyrion_player.o \
+		  $(OBJS_DIR)/timedate.o \
 		  $(OBJS_DIR)/widgets.o \
 		  $(OBJS_DIR)/actions.o \
    		  $(OBJS_DIR)/json.o \
@@ -204,6 +205,7 @@ TEST_WIDGETS_JSON_OBJS =  \
 	$(OBJS_DIR)/city.o $(OBJS_DIR)/texture_cache.o \
 	$(OBJS_DIR)/timing.o $(OBJS_DIR)/event_queue.o \
 	$(OBJS_DIR)/lyrion_player.o \
+	$(OBJS_DIR)/timedate.o \
 	$(OBJS_DIR)/platform_linux.o
 
 $(BIN_DIR)/test_widgets_json : $(OBJS_DIR)/test_widgets_json.o $(TEST_WIDGETS_JSON_OBJS) | $(BIN_DIR)

@@ -63,6 +63,27 @@
             }
         },
         {
+            "text": {
+                "location": {
+                    "position": {
+                        "x": 400,
+                        "w": -1,
+                        "y": -15,
+                        "h": 15
+                    }
+                },
+                "content": "NN MMM hh:mm:ss 20XX",
+                "timedate-format": "{weekday} {day} {month} {hour}:{minutes} {year}",
+                "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
+                "font_size": 10,
+                "colour": {
+                    "red" : 255,
+                    "green" : 255
+                },
+                "justification": "right"
+            }
+        },
+        {
             "vumeter": {
                 "location": {
                     "position": {

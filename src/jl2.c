@@ -873,6 +873,11 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                     }
                 }
             }
+            if (t->type == WIDGET_TEXT && t->sub.text.timedate_format) {
+                timedate_sprintf(buffer, sizeof(buffer), t->sub.text.timedate_format);
+                debug_printf("'%s' -> '%s'\n", t->sub.text.timedate_format, buffer);
+                widget_text_set_content(t, buffer);
+            }
         }
         }
     }

@@ -460,6 +460,7 @@ widget* widget_destroy(widget* wdgt) {
                     FREE(txt_w->name);
                     FREE(txt_w->content);
                     FREE(txt_w->format);
+                    FREE(txt_w->timedate_format);
                     if (txt_w->font) {
                         TTF_CloseFont(txt_w->font);
                         txt_w->font = NULL;
@@ -1104,6 +1105,21 @@ widget* widget_text_set_format(widget* wdgt, const char* format) {
     }
     return wdgt;
 }
+
+widget* widget_text_set_timedate_format(widget* wdgt, const char* format) {
+    if (wdgt && wdgt->type == WIDGET_TEXT) {
+        _text_data_ptr txt_w = &wdgt->sub.text;
+        if (txt_w->timedate_format) {
+            free((void *)txt_w->timedate_format);
+            txt_w->timedate_format = NULL;
+        }
+        if (format) {
+            txt_w->timedate_format = strdup(format);
+        }
+    }
+    return wdgt;
+}
+
 
 static void text_render_surface(widget* wdgt) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
