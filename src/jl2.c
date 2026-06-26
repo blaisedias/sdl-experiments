@@ -426,8 +426,8 @@ printf("starting controller\n"); fflush(stdout);
         }
     }
     np_view_indx = 0;
-//    set_current_view(np_views[np_view_indx]);
-    set_current_view(main_view);
+    set_current_view(np_views[np_view_indx]);
+//    set_current_view(main_view);
 
     //TODO select view when previously shutdown
     
