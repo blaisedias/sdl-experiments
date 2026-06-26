@@ -75,8 +75,8 @@ static bool dump_vu = false;
 static bool monitor_tcache = false;
 
 #define MAX_NP_VIEWS   10
-static volatile view_context_ptr view = NULL;
-static view_context_ptr non_np_view = NULL;
+static volatile view_context_ptr current_view = NULL;
+static view_context_ptr main_view = NULL;
 static view_context_ptr np_views[MAX_NP_VIEWS];
 static volatile int np_view_indx=0;
 static volatile bool refresh_widget_contents = false;
@@ -120,6 +120,14 @@ static void invalid_args(const char* opt) {
     puts(help_text);
     printf("Invalid number of arguments for command line option: %s\n", opt);
     exit(EXIT_FAILURE);
+}
+
+static void set_current_view(view_context_ptr new_view) {
+    __atomic_store_n(&current_view, new_view, __ATOMIC_RELEASE);
+}
+
+static view_context_ptr get_current_view() {
+    return __atomic_load_n(&current_view, __ATOMIC_ACQUIRE);
 }
 
 int main(int argc, char** argv) {
@@ -301,11 +309,12 @@ int main(int argc, char** argv) {
 }
 
 void next_np_view() {
-    if (view != non_np_view) {
+    view_context_ptr view = get_current_view();
+    if (view != main_view) {
         for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
             int indx = (np_view_indx + ix) % MAX_NP_VIEWS;
             if (np_views[indx]) {
-                view = np_views[indx];
+                set_current_view(np_views[indx]);
                 np_view_indx = indx;
                 refresh_widget_contents = true;
                 return;
@@ -315,14 +324,15 @@ void next_np_view() {
 }
 
 void prev_np_view() {
-    if (view != non_np_view) {
+    view_context_ptr view = get_current_view();
+    if (view != main_view) {
         for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
             int indx = (np_view_indx - ix);
             if (indx < 0) {
                 indx += MAX_NP_VIEWS;
             }
             if (np_views[indx]) {
-                view = np_views[indx];
+                set_current_view(np_views[indx]);
                 np_view_indx = indx;
                 refresh_widget_contents = true;
                 return;
@@ -331,6 +341,32 @@ void prev_np_view() {
     }
 }
 
+static view_context_ptr load_json_view(const char* json_path, app_context_ptr app_ctx) {
+    view_context_ptr vw = calloc(sizeof(*vw),1);
+    if(NULL == vw) {
+        return vw;
+    }
+    vw->app = app_ctx;
+    vw->list = create_widget_list(vw);
+    if (0 != deserialise_widgets_file(json_path, vw)) {
+        error_printf("failed to deserialise widgets from file %s\n", json_path);
+        destroy_widget_list(vw->list);
+        FREE(vw);
+    } else {
+        widget_list_load_media(vw->list, "./images");
+        for(widget* t = vw->list->tail.prev; t != NULL; t = t->prev) {
+            if ((t->player_value_key && 0 == strcmp("time", t->player_value_key))
+               || 
+               (t->runtime_value_key && 0 == strcmp("fps", t->runtime_value_key))
+               ||
+               t->hotspot) {
+                widget_set_renderhf(t);
+                log_printf("widget_set_renderhf %d\n", t->type);
+            }
+        }
+    }
+    return vw;
+}
 
 static void controller(app_context_ptr app_ctx) {
     app_wait_ready();
@@ -341,13 +377,11 @@ printf("starting controller\n"); fflush(stdout);
     if (endtime) {
         endtime += get_milli_seconds();
     }
-    view_context_ptr vw = calloc(sizeof(*vw),1);
+    view_context_ptr vw = load_json_view("main.json", app_ctx);
     if(NULL == vw) {
-        return;
+        exit(EXIT_FAILURE);
     }
-    vw->app = app_ctx;
-    vw->list = create_widget_list(vw);
-    non_np_view = vw;
+    main_view = vw;
 
     if (VUMeter_get_props_list() == NULL) {
         error_printf("No VU Meters found\n");
@@ -363,38 +397,9 @@ printf("starting controller\n"); fflush(stdout);
             if (comma_p) {
                 *comma_p = 0;
             }
-            vw = calloc(sizeof(*vw),1);
-            if(NULL == vw) {
-                return;
-            }
-            vw->app = app_ctx;
-            vw->list = create_widget_list(vw);
-
-            if ( 0 != deserialise_widgets_file(json_file, vw)) {
-                error_printf("failed to deserialise widgets from file %s\n", json_file);
-                destroy_widget_list(vw->list);
-                free(vw);
-    //            app_stop(app_ctx);
-            } else {
-                if (dump_vu) {
-                    const vumeter_properties_t* vp = VUMeter_get_props_list();
-                    while(vp) {
-                        VUMeter_dump_props(vp);
-                        vp = vp->next;
-                    }
-                }
-                widget_list_load_media(vw->list, "./images");
-                for(widget* t = vw->list->tail.prev; t != NULL; t = t->prev) {
-                    if ((t->player_value_key && 0 == strcmp("time", t->player_value_key))
-                       || 
-                       (t->runtime_value_key && 0 == strcmp("fps", t->runtime_value_key))
-                       ||
-                       t->hotspot) {
-                        widget_set_renderhf(t);
-                        log_printf("widget_set_renderhf %d\n", t->type);
-                    }
-                }
-                np_views[np_view_indx] = vw;
+            vw = load_json_view(json_file, app_ctx);
+            if(vw) {
+               np_views[np_view_indx] = vw;
                 ++np_view_indx;
             }
             if (comma_p) {
@@ -421,7 +426,8 @@ printf("starting controller\n"); fflush(stdout);
         }
     }
     np_view_indx = 0;
-    view = np_views[np_view_indx];
+//    set_current_view(np_views[np_view_indx]);
+    set_current_view(main_view);
 
     //TODO select view when previously shutdown
     
@@ -439,6 +445,7 @@ printf("starting controller\n"); fflush(stdout);
             if (0 >= --show_cursor) {
                 SDL_ShowCursor(SDL_DISABLE);
                 show_cursor = 0;
+                view_context_ptr view = get_current_view();
                 if (view) {
                     for(widget* widget=view->list->tail.prev; widget != NULL; widget=widget->prev) {
                         if (widget->hidden) { continue;}
@@ -474,7 +481,7 @@ printf("starting controller\n"); fflush(stdout);
         }
     }
     SDL_SemWait(controller_sem);
-    view = NULL;
+    set_current_view(NULL);
     for(int ix = 0; ix < MAX_NP_VIEWS; ++ix) {
         if(np_views[ix]) {
             destroy_widget_list(np_views[ix]->list);
@@ -482,26 +489,34 @@ printf("starting controller\n"); fflush(stdout);
             np_views[ix] = NULL;
         }
     }
-    if(non_np_view) {
-        destroy_widget_list(non_np_view->list);
-        free(non_np_view);
+    if(main_view) {
+        destroy_widget_list(main_view->list);
+        free(main_view);
     }
 }
 
 static bool my_query_render_backdrop(app_context_ptr app_ctx) {
+    view_context_ptr view = get_current_view();
+    static view_context_ptr previous_view = NULL;
     if (view) {
+        if (previous_view != view) {
+            previous_view = view;
+            return true;
+        }
         return widget_list_query_render_backdrop(view->list);
     }
     return false;
 }
 
 static void my_render_backdrop(app_context_ptr app_ctx) {
+    view_context_ptr view = get_current_view();
     if (view) {
         widget_list_render_backdrop(view->list);
     }
 }
 
 static void my_render_foreground(app_context_ptr app_ctx) {
+    view_context_ptr view = get_current_view();
     if (view) {
         widget_list_render_foreground(view->list);
     }
@@ -512,6 +527,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
             case USEREVENT_NEXT_VISU:
             case USEREVENT_NEXT_VU:
                 {
+                    view_context_ptr view = get_current_view();
                     if(view) {
                         for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
                             if (t->type == WIDGET_VUMETER) {
@@ -533,6 +549,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
             case USEREVENT_PREV_VISU:
             case USEREVENT_PREV_VU:
                 {
+                    view_context_ptr view = get_current_view();
                     if (view) {
                         for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
                             if (t->type == WIDGET_VUMETER) {
@@ -559,13 +576,21 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 print_sdl_key_scancode(eventp->key.keysym.scancode);
                 switch (eventp->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE: 
-                    if (view == non_np_view) {
-                        puts("");
-                        app_stop(app_ctx);
-                    } else {
-                        view = non_np_view;
+                    {
+                        if (get_current_view() == main_view) {
+                            puts("");
+                            app_stop(app_ctx);
+                        } else {
+                            set_current_view(main_view);
+                            refresh_widget_contents = true;
+                        }
                     }
                     break;
+                case SDL_SCANCODE_LEFTBRACKET: 
+                    if (get_current_view() == main_view) {
+                        set_current_view(np_views[np_view_indx]);
+                        refresh_widget_contents = true;
+                    }break;
                 case SDL_SCANCODE_SPACE:
                     dispatch_action(ACTION_PLAY_PAUSE);
                     break;
@@ -576,7 +601,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         printf("\n texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
                     }
                     break;
-                case SDL_SCANCODE_T:
+                case SDL_SCANCODE_PRINTSCREEN:
                     tcache_dump();
                     break;
                 case SDL_SCANCODE_LEFT:
@@ -605,6 +630,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 case SDL_SCANCODE_AUDIONEXT:
                     dispatch_action(ACTION_NEXT_TRACK);
                     break;
+                case SDL_SCANCODE_SCROLLLOCK:
                 case SDL_SCANCODE_F9:
                     dispatch_action(ACTION_LOCK_VISU);
                     break;
@@ -636,6 +662,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 } break;
             case SDL_MOUSEBUTTONDOWN:
@@ -643,6 +670,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 } break;
             case SDL_MOUSEBUTTONUP:
@@ -650,6 +678,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
+                    view_context_ptr view = get_current_view();
                     widget_list_react(view->list, POINTER_UP, &pt);
                 } break;
             case SDL_FINGERMOTION:
@@ -661,12 +690,14 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 }
                 break;
             case USEREVENT_FINGERMOTION:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 } break;
             case SDL_FINGERDOWN:
@@ -678,12 +709,14 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 }
                 break;
             case USEREVENT_FINGERDOWN:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 } break;
             case SDL_FINGERUP:
@@ -695,12 +728,14 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_UP, &pt); }
                 }
                 break;
             case USEREVENT_FINGERUP:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
+                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_UP, &pt); }
                 } break;
         
@@ -757,6 +792,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                 }
             }
 
+            view_context_ptr view = get_current_view();
             if (view) {
             for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
                 if (t->player_range_value_key) {
@@ -845,6 +881,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             profile_printf("fps:%u\n", app_ctx->workspace.reported_fps);
             fps = app_ctx->workspace.reported_fps;
         }
+        view_context_ptr view = get_current_view();
         if (view) {
         for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
             if (t->player_value_key) {
