@@ -99,6 +99,33 @@
             "multistate_button": {
                 "location": {
                     "container": {
+                        "y": 25,
+                        "h": -55
+                    },
+                    "position": {
+                        "x": "right",
+                        "y": "bottom",
+                        "w": 16,
+                        "h": 16
+                    }
+                },
+                "state": 0,
+                "states": [
+                    {
+                        "image": "./images/sd/blank.png",
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "image": "./images/sd/lock-outline.png",
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
+            }
+        },
+        {
+            "multistate_button": {
+                "location": {
+                    "container": {
                         "x": 0,
                         "y": 25,
                         "w": 0,
