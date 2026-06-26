@@ -156,7 +156,7 @@
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "container": {
                         "x": 0,
@@ -173,12 +173,22 @@
                 },
                 "hotspot": true,
                 "hotspot_edge": "right",
-                "image": "./images/sd/hotspot-arrow_forward.png",
-                "action": "next_visu"
+                "state": 0,
+                "states": [
+                    {
+                        "image": "./images/sd/hotspot-arrow_forward.png",
+                        "action": "next_visu",
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "image": "./images/sd/blank.png",
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "container": {
                         "x": 0,
@@ -195,12 +205,20 @@
                 },
                 "hotspot": true,
                 "hotspot_edge": "left",
-                "image": "./images/sd/hotspot-arrow_back.png",
-                "action": "prev_visu"
+                "state": 0,
+                "states": [
+                    {
+                        "image": "./images/sd/hotspot-arrow_back.png",
+                        "action": "prev_visu",
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "image": "./images/sd/blank.png",
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
             }
         },
-
-
         {
             "button": {
                 "location": {
