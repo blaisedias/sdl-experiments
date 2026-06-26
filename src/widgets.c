@@ -306,8 +306,7 @@ widget* widget_prev(widget *wdgt, widget* prev) {
 widget* widget_set_player_value_key(widget* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->player_value_key != NULL) {
-            free((void *)wdgt->player_value_key);
-            wdgt->player_value_key = NULL;
+            FREE(wdgt->player_value_key);
         }
         if (key) {
             wdgt->player_value_key = strdup(key);
@@ -319,8 +318,7 @@ widget* widget_set_player_value_key(widget* wdgt, const char* key) {
 widget* widget_set_player_range_value_key(widget* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->player_range_value_key != NULL) {
-            free((void *)wdgt->player_range_value_key);
-            wdgt->player_range_value_key = NULL;
+            FREE(wdgt->player_range_value_key);
         }
         if (key) {
             wdgt->player_range_value_key = strdup(key);
@@ -332,8 +330,7 @@ widget* widget_set_player_range_value_key(widget* wdgt, const char* key) {
 widget* widget_set_runtime_value_key(widget* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->runtime_value_key != NULL) {
-            free((void *)wdgt->runtime_value_key);
-            wdgt->runtime_value_key = NULL;
+            FREE(wdgt->runtime_value_key);
         }
         if (key) {
             wdgt->runtime_value_key = strdup(key);
@@ -382,8 +379,7 @@ widget* widget_hide(widget* wdgt, bool hide) {
 widget* widget_image_path(widget* wdgt, const char* path) {
     if (wdgt) {
         if (wdgt->image_path != NULL) {
-            free((void *)wdgt->image_path);
-            wdgt->image_path = NULL;
+            FREE(wdgt->image_path);
         }
         if (path) {
             wdgt->image_path = strdup(path);
@@ -434,10 +430,9 @@ widget* widget_destroy(widget* wdgt) {
                     _btn_resource* res =  wdgt->sub.multistate_button.res;
                     for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                         tcache_unlock_texture(res[ims].texture_id);
-                        free((void *)res[ims].resource_path);
+                        FREE(res[ims].resource_path);
                     }
-                    free(res);
-                    wdgt->sub.multistate_button.res = NULL;
+                    FREE(res);
                 }break;
             case WIDGET_SLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
@@ -447,8 +442,7 @@ widget* widget_destroy(widget* wdgt) {
                     }
                     for(int ix_img=0; ix_img < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_img) {
                         if ( wdgt->sub.slider.res[ix].image_paths[ix_img] ) {
-                            free((void *)wdgt->sub.slider.res[ix].image_paths[ix_img]);
-                            wdgt->sub.slider.res[ix].image_paths[ix_img] = NULL;
+                            FREE(wdgt->sub.slider.res[ix].image_paths[ix_img]);
                         }
                     }
                 }
@@ -469,19 +463,18 @@ widget* widget_destroy(widget* wdgt) {
                 break;
         }
         if (wdgt->player_value_key) {
-            free((void *)wdgt->player_value_key);
+            FREE(wdgt->player_value_key);
         }
         if (wdgt->runtime_value_key) {
-            free((void *)wdgt->runtime_value_key);
+            FREE(wdgt->runtime_value_key);
         }
         if (wdgt->player_range_value_key) {
-            free((void *)wdgt->player_range_value_key);
+            FREE(wdgt->player_range_value_key);
         }
         if (wdgt->image_path != NULL) {
-            free((void *)wdgt->image_path);
+            FREE(wdgt->image_path);
         }
-        free(wdgt);
-        wdgt = NULL;
+        FREE(wdgt);
     }
     return wdgt;
 }
@@ -661,14 +654,15 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
             if (0 == strcmp(res->resource_path, image_name)) {
                 return wdgt;
             }
-            free((void*)res->resource_path);
-            res->resource_path = NULL;
+            FREE(res->resource_path);
         }
         if (res->texture_id) {
             tcache_unlock_texture(res->texture_id);
             res->texture_id = 0;
         }
-        res->resource_path = strdup(image_name);
+        if (image_name) {
+            res->resource_path = strdup(image_name);
+        }
         res->dispatch_action = dispatch_action;
         res->sync_on_action = sync_on_action;
     }
@@ -890,8 +884,7 @@ widget *widget_slider_image_paths(widget* wdgt, slider_resource_ID id, const cha
             case SLIDER_BAR_START:
                 for(int ix=0; ix < sizeof(wdgt->sub.slider.res[id].image_paths)/sizeof(wdgt->sub.slider.res[id].image_paths[0]); ++ix) {
                     if (wdgt->sub.slider.res[id].image_paths[ix] != NULL) {
-                        free((void *)wdgt->sub.slider.res[id].image_paths[ix]);
-                        wdgt->sub.slider.res[id].image_paths[ix] = NULL;
+                        FREE(wdgt->sub.slider.res[id].image_paths[ix]);
                     }
                 }
                 if (path1) {
@@ -1096,8 +1089,7 @@ widget* widget_text_set_format(widget* wdgt, const char* format) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         if (txt_w->format) {
-            free((void *)txt_w->format);
-            txt_w->format = NULL;
+            FREE(txt_w->format);
         }
         if (format) {
             txt_w->format = strdup(format);
@@ -1110,8 +1102,7 @@ widget* widget_text_set_timedate_format(widget* wdgt, const char* format) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         if (txt_w->timedate_format) {
-            free((void *)txt_w->timedate_format);
-            txt_w->timedate_format = NULL;
+            FREE(txt_w->timedate_format);
         }
         if (format) {
             txt_w->timedate_format = strdup(format);
@@ -1223,8 +1214,7 @@ widget* widget_text_set_content(widget* wdgt, const char* content) {
             if (0 == strcmp(content, txt_w->content)) {
                 return wdgt;
             }
-            free((void *)txt_w->content);
-            txt_w->content = NULL;
+            FREE(txt_w->content);
 //            txt_w->content_dim.w = txt_w->content_dim.h = 0;
         }
         txt_w->content = strdup(content);
