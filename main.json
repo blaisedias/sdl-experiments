@@ -47,6 +47,20 @@
             "button": {
                 "location": {
                     "position": {
+                        "x": -32,
+                        "y": 0,
+                        "w": 32,
+                        "h": 32
+                    }
+                },
+                "image": "./images/sd/music_note_1000dp_1F1F1F_FILL0_wght700_GRAD0_opsz48.png",
+                "action": "nowplaying_view"
+            }
+        },
+        {
+            "button": {
+                "location": {
+                    "position": {
                         "x": 0,
                         "y": 0,
                         "w": 32,

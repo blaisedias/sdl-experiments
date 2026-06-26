@@ -341,6 +341,27 @@ void prev_np_view() {
     }
 }
 
+void select_np_view() {
+    view_context_ptr view = get_current_view();
+    if (view == main_view) {
+        if (np_views[np_view_indx]) {
+            set_current_view(np_views[np_view_indx]);
+            refresh_widget_contents = true;
+        } else {
+            next_np_view();
+        }
+    }
+}
+
+void select_main_view() {
+    view_context_ptr view = get_current_view();
+    if (view != main_view) {
+        set_current_view(main_view);
+        refresh_widget_contents = true;
+    }
+}
+
+
 static view_context_ptr load_json_view(const char* json_path, app_context_ptr app_ctx) {
     view_context_ptr vw = calloc(sizeof(*vw),1);
     if(NULL == vw) {
@@ -581,16 +602,13 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             puts("");
                             app_stop(app_ctx);
                         } else {
-                            set_current_view(main_view);
-                            refresh_widget_contents = true;
+                            select_main_view();
                         }
                     }
                     break;
-                case SDL_SCANCODE_LEFTBRACKET: 
-                    if (get_current_view() == main_view) {
-                        set_current_view(np_views[np_view_indx]);
-                        refresh_widget_contents = true;
-                    }break;
+                case SDL_SCANCODE_LEFTBRACKET:
+                    select_np_view();
+                    break;
                 case SDL_SCANCODE_SPACE:
                     dispatch_action(ACTION_PLAY_PAUSE);
                     break;

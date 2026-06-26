@@ -3,6 +3,10 @@
 
 #include "lyrion_player.h"
 // These functions must be implemented by main application code
+// make nowplaying view active
+void select_main_view();
+// make nowplaying view active
+void select_np_view();
 // Select the next nowplaying view
 void next_np_view();
 // Select the previous nowplaying view

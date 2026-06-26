@@ -178,6 +178,12 @@ static void widget_dispatch_action_explicit(widget* wdgt, action_t act) {
             prev_np_view();
             break;
 
+        case ACTION_NP_VIEW:
+            select_np_view();
+            break;
+        case ACTION_MAIN_VIEW:
+            select_main_view();
+            break;
 
         case ACTION_END:
             break;
@@ -252,6 +258,8 @@ static const char* action_strings[] = {
         "next-nowplaying-view",
         "prev-nowplaying-view",
 
+        "nowplaying_view",
+        "main_view",
         "",                 /* END */
 };
 
@@ -384,6 +392,13 @@ void dispatch_action(action_t act) {
             break;
         case ACTION_PREV_NP_VIEW:
             prev_np_view();
+            break;
+
+        case ACTION_NP_VIEW:
+            select_np_view();
+            break;
+        case ACTION_MAIN_VIEW:
+            select_main_view();
             break;
 
         case ACTION_END:
