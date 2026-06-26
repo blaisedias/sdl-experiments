@@ -11,6 +11,7 @@
 enum resources_enum {
     RSRC_NULL,
     RSRC_white_amber_center,
+    RSRC_quad_center,
     RSRC_white_left_legend,
     RSRC_white_right_legend,
     RSRC_pastel_green_red_center,
@@ -43,6 +44,7 @@ enum resources_enum {
 static const char* resource_names[] = {
    NULL,
    "white-orange-center.png",
+   "quad-center.png",
    "white-left.png",
    "white-right.png",
    "pastel-green-red-center.png",
@@ -75,6 +77,7 @@ static texture_id_t textures[RSRC_COUNT];
 
 enum placements_enum {
     PLCMNT_NULL,
+    PLCMNT_quad_center,
     PLCMNT_white_amber_center,
     PLCMNT_white_left_legend,
     PLCMNT_white_right_legend,
@@ -459,6 +462,7 @@ enum placements_enum {
 
 static vu_placement_t placements[] = {
    { .texture_index=RSRC_NULL, .rect={ 0, 0, 0, 0}, },
+   { .texture_index=RSRC_quad_center, .rect={ 0, 274, 1918, 100}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_white_amber_center, .rect={ 0, 274, 1918, 100}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_white_left_legend, .rect={ 0, 0, 108, 260}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
    { .texture_index=RSRC_white_right_legend, .rect={ 0, 0, 108, 260}, .flip=0, .angle=0, .center={.x=0, .y=0}, },
@@ -845,7 +849,7 @@ static vu_placement_t placements[] = {
 static const vu_background_t bg_shared_quad_color = {
     .placement_count=1,
     .placements={
-        PLCMNT_white_amber_center,
+        PLCMNT_quad_center,
     },
 };
 
