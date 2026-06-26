@@ -560,7 +560,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                     for(int x=0; x<jstates->u.array.length; ++x) {
                         json_value* svalue = jstates->u.array.values[x];
                         widget_multistate_button_addstate(widget, x, 
-                                get_object_string_value(svalue, JT_IMAGE, NULL),
+                                get_object_string_value(svalue, JT_IMAGE, "__EMPTY__"),
                                 action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
                                 action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL))
                                 );
@@ -569,7 +569,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                                 get_object_string_value(svalue, JT_ACTION, NULL),
                                 action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL)),
                                 get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL),
-                                get_object_string_value(svalue, JT_IMAGE, NULL));
+                                get_object_string_value(svalue, JT_IMAGE, "__EMPTY__"));
                     }
                 } else {
                     error_printf("states is either missing or not an array %p", jstates);

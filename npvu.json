@@ -151,7 +151,6 @@
                 "state": 0,
                 "states": [
                     {
-                        "image": "./images/sd/blank.png",
                         "sync_on_action": "unlock_visu"
                     },
                     {
@@ -220,7 +219,6 @@
                         "sync_on_action": "unlock_visu"
                     },
                     {
-                        "image": "./images/sd/blank.png",
                         "sync_on_action": "lock_visu"
                     }
                 ]
@@ -252,7 +250,6 @@
                         "sync_on_action": "unlock_visu"
                     },
                     {
-                        "image": "./images/sd/blank.png",
                         "sync_on_action": "lock_visu"
                     }
                 ]

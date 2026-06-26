@@ -256,6 +256,9 @@ texture_id_t tcache_create_entry(const char* path) {
         error_printf("tcache_create_entry: path pointer is NULL\n");
         exit(EXIT_FAILURE);
     }
+    if (0 == strcmp(path, "__EMPTY__")) {
+        return EMPTY_TEXTURE_ID;
+    }
     uint32_t hashv = hashfn(path);
     texture_id_t indx = hashv%HASHTPRIME;
     int hop_count = 0;
