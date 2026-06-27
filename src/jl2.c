@@ -905,6 +905,8 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             }
         }
         player_value pvalue;
+        get_player_value(player, &pvalue, "CAN_CHANGE_VOLUME");
+        bool can_change_volume = pvalue.integer;
         get_player_value(player, &pvalue, "VOLUME");
         int volume = pvalue.integer;
         get_player_value(player, &pvalue, "DURATION");
@@ -929,6 +931,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                 if (0 == strcmp("VOLUME", t->player_value_key)) {
                     if (t->type == WIDGET_SLIDER) {
                         widget_slider_set_value(t, volume);
+                        widget_slider_set_interactive(t, can_change_volume);
                     }
                 }
                 if (duration && 0 == strcmp("time", t->player_value_key)) {

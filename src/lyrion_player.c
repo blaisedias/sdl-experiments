@@ -225,6 +225,7 @@ typedef enum {
     repeating_stream = 0x02607597b,
 
     VOLUME = 0x022fa5670,
+    CAN_CHANGE_VOLUME = 0x01a798b60,
     ARTIST = 0x013d3211e,
     TITLE = 0x027895b9d,
     PLAYLIST_CURRENT = 0x008374ad5,
@@ -275,6 +276,9 @@ typedef struct {
         int     id;
         int     waitingToPlay;
         int     isClassical;
+        int     mixer_volume;
+        int     digital_volume_control;
+        int     use_volume_control;
 
         const char* const   bitrate;
         const char* const   current_title;
@@ -676,12 +680,14 @@ static void clear_player_status(player_status_ptr status_ptr) {
     status_ptr->isClassical = -1;
 }
 
+/*
 static void get_player_volume(lyrion_player_ptr player) {
     player->volume = -1;
     char *p = lms_query_player(player, "mixer volume");
     player->volume = atoi(p);
     FREE(p);
 }
+*/
 
 static bool update_player_status(lyrion_player_ptr player) {
 #define  SET_INTVALUE(nm) {\
@@ -849,6 +855,16 @@ static bool update_player_status(lyrion_player_ptr player) {
                         SET_STRVALUE(mode);
                         break;
 
+                    case mixer_volume:
+                        SET_INTVALUE(mixer_volume);
+                        break;
+                    case digital_volume_control:
+                        SET_INTVALUE(digital_volume_control);
+                        break;
+                    case use_volume_control:
+                        SET_INTVALUE(use_volume_control);
+                        break;
+
                     case player_name:
                     case player_connected:
                     case player_ip:
@@ -857,12 +873,9 @@ static bool update_player_status(lyrion_player_ptr player) {
                     case rate:
                     case sync_master:
                     case sync_slaves:
-                    case mixer_volume:
                     case playlist_mode:
                     case playlist_timestamp:
                     case seq_no:
-                    case digital_volume_control:
-                    case use_volume_control:
                     case remoteMeta:
                     case bpm:
 
@@ -876,6 +889,7 @@ static bool update_player_status(lyrion_player_ptr player) {
 
                     // pseudo tokens
                     case VOLUME:
+                    case CAN_CHANGE_VOLUME:
                     case ARTIST:
                     case TITLE:
                     case PLAYLIST_CURRENT:
@@ -1118,28 +1132,6 @@ lyrion_player_ptr open_local_player(const char *lms_addr) {
     return player;
 }
 
-int poll_player(lyrion_player_ptr player, player_transient_state_ptr ptransient) {
-    int rv = 0;
-    if (player->lms_player_id) {
-        get_player_volume(player);
-        rv = update_player_status(player);
-        if (ptransient) {
-            ptransient->elapsed_secs = player->status.elapsed_time;
-            ptransient->volume = player->volume;
-        }
-    }
-    return rv;
-}
-
-lyrion_player_ptr close_local_player(lyrion_player_ptr player) {
-    if (player) {
-        close_player(player);
-        free(player);
-        player = NULL;
-    }
-    return player;
-}
-
 static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const char *key) {
     pfv_type return_value = PFV_NONE;
     pfv->integer = 0;
@@ -1318,9 +1310,22 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
 
         // Meta keys
         case VOLUME:
-            if (player->volume > -1) {
+            if (player->status.mixer_volume > -1) {
                 return_value = PFV_INT;
-                pfv->integer = player->volume;
+                pfv->integer = 0;
+                if (player->status.use_volume_control || player->status.digital_volume_control) {
+                    pfv->integer = player->status.mixer_volume;
+                } else {
+                    pfv->integer = 100;
+                }
+            }break;
+        case CAN_CHANGE_VOLUME:
+            {
+                return_value = PFV_INT;
+                pfv->integer = 0;
+                if (player->status.use_volume_control || player->status.digital_volume_control) {
+                    pfv->integer = 1;
+                }
             }break;
         case ARTIST:
             if (player->status.meta_artist) {
@@ -1525,6 +1530,31 @@ pfv_type get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const 
     return pft;
 }
 
+int poll_player(lyrion_player_ptr player, player_transient_state_ptr ptransient) {
+    int rv = 0;
+    if (player->lms_player_id) {
+//        get_player_volume(player);
+        rv = update_player_status(player);
+        if (ptransient) {
+            ptransient->elapsed_secs = player->status.elapsed_time;
+            player_value pv;
+            _get_player_value(player, &pv, "VOLUME");
+            ptransient->volume = pv.integer;
+        }
+    }
+    return rv;
+}
+
+lyrion_player_ptr close_local_player(lyrion_player_ptr player) {
+    if (player) {
+        close_player(player);
+        free(player);
+        player = NULL;
+    }
+    return player;
+}
+
+
 static int snprintf_time(char *buff, size_t bufflen, int seconds, bool suppress0) {
     int wr = 0;
     if (suppress0 && seconds < 1) {
@@ -1709,9 +1739,11 @@ END:
 }
 
 void player_volume_set(lyrion_player_ptr player, int level) {
-    level = level < 0 ? 0 : level;
-    level = level > 100 ? 100: level;
-    lms_command(player, "mixer volume %d", level);
+    if (player->status.use_volume_control || player->status.digital_volume_control) {
+        level = level < 0 ? 0 : level;
+        level = level > 100 ? 100: level;
+        lms_command(player, "mixer volume %d", level);
+    }
 }
 
 void player_volume_step(lyrion_player_ptr player, bool up) {

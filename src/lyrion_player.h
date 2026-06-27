@@ -86,6 +86,7 @@ pfv_type get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const 
 
         string meta value keys: (these keys do not exist in LMS CLI status
             VOLUME: player volume
+            CAN_CHANGE_VOLUME: UI can change player volume
             ARTIST: one of artist, trackartist, albumartist in that order
             TITLE:  one of title, remote_title, current_title, subtitle in that order
             PLAYLIST_CURRENT: playlist_cur_index+1

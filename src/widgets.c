@@ -800,7 +800,8 @@ static void slider_widget_render(widget* wdgt) {
                 pick_rect.x = wk->current_pos - wk->half_pw;
             }
         } else {
-            pick_rect.x = wk->current_pos - wk->half_pw;
+//            pick_rect.x = wk->current_pos - wk->half_pw;
+            pick_rect.x = wk->current_pos;
             pick_rect.w = 0;
         }
     }
@@ -1001,6 +1002,7 @@ widget *widget_slider_set_value(widget* wdgt, int value) {
                         wk->current_pos,
                         value);
             }
+            wdgt->redraw_required = true;
         } else {
             error_printf("widget_slider_set_value: %d not in range %d-%d\n",
                     value,
@@ -1019,6 +1021,7 @@ widget *widget_slider_range(widget* wdgt, int start, int end) {
         wdgt->sub.slider.wk.initialised = false;
         // widget_slider_set_value will initialise the workspace
         widget_slider_set_value(wdgt, wdgt->sub.slider.range.start);
+        wdgt->redraw_required = true;
     }
     return wdgt;
 }
@@ -1027,6 +1030,7 @@ widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         if (wdgt->sub.slider.interactive != yn) {
             wdgt->sub.slider.interactive = yn;
+            wdgt->redraw_required = true;
         }
     }
     return wdgt;
