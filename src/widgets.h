@@ -138,6 +138,8 @@ struct widget {
     //SDL_Rect    draw_rect;
 
     bool         atomic_pressed;
+    int64_t      pressed_millis_start;
+    int64_t      pressed_millis_end;
     const char*  player_value_key;
     const char*  player_range_value_key;
     const char*  runtime_value_key;
@@ -182,6 +184,7 @@ bool widget_highlighted(widget* wdgt);
 void widget_set_highlight(widget* wdgt, bool onoff);
 bool widget_pressed(widget* wdgt);
 void widget_set_pressed(widget* wdgt, bool onoff);
+int widget_get_pressed_millis(widget* wdgt);
 
 
 extern bool debug_rects;

@@ -6,6 +6,7 @@
 #include "actions.h"
 #include "util.h"
 #include "logging.h"
+#include "timing.h"
 
 extern widget *vumeter_widget_destroy(widget *wdgt);
 extern void vumeter_widget_load_media(widget *wdgt, const char* resource_path);
@@ -52,9 +53,17 @@ bool widget_pressed(widget* wdgt) {
 
 void widget_set_pressed(widget* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_pressed, onoff, __ATOMIC_RELEASE);
+     if (onoff) {
+         wdgt->pressed_millis_start = get_milli_seconds();
+     } else {
+         wdgt->pressed_millis_end = get_milli_seconds();
+     }
      wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hidden;
 }
 
+int widget_get_pressed_millis(widget* wdgt) {
+    return (int)(wdgt->pressed_millis_end - wdgt->pressed_millis_start);
+}
 
 const char* widget_type_name(widget_type typ) {
     if (typ >= WIDGET_NONE && typ <= WIDGET_END) {

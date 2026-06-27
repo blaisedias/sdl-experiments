@@ -544,6 +544,9 @@ static void my_render_foreground(app_context_ptr app_ctx) {
 }
 
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
+    static  SDL_Scancode prev_keydown;
+    static int64_t keydown_start_time = 0;
+    int key_press_duration = 0;
     switch (eventp->type) {
             case USEREVENT_NEXT_VISU:
             case USEREVENT_NEXT_VU:
@@ -593,8 +596,21 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 puts("");
                 app_stop(app_ctx);
                 break;
+            case SDL_KEYDOWN:
+                if (eventp->key.keysym.scancode != prev_keydown) {
+                    prev_keydown = eventp->key.keysym.scancode;
+                    keydown_start_time = get_milli_seconds();
+                }
+                break;
             case SDL_KEYUP:
                 print_sdl_key_scancode(eventp->key.keysym.scancode);
+                {
+                    if (eventp->key.keysym.scancode == prev_keydown) {
+                        key_press_duration = get_milli_seconds() - keydown_start_time;
+                        prev_keydown = SDL_SCANCODE_UNKNOWN;
+                    }
+                }
+                app_printf("key press duration = %d ms\n", key_press_duration);
                 switch (eventp->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE: 
                     {
