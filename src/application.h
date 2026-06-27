@@ -60,6 +60,7 @@ struct app_context {
     int64_t         input_loop_sleep_millis;
 
     app_workspace_t workspace; 
+    bool            debug_redraw_backdrop;
 };
 
 bool app_initialize(app_context_ptr app_ctx, const char* window_title);

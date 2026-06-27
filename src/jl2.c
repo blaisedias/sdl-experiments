@@ -47,6 +47,7 @@ static const char* help_text=""
 " - printftcache enable printing of texture cache module\n"
 " - printftcacheeject enable printing of texture cache module ejects\n"
 " - printfapp enable printing of application processing\n"
+" - debug_redraw_backdrop enable printing when backdrop is redrawn\n"
 "\n"  
 " - list list the set of VU Meters and exit\n"
 " - dl <path-to-object-file> : dynamically load VU meter in object file\n"
@@ -60,6 +61,7 @@ static const char* help_text=""
 "\n"
 " - showrects       : show widget draw rectangles when pointer is over them\n"
 " - showinputrects  : show widget input rectangles when pointer is over them\n"
+" - debugrects      : show widget draw_rectangles\n"
 "\n"
 " - peakhold <count>: number of frames for VU peak hold\n"
 " - decayhold <count>: number of frames for VU decay hold - reduces needle jitter\n"
@@ -197,6 +199,8 @@ int main(int argc, char** argv) {
             enable_printf(TEXTURE_CACHE_EJECT_PRINTF);
         } else if (0 == strcmp(argv[i], "printfapp")) {
             enable_printf(APP_PRINTF);
+        } else if (0 == strcmp(argv[i], "debug_redraw_backdrop")) {
+            app_ctx.debug_redraw_backdrop = true;
         } else if (0 == strcmp(argv[i], "fs") || 0 == strcmp(argv[i], "fullscreen")) {
             app_ctx.fullscreen = true;
         } else if (0 == strcmp(argv[i], "texture_cache_size")) {

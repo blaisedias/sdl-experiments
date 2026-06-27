@@ -364,7 +364,9 @@ void app_render_loop(app_context_ptr app_ctx_in) {
         tcache_render_prep(app_ctx->renderer);
 
         if (app_ctx->cb_query_render_backdrop(app_ctx)) {
-//            log_printf("redraw backdrop\n");
+            if (app_ctx->debug_redraw_backdrop) {
+                log_printf("redraw backdrop\n");
+            }
             SDL_SetRenderTarget(app_ctx->renderer, app_ctx->backdrop_texture);
             SDL_RenderClear(app_ctx->renderer);
             app_ctx->cb_render_backdrop(app_ctx);
