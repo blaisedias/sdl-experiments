@@ -258,7 +258,7 @@
 
 
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 10,
@@ -267,8 +267,15 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/skip-previous.png",
-                "action": "previous-track",
+                "states": [
+                    {
+                        "image": "./images/sd/DIS-skip-previous.png"
+                    },
+                    {
+                        "image": "./images/sd/skip-previous.png",
+                        "action": "previous-track"
+                    }
+                ],
                 "player_value": "CAN_REW"
             }
         },
@@ -300,7 +307,7 @@
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 150,
@@ -309,8 +316,15 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/skip-next.png",
-                "action": "next-track",
+                "states":[
+                    {
+                        "image": "./images/sd/DIS-skip-next.png"
+                    },
+                    {
+                        "image": "./images/sd/skip-next.png",
+                        "action": "next-track"
+                    }
+                ],
                 "player_value": "CAN_FWD"
             }
         },

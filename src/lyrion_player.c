@@ -1463,7 +1463,7 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case CAN_REW:
             return_value = PFV_INT;
             pfv->integer = 0;
-            if (player->status.playlist_tracks > 1 || player->status.can_seek) {
+            if (player->status.playlist_tracks > 1 || player->status.can_seek > 0) {
                 pfv->integer = 1;
             }
             break;
