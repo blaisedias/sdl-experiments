@@ -175,6 +175,7 @@ struct widget {
             }range;
             _slider_resource res[SLIDER_RESOURCE_COUNT];
             _slider_workspace wk;
+            volatile bool complete;
         }slider;
         _text_data text;
     }sub;

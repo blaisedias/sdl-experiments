@@ -710,10 +710,39 @@ widget* widget_hotspot(widget* wdgt, bool hotspot) {
     return wdgt;
 }
 
+static inline bool slider_is_interactive(widget* wdgt) {
+    return wdgt->sub.slider.defined_interactive && __atomic_load_n(&wdgt->sub.slider.interactive, __ATOMIC_ACQUIRE);
+}
+
+static inline bool slider_wk_is_initialised(widget* wdgt) {
+    return __atomic_load_n(&wdgt->sub.slider.wk.initialised, __ATOMIC_ACQUIRE);
+}
+
+static inline void slider_set_wk_initialised(widget* wdgt, bool yn) {
+    __atomic_store_n(&wdgt->sub.slider.wk.initialised, yn, __ATOMIC_RELEASE);
+}
+
+// workspace intialisation spin lock 
+static SDL_threadID slider_wk_lock = 0;
+// !!! DO NOT invoke from render thread !!!
 static _slider_workspace* slider_widget_init_workspace(widget* wdgt) {
 #define ZAP_RECT(r) (r).x = (r).y = (r).w = (r).h = 0
+    if (!wdgt->sub.slider.complete) {
+        return &wdgt->sub.slider.wk;
+    }
 
-    if (!wdgt->sub.slider.wk.initialised) {
+    // thread safety: acquire the spin lock 
+    // using a single lock for all sliders id deemed adequate
+    // using this instead of mutex to circumvent the requirement
+    // for static initialisation.
+    // alternative would be to create and use a mutex for each slider.
+    SDL_threadID lock_expected = 0;
+    SDL_threadID lock_desired = SDL_GetThreadID(NULL);
+    while(! __atomic_compare_exchange (&slider_wk_lock, &lock_expected, &lock_desired, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+        sleep_milli_seconds(10);
+    }
+    
+    if (!slider_wk_is_initialised(wdgt)) {
         _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
         
         _slider_workspace* wk = &wdgt->sub.slider.wk;
@@ -771,39 +800,51 @@ static _slider_workspace* slider_widget_init_workspace(widget* wdgt) {
             wdgt->input_rect.y = wdgt->rect.y + (wdgt->rect.h-pick->h)/2;
             wdgt->input_rect.h = pick->h;
         }
-        wdgt->sub.slider.wk.initialised = true;
+        slider_set_wk_initialised(wdgt, true);
     }
+    // release the spin lock
+    lock_expected = SDL_GetThreadID(NULL);
+    lock_desired = 0;
+    if (!__atomic_compare_exchange (&slider_wk_lock, &lock_expected, &lock_desired, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+        error_printf("slider_widget_init_workspace: logic failure on spinlock\n");
+        exit(EXIT_FAILURE);
+    }
+
     return &wdgt->sub.slider.wk;
 }
 
+static inline _slider_workspace*  slider_reinitialise_workspace(widget* wdgt) {
+    __atomic_store_n(&wdgt->sub.slider.wk.initialised, false, __ATOMIC_RELEASE);
+    return slider_widget_init_workspace(wdgt);
+}
+
+
 static void slider_widget_render(widget* wdgt) {
     wdgt->redraw_required = false;
-    _slider_workspace* wk = slider_widget_init_workspace(wdgt);
-/*    
-    if (wk == NULL) {
+    if (!slider_wk_is_initialised(wdgt)) { 
         return;
     }
-*/
+    const _slider_workspace* wk = &wdgt->sub.slider.wk;
+    if (wk->value_range_delta < 1) {
+        // 0 or negative range => nothing to render
+        return;
+    }
     _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
 
     SDL_Rect pick_rect;
     copyRect(&wdgt->rect, &pick_rect);
-    if (wk->value_range_delta < 1) {
-        return;
-    }
     pick_rect.w = pick->w;
-    if (wk->value_range_delta > 0) {
-        if (wdgt->sub.slider.defined_interactive && wdgt->sub.slider.interactive) {
-            if (widget_pressed(wdgt)) {
-                pick_rect.x = wk->drag_pos - wk->half_pw;
-            } else {
-                pick_rect.x = wk->current_pos - wk->half_pw;
-            }
+
+    if (slider_is_interactive(wdgt)) {
+        if (widget_pressed(wdgt)) {
+            pick_rect.x = wk->drag_pos - wk->half_pw;
         } else {
-//            pick_rect.x = wk->current_pos - wk->half_pw;
-            pick_rect.x = wk->current_pos;
-            pick_rect.w = 0;
+            pick_rect.x = wk->current_pos - wk->half_pw;
         }
+    } else {
+//            pick_rect.x = wk->current_pos - wk->half_pw;
+        pick_rect.x = wk->current_pos;
+        pick_rect.w = 0;
     }
 
     {
@@ -846,7 +887,7 @@ static void slider_widget_render(widget* wdgt) {
                 NULL, flip);
     }
 
-    if (pick_rect.w && pick_rect.h && wdgt->sub.slider.defined_interactive && wdgt->sub.slider.interactive) {
+    if (pick_rect.w && pick_rect.h && slider_is_interactive(wdgt)) {
         SDL_Rect image_rect;
         copyRect(&pick_rect, &image_rect);
         translate_image_rect(&image_rect);
@@ -879,7 +920,7 @@ widget *widget_create_slider(const view_context* view) {
         *((widget_type*)&wdgt->type) = WIDGET_SLIDER;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = slider_widget_render;
-        wdgt->sub.slider.interactive = true;
+        __atomic_store_n(&wdgt->sub.slider.interactive, true, __ATOMIC_RELEASE);
         wdgt->sub.slider.defined_interactive = true;
     }
     return wdgt;
@@ -909,7 +950,7 @@ widget *widget_slider_image_paths(widget* wdgt, slider_resource_ID id, const cha
                 error_printf("widget_slider_image_path: unknown resource id %d\n", id);
                 break;
         }
-        wdgt->sub.slider.wk.initialised = false;
+        slider_reinitialise_workspace(wdgt);
     }
     return wdgt;
 }
@@ -933,7 +974,7 @@ widget *widget_slider_image_width(widget* wdgt, slider_resource_ID id, int width
                 error_printf("widget_slider_image_width: unknown resource id %d\n", id);
                 break;
         }
-        wdgt->sub.slider.wk.initialised = false;
+        slider_reinitialise_workspace(wdgt);
     }
     return wdgt;
 }
@@ -952,13 +993,13 @@ widget *widget_slider_image_height(widget* wdgt, slider_resource_ID id, int heig
                 error_printf("widget_slider_image_height: unknown resource id %d\n", id);
                 break;
         }
-        wdgt->sub.slider.wk.initialised = false;
+        slider_reinitialise_workspace(wdgt);
     }
     return wdgt;
 }
 
 static widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
-    if (wdgt->sub.slider.defined_interactive && wdgt->sub.slider.interactive) {
+    if (slider_is_interactive(wdgt)) {
         if (widget_pressed(wdgt) && (wdgt->sub.slider.range.end - wdgt->sub.slider.range.start) > 0) {
             _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
             _slider_workspace* wk = &wdgt->sub.slider.wk;
@@ -978,7 +1019,7 @@ static widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
 }
 
 static widget *widget_slider_tracking_commit(widget* wdgt, const SDL_Point *pt) {
-    if (wdgt->sub.slider.defined_interactive && wdgt->sub.slider.interactive) {
+    if (slider_is_interactive(wdgt)) {
         widget_slider_track(wdgt, pt);
         _slider_workspace* wk = &wdgt->sub.slider.wk;
         wk->current_pos = wk->drag_pos;
@@ -990,19 +1031,23 @@ static widget *widget_slider_tracking_commit(widget* wdgt, const SDL_Point *pt) 
 widget *widget_slider_set_value(widget* wdgt, int value) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         if (value >= wdgt->sub.slider.range.start && value <= wdgt->sub.slider.range.end) {
-            _slider_workspace* wk = slider_widget_init_workspace(wdgt);
-            if (wk->value_range_delta) {
-                // range must be non-zero to calculate the position of the pick
-                float offset = ((float)(value - wdgt->sub.slider.range.start)*(wk->max_pos - wk->min_pos))/wk->value_range_delta;
-                wk->current_pos = wk->min_pos + (int)offset;
-                dummy_printf("widget_slider_set_value (%d * %d)/%d = %d, for %d\n", 
-                        value - wdgt->sub.slider.range.start,
-                        (wk->max_pos - wk->min_pos),
-                        wk->value_range_delta,
-                        wk->current_pos,
-                        value);
+            _slider_workspace* wk = slider_reinitialise_workspace(wdgt);
+            if (slider_wk_is_initialised(wdgt)) {
+                if (wk->value_range_delta) {
+                    // range must be non-zero to calculate the position of the pick
+                    float offset = ((float)(value - wdgt->sub.slider.range.start)*(wk->max_pos - wk->min_pos))/wk->value_range_delta;
+                    wk->current_pos = wk->min_pos + (int)offset;
+                    dummy_printf("widget_slider_set_value (%d * %d)/%d = %d, for %d\n", 
+                            value - wdgt->sub.slider.range.start,
+                            (wk->max_pos - wk->min_pos),
+                            wk->value_range_delta,
+                            wk->current_pos,
+                            value);
+                    wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
+                }
+            } else {
+                error_printf("widget_slider_set_value: workspace is uninitialised\n");
             }
-            wdgt->redraw_required = true;
         } else {
             error_printf("widget_slider_set_value: %d not in range %d-%d\n",
                     value,
@@ -1017,21 +1062,17 @@ widget *widget_slider_range(widget* wdgt, int start, int end) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         wdgt->sub.slider.range.start = start;
         wdgt->sub.slider.range.end = end;
-        // workspace needs reinitialising - set the flag
-        wdgt->sub.slider.wk.initialised = false;
         // widget_slider_set_value will initialise the workspace
         widget_slider_set_value(wdgt, wdgt->sub.slider.range.start);
-        wdgt->redraw_required = true;
+        wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
     }
     return wdgt;
 }
 
 widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
-        if (wdgt->sub.slider.interactive != yn) {
-            wdgt->sub.slider.interactive = yn;
-            wdgt->redraw_required = true;
-        }
+        bool ny = ! yn;
+        wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot && __atomic_compare_exchange_n(&wdgt->sub.slider.interactive, &ny, yn, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
     }
     return wdgt;
 }
@@ -1046,7 +1087,7 @@ widget *widget_slider_define_interactive(widget* wdgt, bool yn) {
 
 widget *widget_slider_get_value(widget* wdgt, int* value) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
-        _slider_workspace* wk = &wdgt->sub.slider.wk;
+        const _slider_workspace* wk = &wdgt->sub.slider.wk;
         int v = (wk->current_pos - wk->min_pos);
         dummy_printf("widget_slider_get_value v=%d\n", v);
         v *= wk->value_range_delta;
@@ -1418,9 +1459,11 @@ void widget_list_render_backdrop(const widget_list* wdgt_list) {
             widget->render_backdrop(widget);
         }
     }
+
     for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
         if (widget->render_backdrop != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
     }
+
 }
 
 void widget_list_render_foreground(const widget_list* wdgt_list) {
