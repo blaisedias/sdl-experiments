@@ -1120,11 +1120,11 @@ widget *widget_slider_range(widget* wdgt, int start, int end) {
 widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         bool ny = ! yn;
-        bool updated =  !wdgt->render_as_foreground && !wdgt->hotspot && __atomic_compare_exchange_n(&wdgt->sub.slider.interactive, &ny, yn, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-        if (updated) {
+        bool modified = __atomic_compare_exchange_n(&wdgt->sub.slider.interactive, &ny, yn, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+        if (modified) {
             slider_reconfigure(wdgt);
+            wdgt->redraw_required = true;
         }
-        wdgt->redraw_required = updated;
     }
     return wdgt;
 }
