@@ -791,19 +791,20 @@ static _slider_workspace* slider_widget_configure(widget* wdgt) {
             wdgt->input_rect.y = wdgt->rect.y + (wdgt->rect.h-pick->h)/2;
             wdgt->input_rect.h = pick->h;
         }
-#if 0        
+#if 0
+        if (0 == strcmp("VOLUME", wdgt->player_value_key ? wdgt->player_value_key: ""))
         {
             SDL_Rect *r = &wdgt->rect;
-            printf("#### SLIDER %p\n", wdgt);        
-            printf("     widget - %02d %02d %02d %02d\n", r->x, r->y, r->w, r->h);
-            r = &wk->bar_start_rect;
-            printf("     bs     - %02d %02d %02d %02d\n", r->x, r->y, r->w, r->h);
-            r = &wk->bar_end_rect;
-            printf("     be     - %02d %02d %02d %02d\n", r->x, r->y, r->w, r->h);
+            printf("#### SLIDER %p %s\n", wdgt, wdgt->player_value_key ? wdgt->player_value_key: "?");
+            printf("     widget - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
             r = &wk->bar_rect;
-            printf("     b      - %02d %02d %02d %02d\n", r->x, r->y, r->w, r->h);
+            printf("     b      - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
             r = &wk->pick_rect;
-            printf("     pick   - %02d %02d %02d %02d\n", r->x, r->y, r->w, r->h);
+            printf("     pick   - %02d %02d\n", r->w, r->h);
+            r = &wk->bar_start_rect;
+            printf("     bs     - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
+            r = &wk->bar_end_rect;
+            printf("     be     - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
         }
 #endif
         slider_set_wk_initialised(wdgt, true);
@@ -847,7 +848,7 @@ static void slider_widget_render(widget* wdgt) {
     }
 
     {
-        int ix_texture = wk->current_pos > wk->min_pos? 1: 0;
+        int ix_texture = wk->min_pos < wk->current_pos? 0: 1;
         _slider_resource* bar_start = wdgt->sub.slider.res[SLIDER_BAR_START].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_START:NULL;
         if (bar_start) {
             SDL_RenderCopyEx(wdgt->view->app->renderer,
@@ -1081,13 +1082,7 @@ widget *widget_slider_update_value(widget* wdgt, int value) {
                     float offset = ((float)(value - wdgt->sub.slider.range.start)*(wk->max_pos - wk->min_pos))/wk->value_range_delta;
                     bool updated = wk->current_pos != wk->min_pos + (int)offset;
                     wk->current_pos = wk->min_pos + (int)offset;
-                    dummy_printf("widget_slider_update_value (%d * %d)/%d = %d, for %d\n", 
-                            value - wdgt->sub.slider.range.start,
-                            (wk->max_pos - wk->min_pos),
-                            wk->value_range_delta,
-                            wk->current_pos,
-                            value);
-                   wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot && updated;
+                    wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot && updated;
                 }
             } else {
                 error_printf("widget_slider_update_value: workspace is uninitialised\n");
