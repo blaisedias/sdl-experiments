@@ -435,7 +435,9 @@
                 },
                 "interactive": true,
                 "pick": {
-                    "image": "./images/sd/slider-pick-circle.png",
+                    "image": [
+                        "./images/sd/slider-pick-circle.png"
+                    ],
                     "width": 16,
                     "height": 16
                 },
@@ -446,11 +448,17 @@
                     ]
                 },
                 "bar_start": {
-                    "image": "./images/sd/slider-bar-left-end.png",
+                    "image": [
+                        "./images/sd/slider-bar-left-end.png",
+                        "./images/sd/slider-bar-left-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "bar_end": {
-                    "image": "./images/sd/slider-bar-right-end-empty.png",
+                    "image": [
+                        "./images/sd/slider-bar-right-end.png",
+                        "./images/sd/slider-bar-right-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "range": {
@@ -515,7 +523,9 @@
                 },
                 "interactive": true,
                 "pick": {
-                    "image": "./images/sd/slider-pick-circle.png",
+                    "image": [
+                        "./images/sd/slider-pick-circle.png"
+                    ],
                     "width": 16,
                     "height": 16
                 },
@@ -526,11 +536,17 @@
                     ]
                 },
                 "bar_start": {
-                    "image": "./images/sd/slider-bar-left-end.png",
+                    "image": [
+                        "./images/sd/slider-bar-left-end.png",
+                        "./images/sd/slider-bar-left-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "bar_end": {
-                    "image": "./images/sd/slider-bar-right-end-empty.png",
+                    "image": [
+                        "./images/sd/slider-bar-right-end.png",
+                        "./images/sd/slider-bar-right-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "range": {
