@@ -876,7 +876,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                             break;
                     }
                 }
-                if (t->type == WIDGET_SLIDER && 0 == strcmp(t->player_value_key, "time")) {
+                if (t->type == WIDGET_SLIDER && t->player_value_key && 0 == strcmp(t->player_value_key, "time")) {
                     widget_slider_set_interactive(t, can_seek);
                 }
                 if (t->type == WIDGET_TEXT && t->sub.text.format) {
