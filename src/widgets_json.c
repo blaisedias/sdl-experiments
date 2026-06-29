@@ -586,7 +586,6 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
         case WIDGET_SLIDER:
             {
                 widget = widget_create_slider(ctx);
-                int start_value = 0;
                 widget_slider_define_interactive(widget, get_object_boolean_value(value, JT_INTERACTIVE, true));
                 {
                     json_value* jrange = get_object_object_value(value, JT_RANGE);
@@ -599,7 +598,6 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                                 get_object_int_value(jrange, JT_RANGE_START, 0),
                                 get_object_int_value(jrange, JT_RANGE_END, 0)
                                 );
-                        start_value = get_object_int_value(jrange, JT_RANGE_START, 0);
                     }
                 }
                 json_printf("     resources:\n");
@@ -631,8 +629,6 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                         json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
                     }
                 }
-                widget->sub.slider.complete = true;
-                widget_slider_set_value(widget, start_value);
             }break;
     }
     if (widget) {
@@ -658,6 +654,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                widget->hotspot,
                tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)),
                get_object_string_value(value, JT_HOTSPOT_EDGE, NULL));
+        widget_configure(widget);
     } else {
         error_printf("deserialise_one_widget NULL widget for type %d\n", wdgt_type);
     }

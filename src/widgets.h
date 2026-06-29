@@ -91,7 +91,8 @@ typedef struct {
     SDL_Rect bar_start_rect;
     SDL_Rect bar_end_rect;
     SDL_Rect bar_rect;
-    SDL_Rect bar_empty_rect;
+//    SDL_Rect bar_empty_rect;
+    SDL_Rect pick_rect;
 }_slider_workspace;
 
 typedef struct {
@@ -145,6 +146,7 @@ struct widget {
     const char*  runtime_value_key;
     volatile     bool redraw_required;
     volatile     bool foreground;
+    volatile     bool configured;
     union {
         vumeter_widget* vu;
         spmeter_widget* sp;
@@ -175,7 +177,6 @@ struct widget {
             }range;
             _slider_resource res[SLIDER_RESOURCE_COUNT];
             _slider_workspace wk;
-            volatile bool complete;
         }slider;
         _text_data text;
     }sub;
@@ -215,6 +216,8 @@ widget* widget_hotspot(widget* wdgt, bool hotspot);
 widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r);
 widget* widget_image_path(widget* wdgt, const char* path);
 widget* widget_focus_enable(widget* wdgt, bool f);
+// DO NOT invoke in render thread
+widget* widget_configure(widget* wdgt);
 
 widget* widget_create_button(const view_context*);
 widget* widget_create_multistate_button(const view_context*, int state_count);
@@ -235,7 +238,8 @@ widget *widget_vumeter_equal_horizontal_spacing(widget *wdgt, bool val);
 
 widget *widget_create_slider(const view_context*);
 widget *widget_slider_range(widget* , int start, int end);
-widget *widget_slider_set_value(widget* wdgt, int value);
+//widget *widget_slider_set_value(widget* wdgt, int value);
+widget *widget_slider_update_value(widget* wdgt, int value);
 widget *widget_slider_set_interactive(widget* wdgt, bool yn);
 widget *widget_slider_define_interactive(widget* wdgt, bool yn);
 widget *widget_slider_get_value(widget* wdgt, int* value);
@@ -275,4 +279,5 @@ void widget_list_render_foreground(const widget_list* wdgt_list);
 widget* widget_set_renderhf(widget* wdgt);
 widget* widget_unset_renderhf(widget* wdgt);
 void widget_render_foreground_default(widget* wdgt);
+
 #endif // __jl_widgets_h_

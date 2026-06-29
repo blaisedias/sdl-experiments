@@ -866,7 +866,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                                 widget_multistate_button_set_state(t, pvalue.integer);
                             } else if (t->type == WIDGET_SLIDER) {
                                 if (strcmp("time", t->player_value_key)) {
-                                    widget_slider_set_value(t, pvalue.integer);
+                                    widget_slider_update_value(t, pvalue.integer);
                                 }
                             }
                             break;
@@ -930,13 +930,13 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             if (t->player_value_key) {
                 if (0 == strcmp("VOLUME", t->player_value_key)) {
                     if (t->type == WIDGET_SLIDER) {
-                        widget_slider_set_value(t, volume);
+                        widget_slider_update_value(t, volume);
                         widget_slider_set_interactive(t, can_change_volume);
                     }
                 }
                 if (duration && 0 == strcmp("time", t->player_value_key)) {
                     if (t->type == WIDGET_SLIDER) {
-                        widget_slider_set_value(t, elapsed);
+                        widget_slider_update_value(t, elapsed);
                     }
                 }
                 if (t->type == WIDGET_TEXT) {
