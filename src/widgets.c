@@ -746,41 +746,41 @@ static _slider_workspace* slider_widget_configure(widget* wdgt) {
         _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
         _slider_workspace* wk = &wdgt->sub.slider.wk;
 
-        ZAP_RECT(wk->bar_start_rect);
-        ZAP_RECT(wk->bar_end_rect);
+        copyRect(&wdgt->rect, &wk->bar_start_rect);
+        copyRect(&wdgt->rect, &wk->bar_end_rect);
         copyRect(&wdgt->rect, &wk->bar_rect);
         copyRect(&wdgt->rect, &wk->pick_rect);
 
+         _slider_resource* bar_start = wdgt->sub.slider.res+SLIDER_BAR_START;
+         _slider_resource* bar_end =  wdgt->sub.slider.res+SLIDER_BAR_END;
+
         wk->value_range_delta = wdgt->sub.slider.range.end - wdgt->sub.slider.range.start;
-
-        {
-            _slider_resource* bar_start = wdgt->sub.slider.res+SLIDER_BAR_START;
-            wk->bar_start_rect.w = bar_start->w;
-            wk->bar_start_rect.h = wdgt->rect.h;
-            wk->bar_start_rect.x = wdgt->rect.x;
-            wk->bar_start_rect.y = wdgt->rect.y;
-            wk->bar_rect.x += bar_start->w;
-            wk->bar_rect.w -= bar_start->w;
-            translate_image_rect(&wk->bar_start_rect);
-        }
-        {
-            _slider_resource* bar_end =  wdgt->sub.slider.res+SLIDER_BAR_END;
-            wk->bar_end_rect.w = bar_end->w;
-            wk->bar_end_rect.h = wdgt->rect.h;
-            wk->bar_end_rect.x = wdgt->rect.x + wdgt->rect.w - bar_end->w -1;
-            wk->bar_end_rect.y = wdgt->rect.y;
-            wk->bar_rect.w -= bar_end->w;
-            translate_image_rect(&wk->bar_end_rect);
-        }
-
+        // FIXME: pick-w>%2 != 0
         if (slider_is_interactive(wdgt)) {
             wk->pick_rect.w = pick->w;
+            wk->half_pw = pick->w/2;
         } else {
             wk->pick_rect.w = 0;
+            wk->half_pw = 0;
         }
-        wk->half_pw = pick->w/2;
-        wk->current_pos = wk->min_pos = wdgt->rect.x + wk->half_pw;
-        wk->max_pos = wdgt->rect.x + wdgt->rect.w - wk->half_pw;
+
+        wk->half_pw = slider_is_interactive(wdgt) ? pick->w/2 : 0;
+        wk->min_pos = wdgt->rect.x + (wk->half_pw > bar_start->w ? wk->half_pw : bar_start->w);
+        wk->max_pos = wdgt->rect.x + wdgt->rect.w - (wk->half_pw > bar_end->w ? wk->half_pw : bar_end->w);
+
+        wk->current_pos = wk->min_pos;
+
+        wk->bar_start_rect.w = bar_start->w;
+        wk->bar_start_rect.x = wk->min_pos - wk->bar_start_rect.w;
+        translate_image_rect(&wk->bar_start_rect);
+
+        wk->bar_end_rect.w = bar_end->w;
+        wk->bar_end_rect.x = wk->max_pos;
+        translate_image_rect(&wk->bar_end_rect);
+
+        wk->bar_rect.x = wk->min_pos;
+        wk->bar_rect.w = wk->max_pos - wk->min_pos;
+        translate_image_rect(&wk->bar_end_rect);
 
         // restore input rectangle y extents.
         wdgt->input_rect.y = wdgt->rect.y;
@@ -791,22 +791,6 @@ static _slider_workspace* slider_widget_configure(widget* wdgt) {
             wdgt->input_rect.y = wdgt->rect.y + (wdgt->rect.h-pick->h)/2;
             wdgt->input_rect.h = pick->h;
         }
-#if 0
-        if (0 == strcmp("VOLUME", wdgt->player_value_key ? wdgt->player_value_key: ""))
-        {
-            SDL_Rect *r = &wdgt->rect;
-            printf("#### SLIDER %p %s\n", wdgt, wdgt->player_value_key ? wdgt->player_value_key: "?");
-            printf("     widget - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
-            r = &wk->bar_rect;
-            printf("     b      - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
-            r = &wk->pick_rect;
-            printf("     pick   - %02d %02d\n", r->w, r->h);
-            r = &wk->bar_start_rect;
-            printf("     bs     - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
-            r = &wk->bar_end_rect;
-            printf("     be     - %04d %04d %04d %04d\n", r->x, r->y, r->w, r->h);
-        }
-#endif
         slider_set_wk_initialised(wdgt, true);
     }
 
@@ -837,23 +821,38 @@ static void slider_widget_render(widget* wdgt) {
         // 0 or negative range => nothing to render
         return;
     }
-    _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
 
+    _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
+    SDL_Rect fill_rect;
+    SDL_Rect empty_rect;
     SDL_Rect pick_rect;
+    copyRect(&wk->bar_rect, &fill_rect);
+    copyRect(&wk->bar_rect, &empty_rect);
     copyRect(&wk->pick_rect, &pick_rect);
 
-    pick_rect.x = wk->current_pos - wk->half_pw;
+    SDL_Rect start_rect;
+    SDL_Rect end_rect;
+    copyRect(&wk->bar_start_rect, &start_rect);
+    copyRect(&wk->bar_end_rect, &end_rect);
+    int curr_pos = wk->current_pos;
     if (slider_is_interactive(wdgt) && widget_pressed(wdgt)) {
-        pick_rect.x = wk->drag_pos - wk->half_pw;
+        // FIXME: need offset from down pos on the pick itself?
+        curr_pos = wk->drag_pos;
     }
 
+    fill_rect.w = curr_pos - wk->bar_rect.x - wk->half_pw;
+    empty_rect.x = curr_pos + wk->half_pw;
+    empty_rect.w = wk->max_pos - empty_rect.x;
+    pick_rect.x =  curr_pos - wk->half_pw;
+    start_rect.w = MIN(pick_rect.x - start_rect.x, start_rect.w);
+
     {
-        int ix_texture = wk->min_pos < wk->current_pos? 0: 1;
+        int ix_texture = wk->min_pos < curr_pos? 0: 1;
         _slider_resource* bar_start = wdgt->sub.slider.res[SLIDER_BAR_START].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_START:NULL;
-        if (bar_start) {
+        if (bar_start && start_rect.w > 0) {
             SDL_RenderCopyEx(wdgt->view->app->renderer,
                    tcache_quick_get_texture(bar_start->texture_ids[ix_texture], wdgt->view->app->renderer),
-                   NULL, &wk->bar_start_rect,
+                   NULL, &start_rect,
 //                   wdgt->view->app->orientation,
                    0.0,
                    NULL, flip);
@@ -861,12 +860,22 @@ static void slider_widget_render(widget* wdgt) {
     }
 
     {
-        int ix_texture = wk->current_pos < wk->max_pos? 1: 0;
+        int pick_x2 = pick_rect.x + pick_rect.w;
+        int srcrect_x = 0;
+        if (pick_x2 > end_rect.x) {
+            srcrect_x = pick_x2 - end_rect.x;
+            end_rect.w -=  srcrect_x;
+            end_rect.x = pick_x2;
+        }
+        // TODO: src_x should feed into srcrect when invoking SDL_RenderCopyEx below
+        // however the raw value cannot be used, it has to be scaled to the bar end image
+        // size. For now not doing turns out to work good enough.
+        int ix_texture = curr_pos < wk->max_pos? 1: 0;
         _slider_resource* bar_end = wdgt->sub.slider.res[SLIDER_BAR_END].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_END:NULL;
-        if (bar_end) {
+        if (bar_end && end_rect.w > 0) {
             SDL_RenderCopyEx(wdgt->view->app->renderer,
                    tcache_quick_get_texture(bar_end->texture_ids[ix_texture], wdgt->view->app->renderer),
-                   NULL, &wk->bar_end_rect,
+                   NULL, &end_rect,
 //                   wdgt->view->app->orientation,
                    0.0,
                    NULL, flip);
@@ -874,40 +883,28 @@ static void slider_widget_render(widget* wdgt) {
     }
 
     _slider_resource* bar = wdgt->sub.slider.res[SLIDER_BAR].texture_ids[0]? wdgt->sub.slider.res+SLIDER_BAR:NULL;
-    if (bar) {
-        SDL_Rect image_rect;
-        copyRect(&wk->bar_rect, &image_rect);
-        image_rect.w = pick_rect.x - image_rect.x;
-        translate_image_rect(&image_rect);
+    if (bar && fill_rect.w > 0) {
         SDL_RenderCopyEx(wdgt->view->app->renderer,
                 tcache_quick_get_texture(bar->texture_ids[0], wdgt->view->app->renderer),
-                NULL, &image_rect,
+                NULL, &fill_rect,
 //                wdgt->view->app->orientation,
                 0.0,
                 NULL, flip);
     }
 
     if (pick_rect.w && pick_rect.h && slider_is_interactive(wdgt)) {
-        SDL_Rect image_rect;
-        copyRect(&pick_rect, &image_rect);
-        translate_image_rect(&image_rect);
         SDL_RenderCopyEx(wdgt->view->app->renderer,
                 tcache_quick_get_texture(pick->texture_ids[0], wdgt->view->app->renderer),
-                NULL, &image_rect,
+                NULL, &pick_rect,
 //                wdgt->view->app->orientation,
                 0.0,
                 NULL, flip);
     }
 
-    if (bar) {
-        SDL_Rect image_rect;
-        copyRect(&wk->bar_rect, &image_rect);
-        image_rect.w -= pick_rect.x + pick_rect.w - image_rect.x;
-        image_rect.x = pick_rect.x + pick_rect.w;
-        translate_image_rect(&image_rect);
+    if (bar && empty_rect.w > 0) {
         SDL_RenderCopyEx(wdgt->view->app->renderer,
                 tcache_quick_get_texture(bar->texture_ids[1], wdgt->view->app->renderer),
-                NULL, &image_rect,
+                NULL, &empty_rect,
 //                wdgt->view->app->orientation,
                 0.0,
                 NULL, flip);
@@ -1117,7 +1114,10 @@ widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
         bool ny = ! yn;
         bool modified = __atomic_compare_exchange_n(&wdgt->sub.slider.interactive, &ny, yn, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
         if (modified) {
+            int value;
+            widget_slider_get_value(wdgt, &value);
             slider_reconfigure(wdgt);
+            widget_slider_update_value(wdgt, value);
             wdgt->redraw_required = true;
         }
     }

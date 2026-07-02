@@ -93,6 +93,7 @@ typedef struct {
     SDL_Rect bar_rect;
 //    SDL_Rect bar_empty_rect;
     SDL_Rect pick_rect;
+    int  pick_x2;
 }_slider_workspace;
 
 typedef struct {
