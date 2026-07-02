@@ -382,7 +382,7 @@ static view_context_ptr load_json_view(const char* json_path, app_context_ptr ap
         FREE(vw);
     } else {
         widget_list_load_media(vw->list, "./images");
-        for(widget* t = vw->list->tail.prev; t != NULL; t = t->prev) {
+        for(widget_t* t = vw->list->tail.prev; t != NULL; t = t->prev) {
             if ((t->player_value_key && 0 == strcmp("time", t->player_value_key))
                || 
                (t->runtime_value_key && 0 == strcmp("fps", t->runtime_value_key))
@@ -443,7 +443,7 @@ printf("starting controller\n"); fflush(stdout);
         for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
             view_context_ptr pv = np_views[ix];
             if (pv) {
-                for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
                     if (widget_has_action(t, ACTION_NEXT_NP_VIEW)
                            ||
                            widget_has_action(t, ACTION_PREV_NP_VIEW)) {
@@ -475,7 +475,7 @@ printf("starting controller\n"); fflush(stdout);
                 show_cursor = 0;
                 view_context_ptr view = get_current_view();
                 if (view) {
-                    for(widget* widget=view->list->tail.prev; widget != NULL; widget=widget->prev) {
+                    for(widget_t* widget=view->list->tail.prev; widget != NULL; widget=widget->prev) {
                         if (widget->hidden) { continue;}
                         widget->focussed = false;
                         widget_set_highlight(widget, false);
@@ -560,7 +560,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 {
                     view_context_ptr view = get_current_view();
                     if(view) {
-                        for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
+                        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
                             if (t->type == WIDGET_VUMETER) {
                                 widget_vumeter_select_next(t);
                             }
@@ -569,7 +569,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
                         view_context_ptr pv = np_views[ix];
                         if (pv && pv != view) {
-                            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
                                 if (t->type == WIDGET_VUMETER) {
                                     widget_vumeter_select_next(t);
                                 }
@@ -582,7 +582,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 {
                     view_context_ptr view = get_current_view();
                     if (view) {
-                        for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
+                        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
                             if (t->type == WIDGET_VUMETER) {
                                 widget_vumeter_select_prev(t);
                             }
@@ -591,7 +591,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
                         view_context_ptr pv = np_views[ix];
                         if (pv && pv != view) {
-                            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
                                 if (t->type == WIDGET_VUMETER) {
                                     widget_vumeter_select_prev(t);
                                 }
@@ -835,7 +835,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
 
             view_context_ptr view = get_current_view();
             if (view) {
-            for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
+            for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
                 if (t->player_range_value_key) {
                     player_value pvalue;
                     switch(get_player_value(player, &pvalue, t->player_range_value_key)) {
@@ -926,7 +926,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
         }
         view_context_ptr view = get_current_view();
         if (view) {
-        for(widget* t = view->list->tail.prev; t != NULL; t = t->prev) {
+        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
             if (t->player_value_key) {
                 if (0 == strcmp("VOLUME", t->player_value_key)) {
                     if (t->type == WIDGET_SLIDER) {
@@ -971,7 +971,7 @@ static void set_visualiser_lock(bool lock, action_t action) {
     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
         view_context_ptr pv = np_views[ix];
         if (pv) {
-            for(widget* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
                 if (t->type == WIDGET_VUMETER) {
                     widget_vumeter_select_lock(t, lock);
                 }

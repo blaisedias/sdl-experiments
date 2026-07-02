@@ -25,7 +25,7 @@ static char* widget_type_strings[] = {
 };
 
 static unsigned text_widget_id = 1;
-static void text_render_surface(widget* wdgt);
+static void text_render_surface(widget_t* wdgt);
 
 static inline void free_ex(void** tgt) {
     if (*tgt) {
@@ -36,19 +36,19 @@ static inline void free_ex(void** tgt) {
 
 #define FREE(x) free_ex((void **)(&x))
 
-bool widget_highlighted(widget* wdgt) {
+bool widget_highlighted(widget_t* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_highlight, __ATOMIC_ACQUIRE);
 }
 
-void widget_set_highlight(widget* wdgt, bool onoff) {
+void widget_set_highlight(widget_t* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_highlight, onoff, __ATOMIC_RELEASE);
 }
 
-bool widget_pressed(widget* wdgt) {
+bool widget_pressed(widget_t* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_pressed, __ATOMIC_ACQUIRE);
 }
 
-void widget_set_pressed(widget* wdgt, bool onoff) {
+void widget_set_pressed(widget_t* wdgt, bool onoff) {
      __atomic_store_n(&wdgt->atomic_pressed, onoff, __ATOMIC_RELEASE);
      if (onoff) {
          wdgt->pressed_millis_start = get_milli_seconds();
@@ -58,21 +58,21 @@ void widget_set_pressed(widget* wdgt, bool onoff) {
      wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hidden;
 }
 
-int widget_get_pressed_millis(widget* wdgt) {
+int widget_get_pressed_millis(widget_t* wdgt) {
     return (int)(wdgt->pressed_millis_end - wdgt->pressed_millis_start);
 }
 
-const char* widget_type_name(widget_type typ) {
+const char* widget_type_name(widget_type_t typ) {
     if (typ >= WIDGET_NONE && typ <= WIDGET_END) {
         return widget_type_strings[typ];
     }
     return "";
 }
 
-void render_none(widget* btn) {
+void render_none(widget_t* btn) {
 }
 
-static void _debug_draw_rect(widget* wdgt) {
+static void _debug_draw_rect(widget_t* wdgt) {
     if (wdgt) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -83,7 +83,7 @@ static void _debug_draw_rect(widget* wdgt) {
     }
 }
 
-static void _show_draw_rect(widget* wdgt) {
+static void _show_draw_rect(widget_t* wdgt) {
     if (wdgt) {
         SDL_Rect draw_rect;
         copyRect(&wdgt->rect, &draw_rect);
@@ -94,7 +94,7 @@ static void _show_draw_rect(widget* wdgt) {
     }
 }
 
-static void _show_input_rect(widget* wdgt) {
+static void _show_input_rect(widget_t* wdgt) {
     if (wdgt) {
         SDL_Rect input_rect;
         copyRect(&wdgt->input_rect, &input_rect);
@@ -105,7 +105,7 @@ static void _show_input_rect(widget* wdgt) {
     }
 }
 
-void widget_render_foreground_default(widget* wdgt) {
+void widget_render_foreground_default(widget_t* wdgt) {
     if (debug_rects) {
        _debug_draw_rect(wdgt);
     }
@@ -118,7 +118,7 @@ void widget_render_foreground_default(widget* wdgt) {
 }
 
 
-static void button_widget_render(widget* wdgt) {
+static void button_widget_render(widget_t* wdgt) {
     wdgt->redraw_required = false;
     if (widget_pressed(wdgt) && !wdgt->hotspot) {
         SDL_Rect draw_rect;
@@ -141,7 +141,7 @@ static void button_widget_render(widget* wdgt) {
     }
 }
 
-static void setup_image_fit_src_rect(widget *wdgt) {
+static void setup_image_fit_src_rect(widget_t *wdgt) {
     if (wdgt->type == WIDGET_IMAGE) {
         switch(wdgt->sub.image.scale_op)
         {
@@ -181,7 +181,7 @@ static void setup_image_fit_src_rect(widget *wdgt) {
     }
 }
 
-widget* widget_load_media(widget* wdgt, const char* resource_path) {
+widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
     if (wdgt && wdgt->view->app->renderer) {
         switch(wdgt->type) {
             case WIDGET_NONE:
@@ -219,7 +219,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
             case WIDGET_MULTISTATE_BUTTON:
                 for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                     bool loaded = false;
-                    _btn_resource* res = wdgt->sub.multistate_button.res + ims;
+                    _bnt_resource_t* res = wdgt->sub.multistate_button.res + ims;
                     res->texture_id = tcache_load_media(res->resource_path, wdgt->view->app->renderer, &loaded, NULL);
                     if (loaded) {
                         tcache_lock_texture(res->texture_id);
@@ -266,7 +266,7 @@ widget* widget_load_media(widget* wdgt, const char* resource_path) {
     return wdgt;
 }
 
-widget* widget_rect(widget *wdgt, const SDL_Rect *rect) {
+widget_t* widget_rect(widget_t *wdgt, const SDL_Rect *rect) {
     if (wdgt) {
         copyRect(rect, &wdgt->rect);
         copyRect(rect, &wdgt->input_rect);
@@ -285,7 +285,7 @@ widget* widget_rect(widget *wdgt, const SDL_Rect *rect) {
     return wdgt;
 }
 
-widget* widget_bounds(widget *wdgt, int x, int y, int w, int h) {
+widget_t* widget_bounds(widget_t *wdgt, int x, int y, int w, int h) {
     SDL_Rect rect = {.x=x, .y=y, .w=w, .h=h};
     return widget_rect(wdgt, &rect);
 }
@@ -309,7 +309,7 @@ widget* widget_prev(widget *wdgt, widget* prev) {
 }
 */
 
-widget* widget_set_player_value_key(widget* wdgt, const char* key) {
+widget_t* widget_set_player_value_key(widget_t* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->player_value_key != NULL) {
             FREE(wdgt->player_value_key);
@@ -321,7 +321,7 @@ widget* widget_set_player_value_key(widget* wdgt, const char* key) {
     return wdgt;
 }
 
-widget* widget_set_player_range_value_key(widget* wdgt, const char* key) {
+widget_t* widget_set_player_range_value_key(widget_t* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->player_range_value_key != NULL) {
             FREE(wdgt->player_range_value_key);
@@ -333,7 +333,7 @@ widget* widget_set_player_range_value_key(widget* wdgt, const char* key) {
     return wdgt;
 }
 
-widget* widget_set_runtime_value_key(widget* wdgt, const char* key) {
+widget_t* widget_set_runtime_value_key(widget_t* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->runtime_value_key != NULL) {
             FREE(wdgt->runtime_value_key);
@@ -346,7 +346,7 @@ widget* widget_set_runtime_value_key(widget* wdgt, const char* key) {
 }
 
 
-widget* widget_action(widget* wdgt, action_t action) {
+widget_t* widget_action(widget_t* wdgt, action_t action) {
     if (wdgt) {
         if (wdgt->type != WIDGET_MULTISTATE_BUTTON) {
             wdgt->action = action;
@@ -359,7 +359,7 @@ widget* widget_action(widget* wdgt, action_t action) {
     return wdgt;
 }
 
-bool widget_has_action(widget* wdgt, action_t action) {
+bool widget_has_action(widget_t* wdgt, action_t action) {
     if (wdgt) {
         if (wdgt->type != WIDGET_MULTISTATE_BUTTON) {
             return wdgt->action == action;
@@ -375,14 +375,14 @@ bool widget_has_action(widget* wdgt, action_t action) {
 }
 
 
-widget* widget_hide(widget* wdgt, bool hide) {
+widget_t* widget_hide(widget_t* wdgt, bool hide) {
     if (wdgt) {
         wdgt->hidden = hide;
     }
     return wdgt;
 }
 
-widget* widget_image_path(widget* wdgt, const char* path) {
+widget_t* widget_image_path(widget_t* wdgt, const char* path) {
     if (wdgt) {
         if (wdgt->image_path != NULL) {
             FREE(wdgt->image_path);
@@ -394,13 +394,13 @@ widget* widget_image_path(widget* wdgt, const char* path) {
     return wdgt;
 }
 
-widget* widget_focus_enable(widget* wdgt, bool f) {
+widget_t* widget_focus_enable(widget_t* wdgt, bool f) {
     *((bool *)(&wdgt->focus_disabled)) = !f;
     return wdgt;
 }
 
-widget* widget_create(const view_context *view) {
-    widget* wdgt = calloc(sizeof(*wdgt), 1);
+widget_t* widget_create(const view_context_t *view) {
+    widget_t* wdgt = calloc(sizeof(*wdgt), 1);
     if (wdgt) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
@@ -416,7 +416,7 @@ widget* widget_create(const view_context *view) {
     return wdgt;
 }
 
-widget* widget_destroy(widget* wdgt) {
+widget_t* widget_destroy(widget_t* wdgt) {
     if (wdgt) {
         switch(wdgt->type) {
             case WIDGET_NONE:
@@ -433,7 +433,7 @@ widget* widget_destroy(widget* wdgt) {
                 break;
             case WIDGET_MULTISTATE_BUTTON:
                 {
-                    _btn_resource* res =  wdgt->sub.multistate_button.res;
+                    _bnt_resource_t* res =  wdgt->sub.multistate_button.res;
                     for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                         tcache_unlock_texture(res[ims].texture_id);
                         FREE(res[ims].resource_path);
@@ -485,17 +485,17 @@ widget* widget_destroy(widget* wdgt) {
     return wdgt;
 }
 
-widget* widget_create_button(const view_context* view) {
-    widget* wdgt = widget_create(view);
+widget_t* widget_create_button(const view_context_t* view) {
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        *((widget_type*)&wdgt->type) = WIDGET_BUTTON;
+        *((widget_type_t*)&wdgt->type) = WIDGET_BUTTON;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = button_widget_render;
     }
     return wdgt;
 }
 
-widget* widget_set_renderhf(widget* wdgt) {
+widget_t* widget_set_renderhf(widget_t* wdgt) {
     if (wdgt && ! wdgt->render_as_foreground) {
         wdgt->render_as_foreground = true;
         if (render_none == wdgt->render_foreground && render_none != wdgt->render_backdrop) {
@@ -506,7 +506,7 @@ widget* widget_set_renderhf(widget* wdgt) {
     return wdgt;
 }
 
-widget* widget_unset_renderhf(widget* wdgt) {
+widget_t* widget_unset_renderhf(widget_t* wdgt) {
     if (wdgt && wdgt->render_as_foreground) {
         wdgt->render_as_foreground = false;
         if (render_none != wdgt->render_foreground && wdgt->render_backdrop == render_none) {
@@ -518,7 +518,7 @@ widget* widget_unset_renderhf(widget* wdgt) {
 }
 
 
-static void image_widget_render(widget* wdgt) {
+static void image_widget_render(widget_t* wdgt) {
     wdgt->redraw_required = false;
     SDL_Rect image_rect;
     copyRect(&wdgt->rect, &image_rect);
@@ -552,23 +552,23 @@ static void image_widget_render(widget* wdgt) {
     }
 }
 
-widget* widget_create_image(const view_context* view) {
-    widget* wdgt = widget_create(view);
+widget_t* widget_create_image(const view_context_t* view) {
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        *((widget_type*)&wdgt->type) = WIDGET_IMAGE;
+        *((widget_type_t*)&wdgt->type) = WIDGET_IMAGE;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = image_widget_render;
     }
     return wdgt;
 }
 
-widget* widget_image_scaling(widget* wdgt, image_scaling op) {
+widget_t* widget_image_scaling(widget_t* wdgt, image_scaling_t op) {
     wdgt->sub.image.scale_op = op;
     setup_image_fit_src_rect(wdgt);
     return wdgt;
 }
 
-widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r) {
+widget_t* widget_hotspot_edge(widget_t* wdgt, hotspot_edge_t edge, SDL_Rect *r) {
     if (r == NULL) {
         switch(edge) {
             case EDGE_NONE:
@@ -611,7 +611,7 @@ widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r) {
     return wdgt;
 }
 
-static void multistate_button_widget_render(widget* wdgt) {
+static void multistate_button_widget_render(widget_t* wdgt) {
     wdgt->redraw_required = false;
     if (widget_pressed(wdgt) && !wdgt->hotspot) {
     SDL_Rect draw_rect;
@@ -634,15 +634,15 @@ static void multistate_button_widget_render(widget* wdgt) {
     }
 }
 
-widget* widget_create_multistate_button(const view_context* view, int state_count){
-    widget* wdgt = widget_create(view);
+widget_t* widget_create_multistate_button(const view_context_t* view, int state_count){
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        _btn_resource* res = calloc(state_count, sizeof(_btn_resource));
+        _bnt_resource_t* res = calloc(state_count, sizeof(_bnt_resource_t));
         if (res == NULL) {
             widget_destroy(wdgt);
             return NULL;
         }
-        *((widget_type*)&wdgt->type) = WIDGET_MULTISTATE_BUTTON ;
+        *((widget_type_t*)&wdgt->type) = WIDGET_MULTISTATE_BUTTON ;
         wdgt->sub.multistate_button.state_count = state_count;
         wdgt->sub.multistate_button.res = res;
         wdgt->action = ACTION_MULTISTATE_BUTTON;
@@ -651,9 +651,9 @@ widget* widget_create_multistate_button(const view_context* view, int state_coun
     return wdgt;
 }
 
-widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const char* image_name, action_t dispatch_action, action_t sync_on_action) {
+widget_t* widget_multistate_button_addstate(widget_t* wdgt, unsigned statenum, const char* image_name, action_t dispatch_action, action_t sync_on_action) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum <  wdgt->sub.multistate_button.state_count) {
-        _btn_resource* res = wdgt->sub.multistate_button.res + statenum;
+        _bnt_resource_t* res = wdgt->sub.multistate_button.res + statenum;
         // cleanup
         if (res->resource_path) {
             // already set up
@@ -675,7 +675,7 @@ widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const
     return wdgt;
 }
 
-widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum) {
+widget_t* widget_multistate_button_set_state(widget_t* wdgt, unsigned statenum) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum < wdgt->sub.multistate_button.state_count) {
         wdgt->sub.multistate_button.state = statenum;
         wdgt->redraw_required = !wdgt->render_as_foreground && !wdgt->hotspot;
@@ -683,14 +683,14 @@ widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum) {
     return wdgt;
 }
 
-widget* widget_multistate_button_get_state(widget* wdgt, unsigned* statenum) {
+widget_t* widget_multistate_button_get_state(widget_t* wdgt, unsigned* statenum) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON && statenum) {
         *statenum = wdgt->sub.multistate_button.state;
     }
     return wdgt;
 }
 
-widget* widget_multistate_button_sync_on_action(widget* wdgt, action_t act) {
+widget_t* widget_multistate_button_sync_on_action(widget_t* wdgt, action_t act) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON) {
         for(int ix_state=0; ix_state<wdgt->sub.multistate_button.state_count; ++ix_state) {
             if (act == wdgt->sub.multistate_button.res[ix_state].sync_on_action) {
@@ -702,12 +702,12 @@ widget* widget_multistate_button_sync_on_action(widget* wdgt, action_t act) {
 }
 
 
-widget* widget_hotspot(widget* wdgt, bool hotspot) {
+widget_t* widget_hotspot(widget_t* wdgt, bool hotspot) {
     wdgt->hotspot = hotspot;
     return wdgt;
 }
 
-static void text_widget_render(widget* wdgt) {
+static void text_widget_render(widget_t* wdgt) {
     wdgt->redraw_required = false;
     _text_data_ptr txt_w = &wdgt->sub.text;
     if (widget_pressed(wdgt)&& !wdgt->hotspot) {
@@ -732,12 +732,12 @@ static void text_widget_render(widget* wdgt) {
     }
 }
 
-widget* widget_create_text(const view_context* view) {
-    widget* wdgt = widget_create(view);
+widget_t* widget_create_text(const view_context_t* view) {
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
         static SDL_Color white = {255, 255, 255, 255};
         _text_data_ptr txt_w = &wdgt->sub.text;
-        *((widget_type*)&wdgt->type) = WIDGET_TEXT;
+        *((widget_type_t*)&wdgt->type) = WIDGET_TEXT;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = text_widget_render;
         char buffer[64];
@@ -749,7 +749,7 @@ widget* widget_create_text(const view_context* view) {
     return wdgt;
 }
 
-widget* widget_text_set_format(widget* wdgt, const char* format) {
+widget_t* widget_text_set_format(widget_t* wdgt, const char* format) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         if (txt_w->format) {
@@ -762,7 +762,7 @@ widget* widget_text_set_format(widget* wdgt, const char* format) {
     return wdgt;
 }
 
-widget* widget_text_set_timedate_format(widget* wdgt, const char* format) {
+widget_t* widget_text_set_timedate_format(widget_t* wdgt, const char* format) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         if (txt_w->timedate_format) {
@@ -776,7 +776,7 @@ widget* widget_text_set_timedate_format(widget* wdgt, const char* format) {
 }
 
 
-static void text_render_surface(widget* wdgt) {
+static void text_render_surface(widget_t* wdgt) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
 //        txt_w->content_dim.x = txt_w->content_dim.y = txt_w->content_dim.w = txt_w->content_dim.h = 0;
@@ -866,7 +866,7 @@ static void text_render_surface(widget* wdgt) {
     }
 }
 
-widget* widget_text_set_content(widget* wdgt, const char* content) {
+widget_t* widget_text_set_content(widget_t* wdgt, const char* content) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         if (NULL == content || 0 == strlen(content)) {
@@ -887,7 +887,7 @@ widget* widget_text_set_content(widget* wdgt, const char* content) {
     return wdgt;
 }
 
-widget* widget_text_set_font(widget* wdgt, const char* font_path, int size) {
+widget_t* widget_text_set_font(widget_t* wdgt, const char* font_path, int size) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         txt_w->font = TTF_OpenFont(font_path, size);
@@ -899,7 +899,7 @@ widget* widget_text_set_font(widget* wdgt, const char* font_path, int size) {
     return wdgt;
 }
 
-widget* widget_text_set_colour(widget* wdgt, SDL_Color colour) {
+widget_t* widget_text_set_colour(widget_t* wdgt, SDL_Color colour) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
         txt_w->colour.r = colour.r;
@@ -911,7 +911,7 @@ widget* widget_text_set_colour(widget* wdgt, SDL_Color colour) {
     return wdgt;
 }
 
-widget* widget_text_set_justification(widget* wdgt, const char* justif_name) {
+widget_t* widget_text_set_justification(widget_t* wdgt, const char* justif_name) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         if (justif_name) {
             if (0 == strcmp("center", justif_name)) { wdgt->sub.text.justification = TXT_CENTRED;}
@@ -925,7 +925,7 @@ widget* widget_text_set_justification(widget* wdgt, const char* justif_name) {
 }
 
 // !!! DO NOT call in render thread
-widget* widget_configure(widget* wdgt) {
+widget_t* widget_configure(widget_t* wdgt) {
     switch(wdgt->type) {
         case WIDGET_NONE:
         case WIDGET_IMAGE:
@@ -944,13 +944,13 @@ widget* widget_configure(widget* wdgt) {
     return wdgt;
 }
 
-static widget_list* widget_list_initialise(widget_list* list, view_context* view) {
+static widget_list_t* widget_list_initialise(widget_list_t* list, view_context_t* view) {
     if (list) {
         list->head.next = &list->tail;
-        *((widget_type*)(&list->head.type)) = WIDGET_NONE;
+        *((widget_type_t*)(&list->head.type)) = WIDGET_NONE;
         list->tail.prev = &list->head;
-        *((widget_type*)(&list->tail.type)) = WIDGET_END;
-        for(widget* w=&list->head; w != NULL; w=w->next) {
+        *((widget_type_t*)(&list->tail.type)) = WIDGET_END;
+        for(widget_t* w=&list->head; w != NULL; w=w->next) {
             w->view = view;
             w->hidden = true;
             *((bool *)(&w->focus_disabled)) = true;
@@ -964,13 +964,13 @@ static widget_list* widget_list_initialise(widget_list* list, view_context* view
     return list;
 }
 
-widget_list* create_widget_list(view_context* view) {
-    return widget_list_initialise(calloc(sizeof(widget_list), 1), view);
+widget_list_t* create_widget_list(view_context_t* view) {
+    return widget_list_initialise(calloc(sizeof(widget_list_t), 1), view);
 }
 
-widget_list* destroy_widgets_in_list(widget_list* list) {
+widget_list_t* destroy_widgets_in_list(widget_list_t* list) {
     if (list) {
-        widget* widget = list->head.next;
+        widget_t* widget = list->head.next;
         while(widget != &list->tail) {
             list->head.next = widget->next;
             widget_destroy(widget);
@@ -983,7 +983,7 @@ widget_list* destroy_widgets_in_list(widget_list* list) {
     return list;
 }
 
-widget_list* destroy_widget_list(widget_list* list) {
+widget_list_t* destroy_widget_list(widget_list_t* list) {
     if (list) {
         destroy_widgets_in_list(list);
         free(list);
@@ -991,20 +991,20 @@ widget_list* destroy_widget_list(widget_list* list) {
     return NULL;
 }
 
-void widget_list_load_media(const widget_list* list, const char* resource_path) {
-    for (widget* widget = list->head.next; widget != NULL; widget = widget->next) {
+void widget_list_load_media(const widget_list_t* list, const char* resource_path) {
+    for (widget_t* widget = list->head.next; widget != NULL; widget = widget->next) {
         widget_load_media(widget, resource_path);
     }
 }
 
-void widget_list_react(const widget_list* list, const pointer_input input, SDL_Point* pt) {
+void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt) {
     bool selected = false;
     input_printf("%d: %04d,%04d -> ", input, pt->x, pt->y);
     translate_point(pt);
     input_printf(" %04d,%04d\n", pt->x, pt->y);
     switch(input) {
         case POINTER_DOWN:
-            for(widget* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
+            for(widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 if (!selected) {
                     widget->focussed = SDL_PointInRect(pt, &widget->input_rect) && (!widget->focus_disabled);
@@ -1022,7 +1022,7 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
             }
             break;
         case POINTER_UP:
-            for(widget* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
+            for(widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 widget_set_pressed(widget, false);
                 if (SDL_PointInRect(pt, &widget->input_rect) && widget->focussed) {
@@ -1048,7 +1048,7 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
             }
             break;
         case POINTER_MOTION:
-            for (widget* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
+            for (widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 if (!selected) {
                     widget_set_highlight(widget, SDL_PointInRect(pt, &widget->input_rect) && (!widget->focus_disabled));
@@ -1067,9 +1067,9 @@ void widget_list_react(const widget_list* list, const pointer_input input, SDL_P
 }
 
 
-bool widget_list_query_render_backdrop(const widget_list* wdgt_list) {
+bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list) {
     if (wdgt_list) {
-        for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+        for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
             if (widget->redraw_required) {
                 return true;
             }
@@ -1078,11 +1078,11 @@ bool widget_list_query_render_backdrop(const widget_list* wdgt_list) {
     return false;
 }
 
-void widget_list_render_backdrop(const widget_list* wdgt_list) {
+void widget_list_render_backdrop(const widget_list_t* wdgt_list) {
     if (NULL == wdgt_list) {
         return;
     }
-    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+    for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
         if (widget->hidden) {
             widget->redraw_required = false;
         } else {
@@ -1090,17 +1090,17 @@ void widget_list_render_backdrop(const widget_list* wdgt_list) {
         }
     }
 
-    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+    for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
         if (widget->render_backdrop != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
     }
 
 }
 
-void widget_list_render_foreground(const widget_list* wdgt_list) {
+void widget_list_render_foreground(const widget_list_t* wdgt_list) {
     if (NULL == wdgt_list) {
         return;
     }
-    for(widget* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
+    for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
         if (!widget->hidden) {
             widget->render_foreground(widget);
             widget_render_foreground_default(widget);

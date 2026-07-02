@@ -21,22 +21,22 @@ static inline void free_ex(void** tgt) {
 #define FREE(x) free_ex((void **)(&x))
 
 
-static inline bool slider_is_interactive(widget* wdgt) {
+static inline bool slider_is_interactive(widget_t* wdgt) {
     return wdgt->sub.slider.defined_interactive && __atomic_load_n(&wdgt->sub.slider.interactive, __ATOMIC_ACQUIRE);
 }
 
-static inline bool slider_wk_is_initialised(widget* wdgt) {
+static inline bool slider_wk_is_initialised(widget_t* wdgt) {
     return __atomic_load_n(&wdgt->sub.slider.wk.initialised, __ATOMIC_ACQUIRE);
 }
 
-static inline void slider_set_wk_initialised(widget* wdgt, bool yn) {
+static inline void slider_set_wk_initialised(widget_t* wdgt, bool yn) {
     __atomic_store_n(&wdgt->sub.slider.wk.initialised, yn, __ATOMIC_RELEASE);
 }
 
 // workspace intialisation spin lock 
 static SDL_threadID slider_wk_lock = 0;
 // !!! DO NOT invoke from render thread !!!
-_slider_workspace* slider_widget_configure(widget* wdgt) {
+_slider_workspace_t* slider_widget_configure(widget_t* wdgt) {
 #define ZAP_RECT(r) (r).x = (r).y = (r).w = (r).h = 0
     if (!wdgt->configured) {
         return &wdgt->sub.slider.wk;
@@ -54,16 +54,16 @@ _slider_workspace* slider_widget_configure(widget* wdgt) {
     }
     
     if (!slider_wk_is_initialised(wdgt)) {
-        _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
-        _slider_workspace* wk = &wdgt->sub.slider.wk;
+        _slider_resource_t* pick = wdgt->sub.slider.res+SLIDER_PICK;
+        _slider_workspace_t* wk = &wdgt->sub.slider.wk;
 
         copyRect(&wdgt->rect, &wk->bar_start_rect);
         copyRect(&wdgt->rect, &wk->bar_end_rect);
         copyRect(&wdgt->rect, &wk->bar_rect);
         copyRect(&wdgt->rect, &wk->pick_rect);
 
-         _slider_resource* bar_start = wdgt->sub.slider.res+SLIDER_BAR_START;
-         _slider_resource* bar_end =  wdgt->sub.slider.res+SLIDER_BAR_END;
+         _slider_resource_t* bar_start = wdgt->sub.slider.res+SLIDER_BAR_START;
+         _slider_resource_t* bar_end =  wdgt->sub.slider.res+SLIDER_BAR_END;
 
         wk->value_range_delta = wdgt->sub.slider.range.end - wdgt->sub.slider.range.start;
         // FIXME: pick-w>%2 != 0
@@ -116,24 +116,24 @@ _slider_workspace* slider_widget_configure(widget* wdgt) {
     return &wdgt->sub.slider.wk;
 }
 
-static inline _slider_workspace*  slider_reconfigure(widget* wdgt) {
+static inline _slider_workspace_t*  slider_reconfigure(widget_t* wdgt) {
     slider_set_wk_initialised(wdgt, false);
     return slider_widget_configure(wdgt);
 }
 
 
-static void slider_widget_render(widget* wdgt) {
+static void slider_widget_render(widget_t* wdgt) {
     wdgt->redraw_required = false;
     if (!slider_wk_is_initialised(wdgt)) { 
         return;
     }
-    const _slider_workspace* wk = &wdgt->sub.slider.wk;
+    const _slider_workspace_t* wk = &wdgt->sub.slider.wk;
     if (wk->value_range_delta < 1) {
         // 0 or negative range => nothing to render
         return;
     }
 
-    _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
+    _slider_resource_t* pick = wdgt->sub.slider.res+SLIDER_PICK;
     SDL_Rect fill_rect;
     SDL_Rect empty_rect;
     SDL_Rect pick_rect;
@@ -159,7 +159,7 @@ static void slider_widget_render(widget* wdgt) {
 
     {
         int ix_texture = wk->min_pos < curr_pos? 0: 1;
-        _slider_resource* bar_start = wdgt->sub.slider.res[SLIDER_BAR_START].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_START:NULL;
+        _slider_resource_t* bar_start = wdgt->sub.slider.res[SLIDER_BAR_START].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_START:NULL;
         if (bar_start && start_rect.w > 0) {
             SDL_RenderCopyEx(wdgt->view->app->renderer,
                    tcache_quick_get_texture(bar_start->texture_ids[ix_texture], wdgt->view->app->renderer),
@@ -182,7 +182,7 @@ static void slider_widget_render(widget* wdgt) {
         // however the raw value cannot be used, it has to be scaled to the bar end image
         // size. For now not doing turns out to work good enough.
         int ix_texture = curr_pos < wk->max_pos? 1: 0;
-        _slider_resource* bar_end = wdgt->sub.slider.res[SLIDER_BAR_END].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_END:NULL;
+        _slider_resource_t* bar_end = wdgt->sub.slider.res[SLIDER_BAR_END].texture_ids[ix_texture]? wdgt->sub.slider.res+SLIDER_BAR_END:NULL;
         if (bar_end && end_rect.w > 0) {
             SDL_RenderCopyEx(wdgt->view->app->renderer,
                    tcache_quick_get_texture(bar_end->texture_ids[ix_texture], wdgt->view->app->renderer),
@@ -193,7 +193,7 @@ static void slider_widget_render(widget* wdgt) {
         }
     }
 
-    _slider_resource* bar = wdgt->sub.slider.res[SLIDER_BAR].texture_ids[0]? wdgt->sub.slider.res+SLIDER_BAR:NULL;
+    _slider_resource_t* bar = wdgt->sub.slider.res[SLIDER_BAR].texture_ids[0]? wdgt->sub.slider.res+SLIDER_BAR:NULL;
     if (bar && fill_rect.w > 0) {
         SDL_RenderCopyEx(wdgt->view->app->renderer,
                 tcache_quick_get_texture(bar->texture_ids[0], wdgt->view->app->renderer),
@@ -222,10 +222,10 @@ static void slider_widget_render(widget* wdgt) {
     }
 }
 
-widget *widget_create_slider(const view_context* view) {
-    widget* wdgt = widget_create(view);
+widget_t *widget_create_slider(const view_context_t* view) {
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        *((widget_type*)&wdgt->type) = WIDGET_SLIDER;
+        *((widget_type_t*)&wdgt->type) = WIDGET_SLIDER;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = slider_widget_render;
         __atomic_store_n(&wdgt->sub.slider.interactive, true, __ATOMIC_RELEASE);
@@ -234,7 +234,7 @@ widget *widget_create_slider(const view_context* view) {
     return wdgt;
 }
 
-widget *widget_slider_image_paths(widget* wdgt, slider_resource_ID id, const char* path1, const char* path2) {
+widget_t *widget_slider_image_paths(widget_t* wdgt, slider_reosurce_ID_t id, const char* path1, const char* path2) {
     if (wdgt) {
         switch(id) {
             case SLIDER_BAR:
@@ -264,7 +264,7 @@ widget *widget_slider_image_paths(widget* wdgt, slider_resource_ID id, const cha
 }
 
 
-widget *widget_slider_image_width(widget* wdgt, slider_resource_ID id, int width) {
+widget_t *widget_slider_image_width(widget_t* wdgt, slider_reosurce_ID_t id, int width) {
     if (wdgt) {
         bool updated = false;
         switch(id) {
@@ -292,7 +292,7 @@ widget *widget_slider_image_width(widget* wdgt, slider_resource_ID id, int width
     return wdgt;
 }
 
-widget *widget_slider_image_height(widget* wdgt, slider_resource_ID id, int height) {
+widget_t *widget_slider_image_height(widget_t* wdgt, slider_reosurce_ID_t id, int height) {
     if (wdgt) {
         bool updated = false;
         switch(id) {
@@ -315,11 +315,11 @@ widget *widget_slider_image_height(widget* wdgt, slider_resource_ID id, int heig
     return wdgt;
 }
 
-widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
+widget_t *widget_slider_track(widget_t* wdgt, const SDL_Point *pt) {
     if (slider_is_interactive(wdgt)) {
         if (widget_pressed(wdgt) && (wdgt->sub.slider.range.end - wdgt->sub.slider.range.start) > 0) {
-            _slider_resource* pick = wdgt->sub.slider.res+SLIDER_PICK;
-            _slider_workspace* wk = &wdgt->sub.slider.wk;
+            _slider_resource_t* pick = wdgt->sub.slider.res+SLIDER_PICK;
+            _slider_workspace_t* wk = &wdgt->sub.slider.wk;
             if (pick) {
                 if (pt->x < wk->min_pos) {
                     wk->drag_pos = wk->min_pos;
@@ -335,20 +335,20 @@ widget *widget_slider_track(widget* wdgt, const SDL_Point *pt) {
     return wdgt;
 }
 
-widget *widget_slider_tracking_commit(widget* wdgt, const SDL_Point *pt) {
+widget_t *widget_slider_tracking_commit(widget_t* wdgt, const SDL_Point *pt) {
     if (slider_is_interactive(wdgt)) {
         widget_slider_track(wdgt, pt);
-        _slider_workspace* wk = &wdgt->sub.slider.wk;
+        _slider_workspace_t* wk = &wdgt->sub.slider.wk;
         wk->current_pos = wk->drag_pos;
     }
     return wdgt;
 }
 
 /*
-widget *widget_slider_set_value(widget* wdgt, int value) {
+widget_t *widget_slider_set_value(widget_t* wdgt, int value) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         if (value >= wdgt->sub.slider.range.start && value <= wdgt->sub.slider.range.end) {
-            _slider_workspace* wk = slider_reconfigure(wdgt);
+            _slider_workspace_t* wk = slider_reconfigure(wdgt);
             if (slider_wk_is_initialised(wdgt)) {
                 if (wk->value_range_delta) {
                     // range must be non-zero to calculate the position of the pick
@@ -376,7 +376,7 @@ widget *widget_slider_set_value(widget* wdgt, int value) {
 }
 */
 
-widget *widget_slider_update_value(widget* wdgt, int value) {
+widget_t *widget_slider_update_value(widget_t* wdgt, int value) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         if (value >= wdgt->sub.slider.range.start
                 && value <= wdgt->sub.slider.range.end) {
@@ -384,7 +384,7 @@ widget *widget_slider_update_value(widget* wdgt, int value) {
                  slider_reconfigure(wdgt);
             }
             if (slider_wk_is_initialised(wdgt)) {
-                _slider_workspace* wk = &wdgt->sub.slider.wk;
+                _slider_workspace_t* wk = &wdgt->sub.slider.wk;
                 if (wk->value_range_delta) {
                     // range must be non-zero to calculate the position of the pick
                     float offset = ((float)(value - wdgt->sub.slider.range.start)*(wk->max_pos - wk->min_pos))/wk->value_range_delta;
@@ -405,7 +405,7 @@ widget *widget_slider_update_value(widget* wdgt, int value) {
     return wdgt;
 }
 
-widget *widget_slider_range(widget* wdgt, int start, int end) {
+widget_t *widget_slider_range(widget_t* wdgt, int start, int end) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         bool updated = wdgt->sub.slider.range.start != start || wdgt->sub.slider.range.end != end;
         wdgt->sub.slider.range.start = start;
@@ -420,7 +420,7 @@ widget *widget_slider_range(widget* wdgt, int start, int end) {
     return wdgt;
 }
 
-widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
+widget_t *widget_slider_set_interactive(widget_t* wdgt, bool yn) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         bool ny = ! yn;
         bool modified = __atomic_compare_exchange_n(&wdgt->sub.slider.interactive, &ny, yn, false, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
@@ -435,7 +435,7 @@ widget *widget_slider_set_interactive(widget* wdgt, bool yn) {
     return wdgt;
 }
 
-widget *widget_slider_define_interactive(widget* wdgt, bool yn) {
+widget_t *widget_slider_define_interactive(widget_t* wdgt, bool yn) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
         wdgt->sub.slider.defined_interactive = yn;
     }
@@ -443,9 +443,9 @@ widget *widget_slider_define_interactive(widget* wdgt, bool yn) {
 }
 
 
-widget *widget_slider_get_value(widget* wdgt, int* value) {
+widget_t *widget_slider_get_value(widget_t* wdgt, int* value) {
     if (wdgt && wdgt->type == WIDGET_SLIDER) {
-        const _slider_workspace* wk = &wdgt->sub.slider.wk;
+        const _slider_workspace_t* wk = &wdgt->sub.slider.wk;
         int v = (wk->current_pos - wk->min_pos);
         dummy_printf("widget_slider_get_value v=%d\n", v);
         v *= wk->value_range_delta;

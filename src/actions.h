@@ -1,21 +1,5 @@
 #ifndef __jl_action_h_
 #define __jl_action_h_
-/*
-void action_quit(widget* wdgt);
-void action_next_visu(widget* wdgt);
-void action_prev_visu(widget* wdgt);
-void action_next_vu(widget* wdgt);
-void action_prev_vu(widget* wdgt);
-void action_next_sp(widget* wdgt);
-void action_prev_sp(widget* wdgt);
-void action_none(widget* wdgt);
-
-void action_lock_vumeter(widget* wdgt);
-void action_unlock_vumeter(widget* wdgt);
-
-void action_lock_visu(widget* wdgt);
-void action_unlock_visu(widget* wdgt);
-*/
 
 typedef enum {
     ACTION_NONE,

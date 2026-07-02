@@ -24,7 +24,7 @@ static const char* widget_type_strings[] = {
     ""
 };
 
-static widget_type tokenise_widget(const char* str) {
+static widget_type_t tokenise_widget(const char* str) {
     if (str == NULL) {
         return WIDGET_NONE;
     }
@@ -71,7 +71,7 @@ typedef enum {
     JT_INTERACTIVE,
     JT_SLIDER_VALUE,
 
-// order of bar, pick, bar-start, bar-end should match slider_resource_ID enum
+// order of bar, pick, bar-start, bar-end should match slider_reosurce_ID_t enum
     JT_BAR,
     JT_PICK,
     JT_BAR_START,
@@ -186,7 +186,7 @@ static const char* edge_strings[] = {
     "bottom"
 };
 
-static hotspot_edge tokenise_hotspot_edge(const char* str) {
+static hotspot_edge_t tokenise_hotspot_edge(const char* str) {
     if (str == NULL) {
         return EDGE_NONE;
     }
@@ -205,7 +205,7 @@ static const char* image_scaling_strings[] = {
     "stretch",
 };
 
-static image_scaling tokenise_image_scaling(const char* str) {
+static image_scaling_t tokenise_image_scaling(const char* str) {
     if (str == NULL) {
         return IMAGE_FIT;
     }
@@ -286,7 +286,7 @@ static double get_object_double_value(json_value* value, json_token jt, double d
 }
 */
 
-static void deserialise_container(json_value* value, SDL_Rect* container, view_context* ctx) {
+static void deserialise_container(json_value* value, SDL_Rect* container, view_context_t* ctx) {
     if (value == NULL) {
 //        error_printf("deserialise_container value==NULL\n");
         return;
@@ -340,7 +340,7 @@ static position tokenise_position(const char* str) {
     return P_NONE;
 }
 
-static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rect* rect, view_context* ctx) {
+static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rect* rect, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_position: value==NULL\n");
         return;
@@ -448,7 +448,7 @@ static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rec
     }
 }
 
-static void deserialise_location(json_value* value, view_context* ctx, SDL_Rect* container, widget* widget) {
+static void deserialise_location(json_value* value, view_context_t* ctx, SDL_Rect* container, widget_t* widget) {
     if (value == NULL) {
         error_printf("deserialise_location value==NULL\n");
         return;
@@ -472,7 +472,7 @@ static void deserialise_location(json_value* value, view_context* ctx, SDL_Rect*
     widget_rect(widget, &rect);
 }
 
-static void deserialise_one_widget_generic(widget* widget, json_value* value, view_context* ctx) {
+static void deserialise_one_widget_generic(widget_t* widget, json_value* value, view_context_t* ctx) {
     if (widget) {
         widget_set_player_value_key(widget, get_object_string_value(value, JT_PLAYER_VALUE, NULL));
         if (get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL)) {
@@ -500,7 +500,7 @@ static void deserialise_one_widget_generic(widget* widget, json_value* value, vi
     }
 }
 
-static void deserialise_one_widget(json_value* value, view_context* ctx) {
+static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_one_widget value==NULL\n");
         return;
@@ -514,7 +514,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
         exit(EXIT_FAILURE);
     }
     const char* widget_typename = value->u.object.values[0].name;
-    widget_type wdgt_type = tokenise_widget(value->u.object.values[0].name);
+    widget_type_t wdgt_type = tokenise_widget(value->u.object.values[0].name);
     switch(wdgt_type) {
         case WIDGET_NONE:
             error_printf("deserialise_one_widget: widget none\n");
@@ -539,7 +539,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
         error_printf("deserialise_one_widget value != object\n");
         return;
     }
-    widget* widget = NULL;
+    widget_t* widget = NULL;
     switch(wdgt_type) {
         case WIDGET_NONE:
         case WIDGET_END:
@@ -636,7 +636,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                     }
                 }
                 json_printf("     resources:\n");
-                for(slider_resource_ID resid = 0; resid < SLIDER_RESOURCE_COUNT; ++resid) {
+                for(slider_reosurce_ID_t resid = 0; resid < SLIDER_RESOURCE_COUNT; ++resid) {
                     json_value* jslider = get_object_object_value(value, JT_BAR+resid);
                     if (jslider) {
                         json_value* jimage = get_object_value(jslider, JT_IMAGE);
@@ -678,7 +678,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
     }
 }
 
-void deserialise_widgets(json_value* value, view_context* ctx) {
+void deserialise_widgets(json_value* value, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_widgets value==NULL\n");
         return;
@@ -697,7 +697,7 @@ void deserialise_widgets(json_value* value, view_context* ctx) {
     }
 }
 
-bool deserialise_screen(json_value* value, view_context* ctx, SDL_Rect* rect) {
+bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) {
     if (value == NULL) {
         error_printf("deserialise_screen value==NULL\n");
         return false;
@@ -719,7 +719,7 @@ bool deserialise_screen(json_value* value, view_context* ctx, SDL_Rect* rect) {
     return false;
 }
 
-int deserialise_json(const char* json_string, const int len, view_context* ctx) {
+int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
     json_value* value = json_parse(json_string, len);
 
     if (value == NULL) {
@@ -748,7 +748,7 @@ int deserialise_json(const char* json_string, const int len, view_context* ctx) 
     return 0;
 }
 
-int deserialise_widgets_file(const char* filepath, view_context* ctx) {
+int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
     FILE *fp;
     struct stat filestatus;
     char* json_string;

@@ -13,54 +13,54 @@ static SDL_Event prev_vu_event = {.type = USEREVENT_PREV_VISU };
 static SDL_Event next_sp_event = {.type = USEREVENT_NEXT_SP };
 static SDL_Event prev_sp_event = {.type = USEREVENT_PREV_SP };
 
-static void action_quit(widget* wdgt) {
+static void action_quit(widget_t* wdgt) {
     SDL_PushEvent(&quit_event);
 }
 
-static void action_next_visu(widget* wdgt) {
+static void action_next_visu(widget_t* wdgt) {
     SDL_PushEvent(&next_visu_event);
 }
 
-static void action_prev_visu(widget* wdgt) {
+static void action_prev_visu(widget_t* wdgt) {
     SDL_PushEvent(&prev_visu_event);
 }
 
-static void action_next_vu(widget* wdgt) {
+static void action_next_vu(widget_t* wdgt) {
     SDL_PushEvent(&next_vu_event);
 }
 
-static void action_prev_vu(widget* wdgt) {
+static void action_prev_vu(widget_t* wdgt) {
     SDL_PushEvent(&prev_vu_event);
 }
 
-static void action_next_sp(widget* wdgt) {
+static void action_next_sp(widget_t* wdgt) {
     SDL_PushEvent(&next_sp_event);
 }
 
-static void action_prev_sp(widget* wdgt) {
+static void action_prev_sp(widget_t* wdgt) {
     SDL_PushEvent(&prev_sp_event);
 }
 
-static void action_none(widget* wdgt) {
+static void action_none(widget_t* wdgt) {
 }
 
-static void action_lock_vumeter(widget* wdgt) {
+static void action_lock_vumeter(widget_t* wdgt) {
     lock_vu_meters();
 }
 
-static void action_unlock_vumeter(widget* wdgt) {
+static void action_unlock_vumeter(widget_t* wdgt) {
     unlock_vu_meters();
 }
 
-static void action_lock_visu(widget* wdgt) {
+static void action_lock_visu(widget_t* wdgt) {
     lock_visualisers();
 }
 
-static void action_unlock_visu(widget* wdgt) {
+static void action_unlock_visu(widget_t* wdgt) {
     unlock_visualisers();
 }
 
-static void widget_dispatch_action_explicit(widget* wdgt, action_t act) {
+static void widget_dispatch_action_explicit(widget_t* wdgt, action_t act) {
     action_printf("%p %d %s\n", wdgt, act, action_to_string(act));
     switch(act) {
         case ACTION_NONE:
@@ -193,7 +193,7 @@ static void widget_dispatch_action_explicit(widget* wdgt, action_t act) {
     }
 }
 
-static void action_multi_state_button(widget* wdgt) {
+static void action_multi_state_button(widget_t* wdgt) {
     action_printf("action_multistate_button action state=%d %d %s\n", 
             wdgt->sub.multistate_button.state,
             wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action,
@@ -202,7 +202,7 @@ static void action_multi_state_button(widget* wdgt) {
 //    wdgt->sub.multistate_button.state = (wdgt->sub.multistate_button.state + 1) % wdgt->sub.multistate_button.state_count;
 }
 
-void widget_dispatch_action(widget* wdgt) {
+void widget_dispatch_action(widget_t* wdgt) {
     if (wdgt->type == WIDGET_SLIDER && (!wdgt->sub.slider.defined_interactive || !wdgt->sub.slider.interactive)) {
         return;
     }

@@ -40,11 +40,11 @@ struct vumeter_widget {
     runtime_volume_t vol_runtimes[NUM_VU_CHANNELS];
 };
 
-static inline int vumeter_index(vumeter_widget* wdgt) {
+static inline int vumeter_index(vumeter_widget_t* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_meter_indx, __ATOMIC_ACQUIRE);
 }
 
-static inline void vumeter_set_index(vumeter_widget* wdgt, int ix) {
+static inline void vumeter_set_index(vumeter_widget_t* wdgt, int ix) {
      __atomic_store_n(&wdgt->atomic_meter_indx, ix, __ATOMIC_RELEASE);
 }
 
@@ -78,11 +78,11 @@ bool VUMeter_loadlib(const char* path) {
     return true;
 }
 
-void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
+void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
     vumeter_properties_t* base_props = vu_props_list;
     char buffer[1024];
     sprintf(buffer, "./images/runtime/%dx%d", wdgt->rect.w, wdgt->rect.h);
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     vw->num_meters = 0;
     debug_printf("VU Meter widget:\n");
     debug_printf("          rect = {%4d,%4d,%4d,%4d}\n", wdgt->rect.x, wdgt->rect.y, wdgt->rect.w, wdgt->rect.h);
@@ -159,9 +159,9 @@ void vumeter_widget_load_media(widget *wdgt, const char* resource_path) {
     }
 }
 
-static void vumeter_render_bg(widget* wdgt) {
+static void vumeter_render_bg(widget_t* wdgt) {
     if (true) {
-        vumeter_widget* vw = wdgt->sub.vu;
+        vumeter_widget_t* vw = wdgt->sub.vu;
         VUMeter_draw_background(wdgt->view->app->renderer,
             vw->meters[vumeter_index(vw)].props,
             vw->meters[vumeter_index(vw)].meter,
@@ -171,13 +171,13 @@ static void vumeter_render_bg(widget* wdgt) {
     wdgt->redraw_required = false;
 }
 
-static void vumeter_render_fg(widget* wdgt) {
+static void vumeter_render_fg(widget_t* wdgt) {
 /*    
     SDL_Rect draw_rect;
     copyRect(&wdgt->rect, &draw_rect);
     translate_draw_rect(&draw_rect);
 */    
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     int vols[2];
     visualizer_vumeter(vols);
     if (vw->num_meters) {
@@ -196,13 +196,13 @@ static void vumeter_render_fg(widget* wdgt) {
     }
 }
 
-widget *widget_create_vumeter(const view_context* view) {
-    widget* wdgt = widget_create(view);
+widget_t *widget_create_vumeter(const view_context_t* view) {
+    widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        *((widget_type*)&wdgt->type) = WIDGET_VUMETER;
+        *((widget_type_t*)&wdgt->type) = WIDGET_VUMETER;
         wdgt->render_backdrop = vumeter_render_bg;
         wdgt->render_foreground = vumeter_render_fg;
-        wdgt->sub.vu = calloc(1, sizeof(vumeter_widget));
+        wdgt->sub.vu = calloc(1, sizeof(vumeter_widget_t));
         if (wdgt->sub.vu == NULL) {
             widget_destroy(wdgt);
             wdgt = NULL;
@@ -211,11 +211,11 @@ widget *widget_create_vumeter(const view_context* view) {
     return wdgt;
 }
 
-widget *vumeter_widget_destroy(widget *wdgt) {
+widget_t *vumeter_widget_destroy(widget_t *wdgt) {
     if (wdgt == NULL) {
         return wdgt;
     }
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw) {
         for (int ix=0; ix < vw->num_meters; ++ix) {
             vw->meters[ix].props = NULL;
@@ -226,8 +226,8 @@ widget *vumeter_widget_destroy(widget *wdgt) {
     return wdgt;
 }
 
-static bool vumeter_select(widget *wdgt, int indx) {
-    vumeter_widget* vw = wdgt->sub.vu;
+static bool vumeter_select(widget_t *wdgt, int indx) {
+    vumeter_widget_t* vw = wdgt->sub.vu;
     if (indx < 0 || indx >= vw->num_meters) {
         return false;
     }
@@ -247,11 +247,11 @@ static bool vumeter_select(widget *wdgt, int indx) {
     return true;
 }
 
-widget *widget_vumeter_select_next(widget *wdgt) {
+widget_t *widget_vumeter_select_next(widget_t *wdgt) {
     if (wdgt == NULL) {
         return wdgt;
     }
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->locked) {
         return wdgt;
     }
@@ -259,11 +259,11 @@ widget *widget_vumeter_select_next(widget *wdgt) {
     return wdgt;
 }
 
-widget *widget_vumeter_select_prev(widget *wdgt) {
+widget_t *widget_vumeter_select_prev(widget_t *wdgt) {
     if (wdgt == NULL) {
         return wdgt;
     }
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->locked) {
         return wdgt;
     }
@@ -271,11 +271,11 @@ widget *widget_vumeter_select_prev(widget *wdgt) {
     return wdgt;
 }
 
-widget *widget_vumeter_select_by_name(widget *wdgt, const char* name) {
+widget_t *widget_vumeter_select_by_name(widget_t *wdgt, const char* name) {
     if (wdgt == NULL) {
         return wdgt;
     }
-    vumeter_widget* vw = wdgt->sub.vu;
+    vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->locked || name == NULL) {
         return wdgt;
     }
@@ -287,14 +287,14 @@ widget *widget_vumeter_select_by_name(widget *wdgt, const char* name) {
     return wdgt;
 }
 
-widget *widget_vumeter_select_lock(widget *wdgt, bool lock) {
-    vumeter_widget* vw = wdgt->sub.vu;
+widget_t *widget_vumeter_select_lock(widget_t *wdgt, bool lock) {
+    vumeter_widget_t* vw = wdgt->sub.vu;
     vw->locked = lock;
     return wdgt;
 }
 
-widget *widget_vumeter_equal_horizontal_spacing(widget *wdgt, bool val) {
-    vumeter_widget* vw = wdgt->sub.vu;
+widget_t *widget_vumeter_equal_horizontal_spacing(widget_t *wdgt, bool val) {
+    vumeter_widget_t* vw = wdgt->sub.vu;
     vw->equal_horizontal_spacing = val;
     return wdgt;
 }
