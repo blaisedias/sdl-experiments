@@ -58,12 +58,20 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
     int     wr;
 
     char*  fields[8] = {
-        buf, "", "", "",
+        "", "", "", "",
         "", "", "", ""
     };
     // buf will have "Wed Jun 24 08:52:24 2026"
     scan = buf;
-    for(int ix=0; *scan != 0; ++scan) {
+    while(*scan == ' ') {
+        ++scan;
+    }
+    fields[0] = scan;
+    for(int ix=1; *scan != 0; ++scan) {
+        while (*scan == ' ' && *(scan+1) == ' ') {
+            *scan = 0;
+            ++scan;
+        }
         if (*scan == ' ' || *scan == ':' || *scan == '\n') {
             *scan = 0;
             if (ix < TD_END && *(scan+1))  {
