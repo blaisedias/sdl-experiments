@@ -10,7 +10,7 @@
 #include <time.h>
 #include "vumeter_util.h"
 #include "application.h"
-#include "widgets.h"
+#include "widgets_internal.h"
 #include "visualizer.h"
 
 static vumeter_properties_t* vu_props_list;
@@ -197,23 +197,15 @@ static void vumeter_render_fg(widget* wdgt) {
 }
 
 widget *widget_create_vumeter(const view_context* view) {
-    widget* wdgt = calloc(sizeof(*wdgt), 1);
+    widget* wdgt = widget_create(view);
     if (wdgt) {
-        wdgt->view = view;
-        wdgt->action = ACTION_NONE;
+        *((widget_type*)&wdgt->type) = WIDGET_VUMETER;
         wdgt->render_backdrop = vumeter_render_bg;
         wdgt->render_foreground = vumeter_render_fg;
         wdgt->sub.vu = calloc(1, sizeof(vumeter_widget));
         if (wdgt->sub.vu == NULL) {
             widget_destroy(wdgt);
             wdgt = NULL;
-        } else {
-            *((widget_type*)&wdgt->type) = WIDGET_VUMETER;
-            if (view->list) {
-                wdgt->next = &view->list->tail;
-                wdgt->prev = view->list->tail.prev;
-                wdgt->prev->next = wdgt->next->prev = wdgt;
-            }
         }
     }
     return wdgt;

@@ -12,6 +12,11 @@
 
 #define  WH_FILL (-1)
 
+// TODO: use setter/getter functions
+extern bool debug_rects;
+extern bool show_rects;
+extern bool show_input_rects;
+
 typedef enum {
     WIDGET_NONE,
     WIDGET_IMAGE,
@@ -189,13 +194,6 @@ bool widget_pressed(widget* wdgt);
 void widget_set_pressed(widget* wdgt, bool onoff);
 int widget_get_pressed_millis(widget* wdgt);
 
-
-extern bool debug_rects;
-extern bool show_rects;
-extern bool show_input_rects;
-
-void render_none(widget* wdgt);
-
 const char* widget_type_name(widget_type typ);
 widget* widget_rect(widget *wdgt, const SDL_Rect *rect);
 widget* widget_bounds(widget *wdgt, int x, int y, int w, int h);
@@ -204,10 +202,6 @@ widget* widget_set_runtime_value_key(widget* wdgt, const char* key);
 // TODO: fix implicit range start value of 0
 widget* widget_set_player_range_value_key(widget* wdgt, const char* key);
 
-/*
-widget* widget_next(widget *wdgt, widget* next);
-widget* widget_prev(widget *wdgt, widget* prev);
-*/
 widget* widget_load_media(widget* wdgt, const char* resource_path);
 widget* widget_destroy(widget* wdgt);
 widget* widget_action(widget* wdgt, action_t action);
@@ -217,6 +211,7 @@ widget* widget_hotspot(widget* wdgt, bool hotspot);
 widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r);
 widget* widget_image_path(widget* wdgt, const char* path);
 widget* widget_focus_enable(widget* wdgt, bool f);
+
 // DO NOT invoke in render thread
 widget* widget_configure(widget* wdgt);
 

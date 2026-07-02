@@ -63,26 +63,6 @@ CF_PIC = $(CF) -fpic
 CF_SHARED = $(CF) -fpic -shared
 
 SHARED_OBJS = $(LIB_DIR)/Chevrons.so $(LIB_DIR)/PurpleTastic.so $(LIB_DIR)/TubeD.so $(LIB_DIR)/SpeakerGreen.so $(LIB_DIR)/SpeakerGray.so $(LIB_DIR)/TransparentWhite.so
-#SQVUMETER_OBJS = \
-#		  $(OBJS_DIR)/sqvumeter.o \
-#		  $(OBJS_DIR)/application.o \
-#		  $(OBJS_DIR)/logging.o \
-#   		  $(OBJS_DIR)/timing.o \
-#   		  $(OBJS_DIR)/util.o \
-#   		  $(OBJS_DIR)/event_queue.o \
-#		  $(OBJS_DIR)/touch_screen.o \
-#		  $(OBJS_DIR)/touch_screen_sdl2.o \
-#   		  $(OBJS_DIR)/platform_linux.o \
-#   		  $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/city.o\
-#		  $(OBJS_DIR)/lyrion_player.o \
-#		  $(OBJS_DIR)/widgets.o \
-#		  $(OBJS_DIR)/actions.o \
-#   		  $(OBJS_DIR)/json.o \
-#		  $(OBJS_DIR)/widgets_json.o \
-#   		  $(OBJS_DIR)/visualizer.o \
-#		  $(OBJS_DIR)/vumeter_util.o \
-#		  $(OBJS_DIR)/vis_vumeter.o \
-#   		  $(OBJS_DIR)/vumeter_widget.o \
 
 #all: $(BIN_DIR)/sqvumeter $(SHARED_OBJS) \
 #	$(BIN_DIR)/test_tcache \
@@ -94,23 +74,24 @@ all: $(BIN_DIR)/jl2 $(SHARED_OBJS)
 TSP_OBJS =  \
 		  $(OBJS_DIR)/application.o \
 		  $(OBJS_DIR)/logging.o \
-   		  $(OBJS_DIR)/timing.o \
+		  $(OBJS_DIR)/timing.o \
 		  $(OBJS_DIR)/util.o \
 		  $(OBJS_DIR)/event_queue.o \
 		  $(OBJS_DIR)/touch_screen.o \
 		  $(OBJS_DIR)/touch_screen_sdl2.o \
 		  $(OBJS_DIR)/platform_linux.o \
-   		  $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/city.o \
+		  $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/city.o \
 		  $(OBJS_DIR)/lyrion_player.o \
 		  $(OBJS_DIR)/timedate.o \
 		  $(OBJS_DIR)/widgets.o \
 		  $(OBJS_DIR)/actions.o \
-   		  $(OBJS_DIR)/json.o \
+		  $(OBJS_DIR)/json.o \
 		  $(OBJS_DIR)/widgets_json.o \
-   		  $(OBJS_DIR)/visualizer.o \
+		  $(OBJS_DIR)/visualizer.o \
 		  $(OBJS_DIR)/vumeter_util.o \
 		  $(OBJS_DIR)/vis_vumeter.o \
-   		  $(OBJS_DIR)/vumeter_widget.o \
+		  $(OBJS_DIR)/slider_widget.o \
+		  $(OBJS_DIR)/vumeter_widget.o \
 
 
 
@@ -135,15 +116,6 @@ Makefile.deps: \
 		./scripts/mkdeps.py $(GLOBAL_DEPS)
 	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(VUMETERS-SRC)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
 
-#Makefile.deps: \
-#	$(SRC)/*.c \
-#	$(SRC)/*.h \
-#	$(CITYHASH-SRC)/*.c \
-#	$(CITYHASH-SRC)/*.h \
-#   	./scripts/mkdeps.py $(GLOBAL_DEPS)
-#	./scripts/mkdeps.py '$(SRC)' '$(CITYHASH-SRC)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
-
-
 include Makefile.deps
 #}
 # Alternative makefile way of doing above.
@@ -157,6 +129,7 @@ include Makefile.deps
 #
 #include $(sources:.c=.d)
 #
+
 $(OBJS_DIR)/%.o: $(SRC)/%.cpp | $(OBJS_DIR)
 	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES)
 
@@ -196,6 +169,7 @@ TEST_WIDGETS_JSON_OBJS =  \
 	$(OBJS_DIR)/json.o \
 	$(OBJS_DIR)/logging.o \
 	$(OBJS_DIR)/widgets.o \
+	$(OBJS_DIR)/slider_widget.o \
 	$(OBJS_DIR)/vumeter_widget.o \
 	$(OBJS_DIR)/actions.o \
 	$(OBJS_DIR)/util.o \
