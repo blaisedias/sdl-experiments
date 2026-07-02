@@ -69,6 +69,7 @@ typedef enum {
     JT_RANGE_START,
     JT_RANGE_END,
     JT_INTERACTIVE,
+    JT_SLIDER_VALUE,
 
 // order of bar, pick, bar-start, bar-end should match slider_resource_ID enum
     JT_BAR,
@@ -135,6 +136,7 @@ static const char* json_token_strings[]= {
     "start",
     "end",
     "interactive",
+    "value",
 
     "bar",
     "pick",
@@ -470,6 +472,34 @@ static void deserialise_location(json_value* value, view_context* ctx, SDL_Rect*
     widget_rect(widget, &rect);
 }
 
+static void deserialise_one_widget_generic(widget* widget, json_value* value, view_context* ctx) {
+    if (widget) {
+        widget_set_player_value_key(widget, get_object_string_value(value, JT_PLAYER_VALUE, NULL));
+        if (get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL)) {
+            widget_set_player_range_value_key(widget, get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL));
+        }
+        widget_set_runtime_value_key(widget, get_object_string_value(value, JT_RUNTIME_VALUE, NULL));
+        json_printf("     location\n");
+        SDL_Rect container = {  -1, -1, -10000, -10000 };
+        deserialise_location(get_object_value(value, JT_LOCATION), ctx, &container, widget);
+
+        widget_action(widget, action_from_string(get_object_string_value(value, JT_ACTION, NULL)));
+        json_printf("     action: %d %s\n",
+            action_from_string(get_object_string_value(value, JT_ACTION, NULL)),
+            get_object_string_value(value, JT_ACTION, NULL));
+
+        widget_hide(widget, get_object_boolean_value(value, JT_HIDDEN, false));
+        json_printf("     hidden: %d\n", widget->hidden);
+        widget_hotspot(widget, get_object_boolean_value(value, JT_HOTSPOT, false));
+        widget_hotspot_edge(widget, tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)), &container);
+        json_printf("     hotspot: %d edge=%d, %s\n",
+               widget->hotspot,
+               tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)),
+               get_object_string_value(value, JT_HOTSPOT_EDGE, NULL));
+        widget_configure(widget);
+    }
+}
+
 static void deserialise_one_widget(json_value* value, view_context* ctx) {
     if (value == NULL) {
         error_printf("deserialise_one_widget value==NULL\n");
@@ -520,12 +550,14 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
                 json_printf("     image    %s\n", widget->image_path);
                 widget_image_scaling(widget, tokenise_image_scaling(get_object_string_value(value, JT_IMAGE_SCALING, "fit")));
+                deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_BUTTON:
             {
                 widget = widget_create_button(ctx);
                 widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
                 json_printf("     image    %s\n", widget->image_path);
+                deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_TEXT:
             {
@@ -550,6 +582,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                     sdlcolour.a =  get_object_int_value(jcolour, JT_ALPHA, 255);
                     widget_text_set_colour(widget, sdlcolour);
                 }
+                deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_MULTISTATE_BUTTON:
             {
@@ -574,6 +607,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 } else {
                     error_printf("states is either missing or not an array %p", jstates);
                 }
+                deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_VUMETER:
             {
@@ -582,6 +616,7 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                 widget_vumeter_select_by_name(widget, get_object_string_value(value, JT_SELECT, NULL));
                 widget_vumeter_equal_horizontal_spacing(widget, get_object_boolean_value(value, JT_EQUAL_HORIZONTAL_SPACING, false));
 
+                deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_SLIDER:
             {
@@ -629,33 +664,16 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                         json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
                     }
                 }
+                deserialise_one_widget_generic(widget, value, ctx);
+                {
+                    json_value* slider_v =get_object_value(value, JT_SLIDER_VALUE);
+                    if (slider_v && slider_v->type == json_integer) {
+                        widget_slider_update_value(widget, slider_v->u.integer);
+                    }
+                }
             }break;
     }
-    if (widget) {
-        widget_set_player_value_key(widget, get_object_string_value(value, JT_PLAYER_VALUE, NULL));
-        if (get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL)) {
-            widget_set_player_range_value_key(widget, get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL));
-        }
-        widget_set_runtime_value_key(widget, get_object_string_value(value, JT_RUNTIME_VALUE, NULL));
-        json_printf("     location\n");
-        SDL_Rect container = {  -1, -1, -10000, -10000 };
-        deserialise_location(get_object_value(value, JT_LOCATION), ctx, &container, widget);
-
-        widget_action(widget, action_from_string(get_object_string_value(value, JT_ACTION, NULL)));
-        json_printf("     action: %d %s\n",
-            action_from_string(get_object_string_value(value, JT_ACTION, NULL)),
-            get_object_string_value(value, JT_ACTION, NULL));
-
-        widget_hide(widget, get_object_boolean_value(value, JT_HIDDEN, false));
-        json_printf("     hidden: %d\n", widget->hidden);
-        widget_hotspot(widget, get_object_boolean_value(value, JT_HOTSPOT, false));
-        widget_hotspot_edge(widget, tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)), &container);
-        json_printf("     hotspot: %d edge=%d, %s\n",
-               widget->hotspot,
-               tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)),
-               get_object_string_value(value, JT_HOTSPOT_EDGE, NULL));
-        widget_configure(widget);
-    } else {
+    if (NULL == widget) {
         error_printf("deserialise_one_widget NULL widget for type %d\n", wdgt_type);
     }
 }
