@@ -45,7 +45,11 @@ typedef enum {
 typedef enum {
     POINTER_DOWN,
     POINTER_UP,
-    POINTER_MOTION
+    POINTER_MOTION,
+    NEXT_VISU,
+    NEXT_VU,
+    PREV_VISU,
+    PREV_VU
 } pointer_input_t;
 
 typedef enum {
@@ -54,26 +58,6 @@ typedef enum {
     TXT_RIGHT
 } text_justification_t;
 
-typedef struct vumeter_widget vumeter_widget_t;
-typedef struct spmeter_widget spmeter_widget_t;
-
-typedef struct widget widget_t;
-typedef struct view_context view_context_t, *view_context_ptr;
-
-typedef struct {
-    texture_id_t    texture_id;
-    const char      *resource_path;
-    action_t        dispatch_action;
-    action_t        sync_on_action;
-}_bnt_resource_t;
-
-typedef struct {
-    const char*     image_paths[2];
-    texture_id_t    texture_ids[2];
-    int w;
-    int h;
-}_slider_resource_t;
-    
 typedef enum {
     SLIDER_BAR,
     SLIDER_PICK,
@@ -82,108 +66,11 @@ typedef enum {
     SLIDER_RESOURCE_COUNT
 }slider_reosurce_ID_t;
 
-typedef struct {
-    bool initialised;
-    int  value_range_delta;
-    int  half_pw;
-    int  min_pos;
-    int  max_pos;
-    int  current_pos;
-    int  drag_pos;
-    SDL_Rect bar_start_rect;
-    SDL_Rect bar_end_rect;
-    SDL_Rect bar_rect;
-//    SDL_Rect bar_empty_rect;
-    SDL_Rect pick_rect;
-    int  pick_x2;
-}_slider_workspace_t;
+typedef struct vumeter_widget vumeter_widget_t;
+typedef struct spmeter_widget spmeter_widget_t;
 
-typedef struct {
-    texture_id_t texture_id;
-    TTF_Font* font;
-    const char* name;   // name is used for texture cache
-    const char* format; // player format string, can be NULL
-    const char* timedate_format; // time date format string, can be NULL
-    const char* content;
-//    SDL_Rect content_dim;
-    SDL_Color colour;
-    SDL_Rect dst_rect;
-    text_justification_t justification;
-}_text_data_t,*_text_data_ptr;
-
-struct widget {
-    widget_t*    next;
-    widget_t*   prev;
-    const       widget_type_t type;
-    const       view_context_t* view;
-    
-    action_t    action;
-    void        (*render_backdrop)(widget_t*);
-    void        (*render_foreground)(widget_t*);
-    bool        render_as_foreground;
-    bool        focussed;
-    // 
-    bool        atomic_highlight;
-    bool        hidden;
-    bool        hotspot;
-    const bool  focus_disabled;
-    // generic image path for all widgets with single images
-    // can be NULL
-    const char* image_path;
-    
-    SDL_Rect    rect;
-    SDL_Rect    input_rect;
-    // For now 2 translated rectangles are used to handle 
-    // orientation correctly. 
-    // TODO further investigation.
-    // 1 - for rotated images
-    // SDL_Rect    image_rect;
-    // 2 - for unrotated operations like DrawRect, FillRect
-    //SDL_Rect    draw_rect;
-
-    bool         atomic_pressed;
-    int64_t      pressed_millis_start;
-    int64_t      pressed_millis_end;
-    const char*  player_value_key;
-    const char*  player_range_value_key;
-    const char*  runtime_value_key;
-    volatile     bool redraw_required;
-    volatile     bool foreground;
-    volatile     bool configured;
-    union {
-        vumeter_widget_t* vu;
-        spmeter_widget_t* sp;
-        struct {
-            texture_id_t texture_id;
-            int w;
-            int h;
-            image_scaling_t scale_op;
-            SDL_Rect src_rect;
-            SDL_Rect dst_rect;
-        }image;
-        struct {
-            texture_id_t texture_id;
-        }button;
-        struct {
-            unsigned state;
-            unsigned state_count;
-            _bnt_resource_t* res;
-        }multistate_button;
-        struct {
-            // interactive property as defined
-            bool defined_interactive;
-            // interactive property runtime controlled
-            bool interactive;
-            struct {
-                int start;
-                int end;
-            }range;
-            _slider_resource_t res[SLIDER_RESOURCE_COUNT];
-            _slider_workspace_t wk;
-        }slider;
-        _text_data_t text;
-    }sub;
-};
+typedef struct widget widget_t;
+typedef struct view_context view_context_t, *view_context_ptr;
 
 bool widget_highlighted(widget_t* wdgt); 
 void widget_set_highlight(widget_t* wdgt, bool onoff);
@@ -191,23 +78,33 @@ bool widget_pressed(widget_t* wdgt);
 void widget_set_pressed(widget_t* wdgt, bool onoff);
 int  widget_get_pressed_millis(widget_t* wdgt);
 
+widget_type_t widget_get_type(widget_t* wdgt);
 const char* widget_type_name(widget_type_t typ);
+const char* widget_get_type_name(widget_t *);
 widget_t* widget_rect(widget_t *wdgt, const SDL_Rect *rect);
 widget_t* widget_bounds(widget_t *wdgt, int x, int y, int w, int h);
 widget_t* widget_set_player_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_player_value_key(widget_t* wdgt);
 widget_t* widget_set_runtime_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_runtime_value_key(widget_t* wdgt);
 // TODO: fix implicit range start value of 0
 widget_t* widget_set_player_range_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_player_range_value_key(widget_t* wdgt);
 
 widget_t* widget_load_media(widget_t* wdgt, const char* resource_path);
 widget_t* widget_destroy(widget_t* wdgt);
 widget_t* widget_action(widget_t* wdgt, action_t action);
 bool widget_has_action(widget_t* wdgt, action_t action);
+action_t widget_get_action(widget_t* wdgt);
 widget_t* widget_hide(widget_t* wdgt, bool hide);
+bool widget_is_hidden(widget_t* wdgt);
 widget_t* widget_hotspot(widget_t* wdgt, bool hotspot);
 widget_t* widget_hotspot_edge(widget_t* wdgt, hotspot_edge_t edge, SDL_Rect *r);
+bool widget_get_hotspot(widget_t* wdgt);
 widget_t* widget_image_path(widget_t* wdgt, const char* path);
 widget_t* widget_focus_enable(widget_t* wdgt, bool f);
+widget_t* widget_set_focussed(widget_t* wdgt, bool f);
+bool widget_get_focussed(widget_t* wdgt);
 
 // DO NOT invoke in render thread
 widget_t* widget_configure(widget_t* wdgt);
@@ -242,16 +139,18 @@ widget_t* widget_slider_image_height(widget_t* , slider_reosurce_ID_t id, int he
 
 widget_t* widget_create_text(const view_context_t*);
 widget_t* widget_text_set_format(widget_t*, const char* format);
+const char* widget_text_get_format(widget_t*);
 widget_t* widget_text_set_timedate_format(widget_t*, const char* format);
+const char* widget_text_get_timedate_format(widget_t*);
 widget_t* widget_text_set_content(widget_t*, const char* content);
 widget_t* widget_text_set_font(widget_t*, const char* font_path, int size);
 widget_t* widget_text_set_colour(widget_t*, SDL_Color colour);
 widget_t* widget_text_set_justification(widget_t*, const char*);
 
-typedef struct {
-    widget_t head;
-    widget_t tail;
-}widget_list_t;
+widget_t* widget_set_renderhf(widget_t* wdgt);
+widget_t* widget_unset_renderhf(widget_t* wdgt);
+
+typedef struct widget_list widget_list_t;
 
 struct view_context {
     app_context_ptr     app;
@@ -268,9 +167,9 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
 bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list);
 void widget_list_render_backdrop(const widget_list_t* wdgt_list);
 void widget_list_render_foreground(const widget_list_t* wdgt_list);
-
-widget_t* widget_set_renderhf(widget_t* wdgt);
-widget_t* widget_unset_renderhf(widget_t* wdgt);
-void widget_render_foreground_default(widget_t* wdgt);
+widget_t* widget_list_next(const widget_list_t* widget_list, widget_t *widget);
+widget_t* widget_list_prev(const widget_list_t* widget_list, widget_t *widget);
+widget_t* widget_list_head(const widget_list_t* wdgt_list);
+widget_t* widget_list_tail(const widget_list_t* wdgt_list);
 
 #endif // __jl_widgets_h_

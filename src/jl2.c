@@ -382,14 +382,16 @@ static view_context_ptr load_json_view(const char* json_path, app_context_ptr ap
         FREE(vw);
     } else {
         widget_list_load_media(vw->list, "./images");
-        for(widget_t* t = vw->list->tail.prev; t != NULL; t = t->prev) {
-            if ((t->player_value_key && 0 == strcmp("time", t->player_value_key))
+        for(widget_t* t = widget_list_tail(vw->list); t != NULL; t = widget_list_prev(vw->list, t)) {
+            const char* player_value_key = widget_get_player_value_key(t);
+            const char* runtime_value_key = widget_get_runtime_value_key(t);
+            if ((player_value_key && 0 == strcmp("time", player_value_key))
                || 
-               (t->runtime_value_key && 0 == strcmp("fps", t->runtime_value_key))
+               (runtime_value_key && 0 == strcmp("fps", runtime_value_key))
                ||
-               t->hotspot) {
+               widget_get_hotspot(t)) {
                 widget_set_renderhf(t);
-                log_printf("widget_set_renderhf %d\n", t->type);
+                log_printf("widget_set_renderhf %d\n", widget_get_type_name(t));
             }
         }
     }
@@ -443,7 +445,7 @@ printf("starting controller\n"); fflush(stdout);
         for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
             view_context_ptr pv = np_views[ix];
             if (pv) {
-                for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
+                for(widget_t* t = widget_list_tail(pv->list); t != NULL; t = widget_list_prev(pv->list, t)) {
                     if (widget_has_action(t, ACTION_NEXT_NP_VIEW)
                            ||
                            widget_has_action(t, ACTION_PREV_NP_VIEW)) {
@@ -475,9 +477,9 @@ printf("starting controller\n"); fflush(stdout);
                 show_cursor = 0;
                 view_context_ptr view = get_current_view();
                 if (view) {
-                    for(widget_t* widget=view->list->tail.prev; widget != NULL; widget=widget->prev) {
-                        if (widget->hidden) { continue;}
-                        widget->focussed = false;
+                    for(widget_t* widget=widget_list_tail(view->list); widget != NULL; widget=widget_list_prev(view->list, widget)) {
+                        if (widget_is_hidden(widget)) { continue;}
+                        widget_set_focussed(widget, false);
                         widget_set_highlight(widget, false);
                     }
                 }            
@@ -560,20 +562,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 {
                     view_context_ptr view = get_current_view();
                     if(view) {
-                        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
-                            if (t->type == WIDGET_VUMETER) {
-                                widget_vumeter_select_next(t);
-                            }
-                        }
+                        widget_list_react(view->list, USEREVENT_NEXT_VISU ? NEXT_VISU: NEXT_VU, NULL);
                     }
                     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
                         view_context_ptr pv = np_views[ix];
                         if (pv && pv != view) {
-                            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
-                                if (t->type == WIDGET_VUMETER) {
-                                    widget_vumeter_select_next(t);
-                                }
-                            }
+                            widget_list_react(pv->list, USEREVENT_NEXT_VISU ? NEXT_VISU: NEXT_VU, NULL);
                         }
                     }
                 }break;
@@ -582,20 +576,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                 {
                     view_context_ptr view = get_current_view();
                     if (view) {
-                        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
-                            if (t->type == WIDGET_VUMETER) {
-                                widget_vumeter_select_prev(t);
-                            }
-                        }
+                        widget_list_react(view->list, USEREVENT_PREV_VISU ? PREV_VISU: PREV_VU, NULL);
                     }
                     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
                         view_context_ptr pv = np_views[ix];
                         if (pv && pv != view) {
-                            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
-                                if (t->type == WIDGET_VUMETER) {
-                                    widget_vumeter_select_prev(t);
-                                }
-                            }
+                            widget_list_react(pv->list, USEREVENT_PREV_VISU ? PREV_VISU: PREV_VU, NULL);
                         }
                     }
                 }break;
@@ -835,54 +821,60 @@ printf("starting player_poll_loop\n"); fflush(stdout);
 
             view_context_ptr view = get_current_view();
             if (view) {
-            for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
-                if (t->player_range_value_key) {
+            for(widget_t* t = widget_list_tail(view->list); t != NULL; t = widget_list_prev(view->list, t)) {
+                const char* player_value_key = widget_get_player_value_key(t);
+                const char* player_range_value_key = widget_get_player_range_value_key(t);
+                widget_type_t wtype = widget_get_type(t);
+                if (player_range_value_key) {
                     player_value pvalue;
-                    switch(get_player_value(player, &pvalue, t->player_range_value_key)) {
+                    switch(get_player_value(player, &pvalue, player_range_value_key)) {
                         case PFV_NONE:
-                            error_printf("got nothing for player range value %s\n", t->player_range_value_key);
+                            error_printf("got nothing for player range value %s\n", player_range_value_key);
                             break;
                         case PFV_INT:
-                            debug_printf("got int %d for player range value %s\n", pvalue.integer, t->player_range_value_key);
-                            if (t->type == WIDGET_SLIDER) {
+                            debug_printf("got int %d for player range value %s\n", pvalue.integer, player_range_value_key);
+                            if (wtype == WIDGET_SLIDER) {
                                 widget_slider_range(t, 0, pvalue.integer);
                             }
                             break;
                         case PFV_STRINGPTR:
-                            error_printf("got string %s for player range value %s\n", pvalue.strptr, t->player_range_value_key);
+                            error_printf("got string %s for player range value %s\n", pvalue.strptr, player_range_value_key);
                             FREE(pvalue.strptr);
                             break;
                     }
                 }
-                if (t->player_value_key) {
+                if (*player_value_key) {
                     player_value pvalue;
-                    switch(get_player_value(player, &pvalue, t->player_value_key)) {
+                    switch(get_player_value(player, &pvalue, player_value_key)) {
                         case PFV_NONE:
-                            error_printf("got nothing for player value %s\n", t->player_value_key);
+                            error_printf("got nothing for player value %s\n", player_value_key);
                             break;
                         case PFV_INT:
-                            debug_printf("got int %d for player value %s\n", pvalue.integer, t->player_value_key);
-                            if (t->type == WIDGET_MULTISTATE_BUTTON) {
+                            debug_printf("got int %d for player value %s\n", pvalue.integer, player_value_key);
+                            if (wtype == WIDGET_MULTISTATE_BUTTON) {
                                 widget_multistate_button_set_state(t, pvalue.integer);
-                            } else if (t->type == WIDGET_SLIDER) {
-                                if (strcmp("time", t->player_value_key)) {
+                            } else if (wtype == WIDGET_SLIDER) {
+                                if (strcmp("time", player_value_key)) {
                                     widget_slider_update_value(t, pvalue.integer);
                                 }
                             }
                             break;
                         case PFV_STRINGPTR:
-                            error_printf("got string %s for player value %s\n", pvalue.strptr, t->player_value_key);
+                            error_printf("got string %s for player value %s\n", pvalue.strptr, player_value_key);
                             FREE(pvalue.strptr);
                             break;
                     }
                 }
-                if (t->type == WIDGET_SLIDER && t->player_value_key && 0 == strcmp(t->player_value_key, "time")) {
+                if (wtype == WIDGET_SLIDER && player_value_key && 0 == strcmp(player_value_key, "time")) {
                     widget_slider_set_interactive(t, can_seek);
                 }
-                if (t->type == WIDGET_TEXT && t->sub.text.format) {
-                    player_sprintf(player, buffer, sizeof(buffer), t->sub.text.format);
-                    debug_printf("'%s' -> '%s'\n", t->sub.text.format, buffer);
-                    widget_text_set_content(t, buffer);
+                if (wtype == WIDGET_TEXT) {
+                    const char* fmt = widget_text_get_format(t);
+                    if (*fmt) {
+                        player_sprintf(player, buffer, sizeof(buffer), fmt);
+                        debug_printf("'%s' -> '%s'\n", fmt, buffer);
+                        widget_text_set_content(t, buffer);
+                    }
                 }
             }
             }
@@ -926,37 +918,40 @@ printf("starting player_poll_loop\n"); fflush(stdout);
         }
         view_context_ptr view = get_current_view();
         if (view) {
-        for(widget_t* t = view->list->tail.prev; t != NULL; t = t->prev) {
-            if (t->player_value_key) {
-                if (0 == strcmp("VOLUME", t->player_value_key)) {
-                    if (t->type == WIDGET_SLIDER) {
+        for(widget_t* t = widget_list_tail(view->list); t != NULL; t = widget_list_prev(view->list, t)) {
+            const char* player_value_key = widget_get_player_value_key(t);
+            const char* runtime_value_key = widget_get_runtime_value_key(t);
+            widget_type_t wtype = widget_get_type(t);
+            if (player_value_key) {
+                if (0 == strcmp("VOLUME", player_value_key)) {
+                    if (wtype == WIDGET_SLIDER) {
                         widget_slider_update_value(t, volume);
                         widget_slider_set_interactive(t, can_change_volume);
                     }
                 }
-                if (duration && 0 == strcmp("time", t->player_value_key)) {
-                    if (t->type == WIDGET_SLIDER) {
+                if (duration && 0 == strcmp("time", player_value_key)) {
+                    if (wtype == WIDGET_SLIDER) {
                         widget_slider_update_value(t, elapsed);
                     }
                 }
-                if (t->type == WIDGET_TEXT) {
-                    if(0 == strcmp("time", t->player_value_key)) {
-                        player_sprintf(player, buffer, sizeof(buffer), t->sub.text.format);
+                if (wtype == WIDGET_TEXT) {
+                    if(0 == strcmp("time", player_value_key)) {
+                        player_sprintf(player, buffer, sizeof(buffer), widget_text_get_format(t));
                         widget_text_set_content(t, buffer);
                     }
                 }
             }
-            if (t->runtime_value_key) {
-                if (t->type == WIDGET_TEXT) {
-                    if(0 == strcmp("fps", t->runtime_value_key)) {
+
+                if (wtype == WIDGET_TEXT) {
+                    if(0 == strcmp("fps", runtime_value_key)) {
                         snprintf(buffer, sizeof(buffer), "FPS:%u", app_ctx->workspace.reported_fps);
                         widget_text_set_content(t, buffer);
                     }
                 }
-            }
-            if (t->type == WIDGET_TEXT && t->sub.text.timedate_format) {
-                timedate_sprintf(buffer, sizeof(buffer), t->sub.text.timedate_format);
-                debug_printf("'%s' -> '%s'\n", t->sub.text.timedate_format, buffer);
+
+            if (wtype == WIDGET_TEXT && *widget_text_get_timedate_format(t)) {
+                timedate_sprintf(buffer, sizeof(buffer), widget_text_get_timedate_format(t));
+                debug_printf("'%s' -> '%s'\n", widget_text_get_timedate_format(t), buffer);
                 widget_text_set_content(t, buffer);
             }
         }
@@ -971,11 +966,11 @@ static void set_visualiser_lock(bool lock, action_t action) {
     for(int ix =0; ix < MAX_NP_VIEWS && propagate_visualiser_change; ++ix) {
         view_context_ptr pv = np_views[ix];
         if (pv) {
-            for(widget_t* t = pv->list->tail.prev; t != NULL; t = t->prev) {
-                if (t->type == WIDGET_VUMETER) {
+            for(widget_t* t = widget_list_tail(pv->list); t != NULL; t = widget_list_prev(pv->list, t)) {
+                if (widget_get_type(t) == WIDGET_VUMETER) {
                     widget_vumeter_select_lock(t, lock);
                 }
-                if (t->type == WIDGET_MULTISTATE_BUTTON) {
+                if (widget_get_type(t) == WIDGET_MULTISTATE_BUTTON) {
                     widget_multistate_button_sync_on_action(t, action);
                 }
             }

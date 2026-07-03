@@ -1,6 +1,7 @@
 #include "application.h"
 #include "actions.h"
-#include "widgets.h"
+//FIXME
+#include "widgets_internal.h"
 #include "logging.h"
 #include "lyrion_player.h"
 #include "nowplaying.h"
@@ -13,134 +14,45 @@ static SDL_Event prev_vu_event = {.type = USEREVENT_PREV_VISU };
 static SDL_Event next_sp_event = {.type = USEREVENT_NEXT_SP };
 static SDL_Event prev_sp_event = {.type = USEREVENT_PREV_SP };
 
-static void action_quit(widget_t* wdgt) {
-    SDL_PushEvent(&quit_event);
-}
-
-static void action_next_visu(widget_t* wdgt) {
-    SDL_PushEvent(&next_visu_event);
-}
-
-static void action_prev_visu(widget_t* wdgt) {
-    SDL_PushEvent(&prev_visu_event);
-}
-
-static void action_next_vu(widget_t* wdgt) {
-    SDL_PushEvent(&next_vu_event);
-}
-
-static void action_prev_vu(widget_t* wdgt) {
-    SDL_PushEvent(&prev_vu_event);
-}
-
-static void action_next_sp(widget_t* wdgt) {
-    SDL_PushEvent(&next_sp_event);
-}
-
-static void action_prev_sp(widget_t* wdgt) {
-    SDL_PushEvent(&prev_sp_event);
-}
-
-static void action_none(widget_t* wdgt) {
-}
-
-static void action_lock_vumeter(widget_t* wdgt) {
-    lock_vu_meters();
-}
-
-static void action_unlock_vumeter(widget_t* wdgt) {
-    unlock_vu_meters();
-}
-
-static void action_lock_visu(widget_t* wdgt) {
-    lock_visualisers();
-}
-
-static void action_unlock_visu(widget_t* wdgt) {
-    unlock_visualisers();
-}
 
 static void widget_dispatch_action_explicit(widget_t* wdgt, action_t act) {
     action_printf("%p %d %s\n", wdgt, act, action_to_string(act));
     switch(act) {
         case ACTION_NONE:
-            action_none(wdgt);
-            break;
         case ACTION_QUIT:
-            action_quit(wdgt);
-            break;
         case ACTION_NEXT_VISU:
-            action_next_visu(wdgt);
-            break;
         case ACTION_PREV_VISU:
-            action_prev_visu(wdgt);
-            break;
         case ACTION_NEXT_VU:
-            action_next_vu(wdgt);
-            break;
         case ACTION_PREV_VU:
-            action_prev_vu(wdgt);
-            break;
         case ACTION_NEXT_SP:
-            action_next_sp(wdgt);
-            break;
         case ACTION_PREV_SP:
-            action_prev_sp(wdgt);
-            break;
         case ACTION_LOCK_VUMETER:
-            action_lock_vumeter(wdgt);
-            break;
         case ACTION_UNLOCK_VUMETER:
-            action_unlock_vumeter(wdgt);
-            break;
         case ACTION_LOCK_VISU:
-            action_lock_visu(wdgt);
-            break;
         case ACTION_UNLOCK_VISU:
-            action_unlock_visu(wdgt);
+            dispatch_action(act);
             break;
+
         case ACTION_MULTISTATE_BUTTON:
             error_printf("multistate action %d for %p type=%d\n", act, wdgt, wdgt->type);
             break;
 
         case ACTION_PLAY:
-            player_play(get_player());
-            break;
         case ACTION_PAUSE:
-            player_pause(get_player());
-            break;
         case ACTION_STOP:
-            player_stop(get_player());
-            break;
         case ACTION_PLAY_PAUSE:
-            player_play_pause_toggle(get_player());
 
         case ACTION_NEXT_TRACK:
-            player_fwd(get_player());
-            break;
         case ACTION_PREV_TRACK:
-            player_rew(get_player());
-            break;
 
         case ACTION_REPEAT_ONCE:
-            player_repeat_one(get_player());
-            break;
         case ACTION_REPEAT:
-            player_repeat_toggle(get_player());
-            break;
         case ACTION_REPEAT_OFF:
-            player_repeat_off(get_player());
-            break;
 
         case ACTION_SHUFFLE:
-            player_shuffle_on(get_player());
-            break;
         case ACTION_SHUFFLE_ALBUM:
-            player_shuffle_on(get_player());
-            player_shuffle_toggle(get_player());
-            break;
         case ACTION_SHUFFLE_OFF:
-            player_shuffle_off(get_player());
+            dispatch_action(act);
             break;
 
         case ACTION_MUSIC_INFORMATION:
@@ -156,10 +68,8 @@ static void widget_dispatch_action_explicit(widget_t* wdgt, action_t act) {
             break;
 
         case ACTION_INCREMENT_VOLUME:
-            player_volume_inc(get_player());
-            break;
         case ACTION_DECREMENT_VOLUME:
-            player_volume_dec(get_player());
+            dispatch_action(act);
             break;
 
         case ACTION_SEEK:
@@ -172,20 +82,13 @@ static void widget_dispatch_action_explicit(widget_t* wdgt, action_t act) {
             break;
 
         case ACTION_NEXT_NP_VIEW:
-            next_np_view();
-            break;
         case ACTION_PREV_NP_VIEW:
-            prev_np_view();
-            break;
 
         case ACTION_NP_VIEW:
-            select_np_view();
-            break;
         case ACTION_MAIN_VIEW:
-            select_main_view();
-            break;
 
         case ACTION_END:
+            dispatch_action(act);
             break;
         default:
             error_printf("unknown action %d for %p type=%d\n", act, wdgt, wdgt->type);
@@ -323,6 +226,7 @@ void dispatch_action(action_t act) {
         case ACTION_UNLOCK_VISU:
             unlock_visualisers();
             break;
+            
         case ACTION_MULTISTATE_BUTTON:
             // NOTHING TO DO
             break;

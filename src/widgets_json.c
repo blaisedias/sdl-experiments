@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <SDL2/SDL.h>
 #include "application.h"
-#include "widgets.h"
+#include "widgets_internal.h"
 #include "actions.h"
 #include "logging.h"
 #include "util.h"

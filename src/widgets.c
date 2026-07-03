@@ -69,6 +69,20 @@ const char* widget_type_name(widget_type_t typ) {
     return "";
 }
 
+const char* widget_get_type_name(widget_t* wdgt) {
+    if (wdgt) {
+        return widget_type_name(wdgt->type);
+    }
+    return "";
+}
+
+widget_type_t widget_get_type(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->type;
+    }
+    return WIDGET_NONE;
+}
+
 void render_none(widget_t* btn) {
 }
 
@@ -290,24 +304,6 @@ widget_t* widget_bounds(widget_t *wdgt, int x, int y, int w, int h) {
     return widget_rect(wdgt, &rect);
 }
 
-/*
-widget* widget_next(widget *wdgt, widget* next) {
-    if (wdgt) {
-        wdgt->next = next;
-    }
-    return wdgt;
-}
-
-widget* widget_prev(widget *wdgt, widget* prev) {
-    if (wdgt) {
-        if (prev) {
-            wdgt->next = prev->next;
-            prev->next = wdgt;
-        }
-    }
-    return wdgt;
-}
-*/
 
 widget_t* widget_set_player_value_key(widget_t* wdgt, const char* key) {
     if (wdgt) {
@@ -321,6 +317,14 @@ widget_t* widget_set_player_value_key(widget_t* wdgt, const char* key) {
     return wdgt;
 }
 
+const char* widget_get_player_value_key(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->player_value_key ? wdgt->player_value_key : "";
+    }
+    return "";
+}
+
+
 widget_t* widget_set_player_range_value_key(widget_t* wdgt, const char* key) {
     if (wdgt) {
         if (wdgt->player_range_value_key != NULL) {
@@ -331,6 +335,13 @@ widget_t* widget_set_player_range_value_key(widget_t* wdgt, const char* key) {
         }
     }
     return wdgt;
+}
+
+const char* widget_get_player_range_value_key(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->player_range_value_key;
+    }
+    return "";
 }
 
 widget_t* widget_set_runtime_value_key(widget_t* wdgt, const char* key) {
@@ -345,6 +356,12 @@ widget_t* widget_set_runtime_value_key(widget_t* wdgt, const char* key) {
     return wdgt;
 }
 
+const char* widget_get_runtime_value_key(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->runtime_value_key ? wdgt->runtime_value_key : "";
+    }
+    return "";
+}
 
 widget_t* widget_action(widget_t* wdgt, action_t action) {
     if (wdgt) {
@@ -374,6 +391,9 @@ bool widget_has_action(widget_t* wdgt, action_t action) {
     return false;
 }
 
+action_t widget_get_action(widget_t* wdgt) {
+    return ACTION_NONE;
+}
 
 widget_t* widget_hide(widget_t* wdgt, bool hide) {
     if (wdgt) {
@@ -381,6 +401,14 @@ widget_t* widget_hide(widget_t* wdgt, bool hide) {
     }
     return wdgt;
 }
+
+bool widget_is_hidden(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->hidden;
+    }
+    return true;
+}
+
 
 widget_t* widget_image_path(widget_t* wdgt, const char* path) {
     if (wdgt) {
@@ -395,8 +423,24 @@ widget_t* widget_image_path(widget_t* wdgt, const char* path) {
 }
 
 widget_t* widget_focus_enable(widget_t* wdgt, bool f) {
-    *((bool *)(&wdgt->focus_disabled)) = !f;
+    if (wdgt) {
+        *((bool *)(&wdgt->focus_disabled)) = !f;
+    }
     return wdgt;
+}
+
+widget_t* widget_set_focussed(widget_t* wdgt, bool f) {
+    if (wdgt) {
+        wdgt->focussed = f;
+    }
+    return wdgt;
+}
+
+bool widget_get_focussed(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->focussed;
+    }
+    return false;
 }
 
 widget_t* widget_create(const view_context_t *view) {
@@ -703,8 +747,17 @@ widget_t* widget_multistate_button_sync_on_action(widget_t* wdgt, action_t act) 
 
 
 widget_t* widget_hotspot(widget_t* wdgt, bool hotspot) {
-    wdgt->hotspot = hotspot;
+    if (wdgt) {
+        wdgt->hotspot = hotspot;
+    }
     return wdgt;
+}
+
+bool widget_get_hotspot(widget_t* wdgt) {
+    if (wdgt) {
+        return wdgt->hotspot;
+    }
+    return false;
 }
 
 static void text_widget_render(widget_t* wdgt) {
@@ -762,6 +815,17 @@ widget_t* widget_text_set_format(widget_t* wdgt, const char* format) {
     return wdgt;
 }
 
+const char* widget_text_get_format(widget_t* wdgt) {
+    if (wdgt && wdgt->type == WIDGET_TEXT) {
+        _text_data_ptr txt_w = &wdgt->sub.text;
+        if (txt_w->format) {
+            return txt_w->format;
+        }
+    }
+    return "";
+}
+
+
 widget_t* widget_text_set_timedate_format(widget_t* wdgt, const char* format) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
@@ -775,6 +839,15 @@ widget_t* widget_text_set_timedate_format(widget_t* wdgt, const char* format) {
     return wdgt;
 }
 
+const char* widget_text_get_timedate_format(widget_t* wdgt) {
+    if (wdgt && wdgt->type == WIDGET_TEXT) {
+        _text_data_ptr txt_w = &wdgt->sub.text;
+        if (txt_w->timedate_format) {
+            return txt_w->timedate_format;
+        }
+    }
+    return "";
+}
 
 static void text_render_surface(widget_t* wdgt) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
@@ -999,11 +1072,16 @@ void widget_list_load_media(const widget_list_t* list, const char* resource_path
 
 void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt) {
     bool selected = false;
-    input_printf("%d: %04d,%04d -> ", input, pt->x, pt->y);
-    translate_point(pt);
-    input_printf(" %04d,%04d\n", pt->x, pt->y);
+    if(pt) {
+        input_printf("%d: %04d,%04d -> ", input, pt->x, pt->y);
+        translate_point(pt);
+        input_printf(" %04d,%04d\n", pt->x, pt->y);
+    }
     switch(input) {
         case POINTER_DOWN:
+            if (NULL == pt) {
+                return;
+            }
             for(widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 if (!selected) {
@@ -1022,6 +1100,9 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
             }
             break;
         case POINTER_UP:
+            if (NULL == pt) {
+                return;
+            }
             for(widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 widget_set_pressed(widget, false);
@@ -1048,6 +1129,9 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
             }
             break;
         case POINTER_MOTION:
+            if (NULL == pt) {
+                return;
+            }
             for (widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
                 if (widget->hidden) { continue;}
                 if (!selected) {
@@ -1060,6 +1144,22 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
                     }
                 } else {
                     widget_set_highlight(widget, false);
+                }
+            }
+            break;
+        case NEXT_VISU:
+        case NEXT_VU:
+            for (widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
+                if (widget->type == WIDGET_VUMETER) {
+                    widget_vumeter_select_next(widget);
+                }
+            }
+            break;
+        case PREV_VISU:
+        case PREV_VU:
+            for (widget_t* widget=list->tail.prev; widget != NULL; widget=widget->prev) {
+                if (widget->type == WIDGET_VUMETER) {
+                    widget_vumeter_select_prev(widget);
                 }
             }
             break;
@@ -1108,3 +1208,17 @@ void widget_list_render_foreground(const widget_list_t* wdgt_list) {
     }
 }
 
+widget_t* widget_list_head(const widget_list_t* wdgt_list) {
+    return wdgt_list->head.next;
+}
+widget_t* widget_list_next(const widget_list_t* widget_list, widget_t *widget) {
+    return widget->next != &widget_list->tail ? widget->next: NULL; 
+}
+
+
+widget_t* widget_list_tail(const widget_list_t* wdgt_list) {
+    return wdgt_list->tail.prev;
+}
+widget_t* widget_list_prev(const widget_list_t* widget_list, widget_t *widget) {
+    return widget->prev != &widget_list->head ? widget->prev: NULL; 
+}
