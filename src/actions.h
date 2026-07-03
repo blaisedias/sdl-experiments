@@ -14,7 +14,6 @@ typedef enum {
     ACTION_UNLOCK_VUMETER,
     ACTION_LOCK_VISU,
     ACTION_UNLOCK_VISU,
-    ACTION_MULTISTATE_BUTTON,
 
     ACTION_PLAY,
     ACTION_PAUSE,
@@ -51,5 +50,5 @@ typedef enum {
 
 action_t action_from_string(const char* str);
 const char* action_to_string(action_t action);
-void dispatch_action(action_t act);
+void dispatch_action(action_t, int value);
 #endif // __jl_action_h_

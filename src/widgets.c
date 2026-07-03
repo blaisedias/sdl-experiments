@@ -689,7 +689,7 @@ widget_t* widget_create_multistate_button(const view_context_t* view, int state_
         *((widget_type_t*)&wdgt->type) = WIDGET_MULTISTATE_BUTTON ;
         wdgt->sub.multistate_button.state_count = state_count;
         wdgt->sub.multistate_button.res = res;
-        wdgt->action = ACTION_MULTISTATE_BUTTON;
+        wdgt->action = ACTION_END;
         wdgt->render_backdrop = multistate_button_widget_render;
     }
     return wdgt;
@@ -1016,6 +1016,90 @@ widget_t* widget_configure(widget_t* wdgt) {
     }
     return wdgt;
 }
+
+void widget_dispatch_action(widget_t* wdgt) {
+    if (wdgt->type == WIDGET_SLIDER && (!wdgt->sub.slider.defined_interactive || !wdgt->sub.slider.interactive)) {
+        return;
+    }
+
+    action_t act = wdgt->action;
+    if (wdgt->type == WIDGET_MULTISTATE_BUTTON) {
+        action_printf("action_multistate_button action state=%d %d %s\n", 
+            wdgt->sub.multistate_button.state,
+            wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action,
+            action_to_string( wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action));
+        act = wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].dispatch_action;
+    }
+
+    action_printf("%p %d %s\n", wdgt, act, action_to_string(act));
+    switch(act) {
+        case ACTION_NONE:
+        case ACTION_QUIT:
+        case ACTION_NEXT_VISU:
+        case ACTION_PREV_VISU:
+        case ACTION_NEXT_VU:
+        case ACTION_PREV_VU:
+        case ACTION_NEXT_SP:
+        case ACTION_PREV_SP:
+        case ACTION_LOCK_VUMETER:
+        case ACTION_UNLOCK_VUMETER:
+        case ACTION_LOCK_VISU:
+        case ACTION_UNLOCK_VISU:
+
+        case ACTION_PLAY:
+        case ACTION_PAUSE:
+        case ACTION_STOP:
+        case ACTION_PLAY_PAUSE:
+
+        case ACTION_NEXT_TRACK:
+        case ACTION_PREV_TRACK:
+
+        case ACTION_REPEAT_ONCE:
+        case ACTION_REPEAT:
+        case ACTION_REPEAT_OFF:
+
+        case ACTION_SHUFFLE:
+        case ACTION_SHUFFLE_ALBUM:
+        case ACTION_SHUFFLE_OFF:
+
+        case ACTION_MUSIC_INFORMATION:
+
+        case ACTION_NEXT_NP_VIEW:
+        case ACTION_PREV_NP_VIEW:
+
+        case ACTION_NP_VIEW:
+        case ACTION_MAIN_VIEW:
+
+        case ACTION_INCREMENT_VOLUME:
+        case ACTION_DECREMENT_VOLUME:
+
+        case ACTION_END:
+            dispatch_action(act, 0);
+            break;
+
+        case ACTION_SET_VOLUME:
+            if (wdgt->type == WIDGET_SLIDER) {
+                int level;
+                widget_slider_get_value(wdgt, &level);
+                dispatch_action(act, level);
+            }
+            break;
+
+        case ACTION_SEEK:
+            if (wdgt->type == WIDGET_SLIDER) {
+                int track_time;
+                widget_slider_get_value(wdgt, &track_time);
+                dispatch_action(act, track_time);
+            }
+            break;
+
+        default:
+            error_printf("unknown action %d for %p type=%d\n", act, wdgt, wdgt->type);
+            break;
+    }
+}
+
+// widget list
 
 static widget_list_t* widget_list_initialise(widget_list_t* list, view_context_t* view) {
     if (list) {

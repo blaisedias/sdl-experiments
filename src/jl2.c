@@ -619,7 +619,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     select_np_view();
                     break;
                 case SDL_SCANCODE_SPACE:
-                    dispatch_action(ACTION_PLAY_PAUSE);
+                    dispatch_action(ACTION_PLAY_PAUSE, 0);
                     break;
                 case SDL_SCANCODE_TAB:
                     {
@@ -633,36 +633,36 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     break;
                 case SDL_SCANCODE_LEFT:
                 case SDL_SCANCODE_KP_4:
-                    dispatch_action(ACTION_PREV_VISU);
+                    dispatch_action(ACTION_PREV_VISU, 0);
                     break;
                 case SDL_SCANCODE_UP:
-                    dispatch_action(ACTION_NEXT_NP_VIEW);
+                    dispatch_action(ACTION_NEXT_NP_VIEW, 0);
                     break;
                 case SDL_SCANCODE_DOWN:
-                    dispatch_action(ACTION_PREV_NP_VIEW);
+                    dispatch_action(ACTION_PREV_NP_VIEW, 0);
                     break;
                 case SDL_SCANCODE_RIGHT:
                 case SDL_SCANCODE_KP_6:
-                    dispatch_action(ACTION_NEXT_VISU);
+                    dispatch_action(ACTION_NEXT_VISU, 0);
                     break;
                 case SDL_SCANCODE_AUDIOPLAY:
-                    dispatch_action(ACTION_PLAY_PAUSE);
+                    dispatch_action(ACTION_PLAY_PAUSE, 0);
                     break;
                 case SDL_SCANCODE_AUDIOSTOP:
-                    dispatch_action(ACTION_STOP);
+                    dispatch_action(ACTION_STOP, 0);
                     break;
                 case SDL_SCANCODE_AUDIOPREV:
-                    dispatch_action(ACTION_PREV_TRACK);
+                    dispatch_action(ACTION_PREV_TRACK, 0);
                     break;
                 case SDL_SCANCODE_AUDIONEXT:
-                    dispatch_action(ACTION_NEXT_TRACK);
+                    dispatch_action(ACTION_NEXT_TRACK, 0);
                     break;
                 case SDL_SCANCODE_SCROLLLOCK:
                 case SDL_SCANCODE_F9:
-                    dispatch_action(ACTION_LOCK_VISU);
+                    dispatch_action(ACTION_LOCK_VISU, 0);
                     break;
                 case SDL_SCANCODE_F10:
-                    dispatch_action(ACTION_UNLOCK_VISU);
+                    dispatch_action(ACTION_UNLOCK_VISU, 0);
                     break;
                 case SDL_SCANCODE_AUDIOREWIND:
                     error_printf("rewind is not supported\n");

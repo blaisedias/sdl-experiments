@@ -133,6 +133,7 @@ struct widget_list{
 widget_t* widget_create(const view_context_t *view);
 void render_none(widget_t* wdgt);
 void widget_render_foreground_default(widget_t* wdgt);
+void widget_dispatch_action(widget_t* wdgt);
 
 // VUmeter
 widget_t *vumeter_widget_destroy(widget_t *wdgt);
