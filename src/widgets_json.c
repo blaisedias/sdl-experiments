@@ -21,6 +21,7 @@ static const char* widget_type_strings[] = {
     "vumeter",
     "slider",
     "text",
+    "vslider",
     ""
 };
 
@@ -526,6 +527,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
         case WIDGET_BUTTON:
         case WIDGET_MULTISTATE_BUTTON:
         case WIDGET_VUMETER:
+        case WIDGET_VSLIDER:
         case WIDGET_SLIDER:
         case WIDGET_TEXT:
             break;
@@ -619,8 +621,9 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 deserialise_one_widget_generic(widget, value, ctx);
             }break;
         case WIDGET_SLIDER:
+        case WIDGET_VSLIDER:
             {
-                widget = widget_create_slider(ctx);
+                widget = wdgt_type == WIDGET_SLIDER ? widget_create_slider(ctx) : widget_create_vslider(ctx);
                 widget_slider_define_interactive(widget, get_object_boolean_value(value, JT_INTERACTIVE, true));
                 {
                     json_value* jrange = get_object_object_value(value, JT_RANGE);
@@ -654,14 +657,26 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                                     );
                             json_printf("              %d img=%s\n", resid, get_object_string_value(jslider, JT_IMAGE, NULL));
                         }
-                        if (get_object_value(jslider, JT_WIDTH)) {
+
+                        if (wdgt_type == WIDGET_SLIDER) {
+                            if (get_object_value(jslider, JT_WIDTH)) {
+                                widget_slider_image_width(widget, resid, 
+                                        get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                                json_printf("              %d w=%d\n", resid, get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                            }
+                            widget_slider_image_height(widget, resid, 
+                                get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                            json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                        } else {
+                            if (get_object_value(jslider, JT_HEIGHT)) {
+                                widget_slider_image_height(widget, resid, 
+                                        get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                                json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                            }
                             widget_slider_image_width(widget, resid, 
-                                    get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                                get_scaled_object_int_value(jslider, JT_WIDTH, 0));
                             json_printf("              %d w=%d\n", resid, get_scaled_object_int_value(jslider, JT_WIDTH, 0));
                         }
-                        widget_slider_image_height(widget, resid, 
-                            get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
-                        json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
                     }
                 }
                 deserialise_one_widget_generic(widget, value, ctx);

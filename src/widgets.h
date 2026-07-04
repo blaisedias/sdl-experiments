@@ -25,6 +25,7 @@ typedef enum {
     WIDGET_VUMETER,
     WIDGET_SLIDER,
     WIDGET_TEXT,
+    WIDGET_VSLIDER,
     WIDGET_END
 }widget_type_t;
 
@@ -109,16 +110,21 @@ bool widget_get_focussed(widget_t* wdgt);
 // DO NOT invoke in render thread
 widget_t* widget_configure(widget_t* wdgt);
 
+// Button widget
 widget_t* widget_create_button(const view_context_t*);
+
+// Multistate Button widget
 widget_t* widget_create_multistate_button(const view_context_t*, int state_count);
 widget_t* widget_multistate_button_addstate(widget_t* wdgt, unsigned statenum, const char* resource_path, action_t dispatch_action, action_t sync_on_action);
 widget_t* widget_multistate_button_set_state(widget_t* wdgt, unsigned statenum);
 widget_t* widget_multistate_button_get_state(widget_t* wdgt, unsigned* statenum);
 widget_t* widget_multistate_button_sync_on_action(widget_t* wdgt, action_t act);
 
+// Image widget
 widget_t* widget_create_image(const view_context_t*);
 widget_t* widget_image_scaling(widget_t *wdgt, image_scaling_t op);
 
+// VUMeter widget
 widget_t* widget_create_vumeter(const view_context_t*);
 widget_t* widget_vumeter_select_next(widget_t *wdgt);
 widget_t* widget_vumeter_select_prev(widget_t *wdgt);
@@ -126,17 +132,19 @@ widget_t* widget_vumeter_select_by_name(widget_t *wdgt, const char* name);
 widget_t* widget_vumeter_select_lock(widget_t *wdgt, bool lock);
 widget_t* widget_vumeter_equal_horizontal_spacing(widget_t *wdgt, bool val);
 
+// Slider widgets
 widget_t* widget_create_slider(const view_context_t*);
+widget_t *widget_create_vslider(const view_context_t* view);
+widget_t* widget_slider_image_paths(widget_t* , slider_reosurce_ID_t id, const char* path1, const char* path2);
+widget_t* widget_slider_image_width(widget_t* , slider_reosurce_ID_t id, int width);
+widget_t* widget_slider_image_height(widget_t* , slider_reosurce_ID_t id, int height);
 widget_t* widget_slider_range(widget_t* , int start, int end);
-//widget_t* widget_slider_set_value(widget_t* wdgt, int value);
 widget_t* widget_slider_update_value(widget_t* wdgt, int value);
 widget_t* widget_slider_set_interactive(widget_t* wdgt, bool yn);
 widget_t* widget_slider_define_interactive(widget_t* wdgt, bool yn);
 widget_t* widget_slider_get_value(widget_t* wdgt, int* value);
-widget_t* widget_slider_image_paths(widget_t* , slider_reosurce_ID_t id, const char* path1, const char* path2);
-widget_t* widget_slider_image_width(widget_t* , slider_reosurce_ID_t id, int width);
-widget_t* widget_slider_image_height(widget_t* , slider_reosurce_ID_t id, int height);
 
+// Text widget
 widget_t* widget_create_text(const view_context_t*);
 widget_t* widget_text_set_format(widget_t*, const char* format);
 const char* widget_text_get_format(widget_t*);
@@ -147,11 +155,12 @@ widget_t* widget_text_set_font(widget_t*, const char* font_path, int size);
 widget_t* widget_text_set_colour(widget_t*, SDL_Color colour);
 widget_t* widget_text_set_justification(widget_t*, const char*);
 
+// widget render 
 widget_t* widget_set_renderhf(widget_t* wdgt);
 widget_t* widget_unset_renderhf(widget_t* wdgt);
 
+// Widget list and view
 typedef struct widget_list widget_list_t;
-
 struct view_context {
     app_context_ptr     app;
     widget_list_t*      list;
@@ -171,4 +180,5 @@ widget_t* widget_list_prev(const widget_list_t* widget_list, widget_t *widget);
 widget_t* widget_list_head(const widget_list_t* wdgt_list);
 widget_t* widget_list_tail(const widget_list_t* wdgt_list);
 
+bool widget_is_slider(widget_t* w);
 #endif // __jl_widgets_h_

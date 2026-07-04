@@ -833,7 +833,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                             break;
                         case PFV_INT:
                             debug_printf("got int %d for player range value %s\n", pvalue.integer, player_range_value_key);
-                            if (wtype == WIDGET_SLIDER) {
+                            if (widget_is_slider(t)) {
                                 widget_slider_range(t, 0, pvalue.integer);
                             }
                             break;
@@ -853,7 +853,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                             debug_printf("got int %d for player value %s\n", pvalue.integer, player_value_key);
                             if (wtype == WIDGET_MULTISTATE_BUTTON) {
                                 widget_multistate_button_set_state(t, pvalue.integer);
-                            } else if (wtype == WIDGET_SLIDER) {
+                            } else if (widget_is_slider(t)) {
                                 if (strcmp("time", player_value_key)) {
                                     widget_slider_update_value(t, pvalue.integer);
                                 }
@@ -865,7 +865,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                             break;
                     }
                 }
-                if (wtype == WIDGET_SLIDER && player_value_key && 0 == strcmp(player_value_key, "time")) {
+                if (widget_is_slider(t) && *player_value_key && 0 == strcmp(player_value_key, "time")) {
                     widget_slider_set_interactive(t, can_seek);
                 }
                 if (wtype == WIDGET_TEXT) {
@@ -924,13 +924,13 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             widget_type_t wtype = widget_get_type(t);
             if (player_value_key) {
                 if (0 == strcmp("VOLUME", player_value_key)) {
-                    if (wtype == WIDGET_SLIDER) {
+                    if (widget_is_slider(t)) {
                         widget_slider_update_value(t, volume);
                         widget_slider_set_interactive(t, can_change_volume);
                     }
                 }
                 if (duration && 0 == strcmp("time", player_value_key)) {
-                    if (wtype == WIDGET_SLIDER) {
+                    if (widget_is_slider(t)) {
                         widget_slider_update_value(t, elapsed);
                     }
                 }

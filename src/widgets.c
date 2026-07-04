@@ -21,6 +21,8 @@ static char* widget_type_strings[] = {
     "MultistateButton",
     "VUMeter",
     "Slider",
+    "Text",
+    "VSlider",
     "none"
 };
 
@@ -244,6 +246,7 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
                 }
                 break;
             case WIDGET_SLIDER:
+            case WIDGET_VSLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
                     for(int ix_img=0; ix_img < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_img) {
                         if (wdgt->sub.slider.res[ix].image_paths[ix_img]) {
@@ -284,12 +287,6 @@ widget_t* widget_rect(widget_t *wdgt, const SDL_Rect *rect) {
     if (wdgt) {
         copyRect(rect, &wdgt->rect);
         copyRect(rect, &wdgt->input_rect);
-/*        
-        if (wdgt->type == WIDGET_SLIDER) {
-            wdgt->input_rect.y = wdgt->rect.y + wdgt->rect.h/3;
-            wdgt->input_rect.h = wdgt->rect.h/3;
-        }
-*/
 //        copyRect(&wdgt->rect, &wdgt->image_rect);
 //        translate_image_rect(&wdgt->image_rect);
 
@@ -485,6 +482,7 @@ widget_t* widget_destroy(widget_t* wdgt) {
                     FREE(res);
                 }break;
             case WIDGET_SLIDER:
+            case WIDGET_VSLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
                     for(int ix_txtr=0; ix_txtr < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_txtr) {
                         tcache_unlock_texture(wdgt->sub.slider.res[ix].texture_ids[ix_txtr]);
@@ -1010,6 +1008,7 @@ widget_t* widget_configure(widget_t* wdgt) {
             wdgt->configured = true;
             break;
         case WIDGET_SLIDER:
+        case WIDGET_VSLIDER:
             wdgt->configured = true;
             slider_widget_configure(wdgt);
             break;
@@ -1018,7 +1017,8 @@ widget_t* widget_configure(widget_t* wdgt) {
 }
 
 void widget_dispatch_action(widget_t* wdgt) {
-    if (wdgt->type == WIDGET_SLIDER && (!wdgt->sub.slider.defined_interactive || !wdgt->sub.slider.interactive)) {
+    if (widget_is_slider(wdgt)
+                && (!wdgt->sub.slider.defined_interactive || !wdgt->sub.slider.interactive)) {
         return;
     }
 
@@ -1078,7 +1078,7 @@ void widget_dispatch_action(widget_t* wdgt) {
             break;
 
         case ACTION_SET_VOLUME:
-            if (wdgt->type == WIDGET_SLIDER) {
+            if (widget_is_slider(wdgt)) {
                 int level;
                 widget_slider_get_value(wdgt, &level);
                 dispatch_action(act, level);
@@ -1086,7 +1086,7 @@ void widget_dispatch_action(widget_t* wdgt) {
             break;
 
         case ACTION_SEEK:
-            if (wdgt->type == WIDGET_SLIDER) {
+            if (widget_is_slider(wdgt)) {
                 int track_time;
                 widget_slider_get_value(wdgt, &track_time);
                 dispatch_action(act, track_time);
@@ -1173,7 +1173,7 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
                     widget_set_highlight(widget, widget->focussed);
                     widget_set_pressed(widget, widget->focussed);
                     selected = widget->focussed;
-                    if (widget->type == WIDGET_SLIDER) {
+                    if (widget_is_slider(widget)) {
                         widget_slider_track(widget, pt);
                     }
                 } else {
@@ -1199,7 +1199,7 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
                                 );
                     widget->focussed = false;
                     widget_set_highlight(widget, widget->focussed);
-                    if (widget->type == WIDGET_SLIDER) {
+                    if (widget_is_slider(widget)) {
                         widget_slider_tracking_commit(widget, pt);
                         int value =  -987654321;
                         widget_slider_get_value(widget, &value);
@@ -1222,7 +1222,7 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
                     widget_set_highlight(widget, SDL_PointInRect(pt, &widget->input_rect) && (!widget->focus_disabled));
                     selected = widget_highlighted(widget);
                     if (selected) {
-                        if (widget->type == WIDGET_SLIDER) {
+                        if (widget_is_slider(widget)) {
                             widget_slider_track(widget, pt);
                         }
                     }

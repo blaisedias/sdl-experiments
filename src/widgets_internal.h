@@ -24,7 +24,7 @@ typedef struct {
 typedef struct {
     bool initialised;
     int  value_range_delta;
-    int  half_pw;
+    int  half_pick_dim;
     int  min_pos;
     int  max_pos;
     int  current_pos;
@@ -34,7 +34,6 @@ typedef struct {
     SDL_Rect bar_rect;
 //    SDL_Rect bar_empty_rect;
     SDL_Rect pick_rect;
-    int  pick_x2;
 }_slider_workspace_t;
 
 typedef struct {
@@ -142,5 +141,4 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path);
 widget_t *widget_slider_track(widget_t* wdgt, const SDL_Point *pt);
 widget_t *widget_slider_tracking_commit(widget_t* wdgt, const SDL_Point *pt);
 _slider_workspace_t* slider_widget_configure(widget_t* wdgt);
-
 #endif
