@@ -159,6 +159,14 @@ static void button_widget_render(widget_t* wdgt) {
 
 static void setup_image_fit_src_rect(widget_t *wdgt) {
     if (wdgt->type == WIDGET_IMAGE) {
+        if (0 == wdgt->sub.image.texture_id) {
+            return;
+        }
+        if (!tcache_quick_get_texture_dimensions(wdgt->sub.image.texture_id, &wdgt->sub.image.w, &wdgt->sub.image.h)) {
+            error_printf("unable to retrieve texture dimensions from cache for texture_id%d\n",
+                            wdgt->sub.image.texture_id);
+            return;
+        }
         switch(wdgt->sub.image.scale_op)
         {
             case IMAGE_STRETCH_FILL:
@@ -181,8 +189,8 @@ static void setup_image_fit_src_rect(widget_t *wdgt) {
 
                 wdgt->sub.image.dst_rect.w = wdgt->sub.image.w*scale_f;
                 wdgt->sub.image.dst_rect.h = wdgt->sub.image.h*scale_f;
-                wdgt->sub.image.dst_rect.x = (wdgt->rect.w -  wdgt->sub.image.dst_rect.w)/2;
-                wdgt->sub.image.dst_rect.y = (wdgt->rect.h -  wdgt->sub.image.dst_rect.h)/2;
+                wdgt->sub.image.dst_rect.x = wdgt->rect.x + (wdgt->rect.w -  wdgt->sub.image.dst_rect.w)/2;
+                wdgt->sub.image.dst_rect.y = wdgt->rect.y + (wdgt->rect.h -  wdgt->sub.image.dst_rect.h)/2;
                 debug_printf("image widget: dst: fit: {w=%d, h=%d} %f, scalef=%f {%d,%d,%d,%d}\n", 
                         wdgt->sub.image.w, wdgt->sub.image.h, 
                         (float)wdgt->sub.image.w/wdgt->sub.image.h,
@@ -606,7 +614,9 @@ widget_t* widget_create_image(const view_context_t* view) {
 
 widget_t* widget_image_scaling(widget_t* wdgt, image_scaling_t op) {
     wdgt->sub.image.scale_op = op;
-    setup_image_fit_src_rect(wdgt);
+    if (wdgt->configured) {
+        setup_image_fit_src_rect(wdgt);
+    }
     return wdgt;
 }
 
@@ -999,13 +1009,16 @@ widget_t* widget_text_set_justification(widget_t* wdgt, const char* justif_name)
 widget_t* widget_configure(widget_t* wdgt) {
     switch(wdgt->type) {
         case WIDGET_NONE:
-        case WIDGET_IMAGE:
         case WIDGET_BUTTON:
         case WIDGET_MULTISTATE_BUTTON:
         case WIDGET_VUMETER:
         case WIDGET_TEXT:
         case WIDGET_END:
             wdgt->configured = true;
+            break;
+        case WIDGET_IMAGE:
+            wdgt->configured = true;
+            setup_image_fit_src_rect(wdgt);
             break;
         case WIDGET_SLIDER:
         case WIDGET_VSLIDER:
