@@ -2,4 +2,6 @@ Makefile.deps
 obj/
 lib/
 bin/
+*.xcf
+*.svg
 
