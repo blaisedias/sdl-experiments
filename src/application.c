@@ -324,6 +324,7 @@ void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+    app_printf("app_cleanup OK\n");
     exit(exit_status);
 }
 
