@@ -73,7 +73,7 @@ static const char* help_text=""
 " - monitor-tcache: print texture cache memory usage at regular intervals \n"
 "\n";  
 
-static char *json_files = "npvu.json,npvularge.json";
+static char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
 static bool dump_vu = false;
 static bool monitor_tcache = false;
 

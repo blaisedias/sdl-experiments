@@ -134,6 +134,7 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
                 int lead = FUZZ_DOWN(vwmeter_ptr->channel_parms[0].channel_rect.x - vwmeter_ptr->vu_rect.x);
                 int trail = FUZZ_DOWN(vwmeter_ptr->vu_rect.x + vwmeter_ptr->vu_rect.w - ( vwmeter_ptr->channel_parms[1].channel_rect.x +  vwmeter_ptr->channel_parms[1].channel_rect.w));
                 int middle = FUZZ_DOWN(vwmeter_ptr->channel_parms[1].channel_rect.x - (vwmeter_ptr->channel_parms[0].channel_rect.x +  vwmeter_ptr->channel_parms[0].channel_rect.w));
+
                 float avail = ( vwmeter_ptr->channel_parms[0].channel_rect.x 
                         + wdgt->rect.w - (vwmeter_ptr->channel_parms[1].channel_rect.x + vwmeter_ptr->channel_parms[1].channel_rect.w)
                         + middle);
@@ -141,8 +142,10 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
                 int l = avail*lead;
                 int m = avail*middle;
 //                int t = avail*trail;
-                vwmeter_ptr->channel_parms[0].channel_rect.x = l;
-                vwmeter_ptr->channel_parms[1].channel_rect.x = l + vwmeter_ptr->channel_parms[0].channel_rect.w + m;
+                vwmeter_ptr->vu_rect.x = wdgt->rect.x;
+                vwmeter_ptr->vu_rect.w = wdgt->rect.w;
+                vwmeter_ptr->channel_parms[0].channel_rect.x = vwmeter_ptr->vu_rect.x + l;
+                vwmeter_ptr->channel_parms[1].channel_rect.x = vwmeter_ptr->channel_parms[0].channel_rect.x + vwmeter_ptr->channel_parms[0].channel_rect.w + m;
 #undef FUZZ_DOWN
             }
             debug_printf("    %d) meter:%s decay_unit:%f volume_levels:%d\n", vw->num_meters, vw->meters[vw->num_meters].meter->name, decay_unit, props->volume_levels);
@@ -158,6 +161,7 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
             error_printf("no VU meters loaded\n");
     }
 }
+
 
 static void vumeter_render_bg(widget_t* wdgt) {
     if (true) {
