@@ -762,8 +762,12 @@ bool tcache_lock_texture(texture_id_t texture_id) {
 bool tcache_unlock_texture(texture_id_t texture_id) {
     // locking the 0th entry, "uninitialised" is a client bug
     if (texture_id <= 0 || texture_id >= NUM_TBL_ENTRIES) {
-        error_printf("tcache_unlock_texture: invalid id %d\n", texture_id);
-        exit(EXIT_FAILURE);
+        if ( 0 == texture_id ) {
+            error_printf("tcache_unlock_texture: ignoring unlock empty texture %d\n", texture_id);
+        } else {
+            error_printf("tcache_unlock_texture: invalid id %d\n", texture_id);
+            exit(EXIT_FAILURE);
+        }
     }
     tcache_entry* tce = tbl[texture_id];
     if (external_tce(tce)) {
