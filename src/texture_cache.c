@@ -580,7 +580,7 @@ bool tcache_load_from_file(texture_id_t texture_id, SDL_Renderer* renderer) {
             tcache_printf("tcache_load_from_file: : %d %s\n", texture_id, tce->path);
             tce->surface = IMG_Load(tce->path);
             if (tce->surface == NULL)  {
-                error_printf("tcache_load_from_file: failed: %d %s\n", texture_id, tce->path);
+                error_printf("tcache_load_from_file: failed: %d %s %s\n", texture_id, tce->path, IMG_GetError());
             } else {
                 tce->w = tce->surface->w;
                 tce->h = tce->surface->h;
