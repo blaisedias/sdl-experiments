@@ -555,7 +555,7 @@ static void my_render_foreground(app_context_ptr app_ctx) {
 static void print_tcache_stats(){
     unsigned texture_bytes = tcache_get_texture_bytes_count();
     unsigned surface_bytes = tcache_get_surface_bytes_count();
-    printf("\n texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
+    log_printf("texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
 }
 
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
