@@ -154,6 +154,7 @@ widget_t* widget_text_set_content(widget_t*, const char* content);
 widget_t* widget_text_set_font(widget_t*, const char* font_path, int size);
 widget_t* widget_text_set_colour(widget_t*, SDL_Color colour);
 widget_t* widget_text_set_justification(widget_t*, const char*);
+widget_t* widget_text_set_y_scaling_threshold(widget_t* wdgt, float threshold);
 
 // widget render 
 widget_t* widget_set_renderhf(widget_t* wdgt);

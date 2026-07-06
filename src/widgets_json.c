@@ -87,6 +87,7 @@ typedef enum {
     JT_TEXT_FONT_SIZE,
     JT_TEXT_COLOUR,
     JT_TEXT_JUSTIFICATION,
+    JT_TEXT_Y_SCALING_THRESHOLD,
 
     JT_RED,
     JT_GREEN,
@@ -153,6 +154,7 @@ static const char* json_token_strings[]= {
     "font_size",
     "colour",
     "justification",
+    "y_scaling_threshold",
 
     "red",
     "green",
@@ -277,7 +279,6 @@ static bool get_object_boolean_value(json_value* value, json_token jt, bool defa
     return default_value;
 }
 
-/*
 static double get_object_double_value(json_value* value, json_token jt, double default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_double) {
@@ -285,7 +286,11 @@ static double get_object_double_value(json_value* value, json_token jt, double d
     }
     return default_value;
 }
-*/
+
+static float get_object_float_value(json_value* value, json_token jt, float default_value) {
+    return (float) get_object_double_value(value, jt, (double) default_value);
+}
+
 
 static void deserialise_container(json_value* value, SDL_Rect* container, view_context_t* ctx) {
     if (value == NULL) {
@@ -575,6 +580,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 json_printf("     font       %p\n", widget->sub.text.font);
                 json_printf("     fontsize   %p\n", font_size);
                 widget_text_set_justification(widget, get_object_string_value(value, JT_TEXT_JUSTIFICATION, NULL));
+                widget_text_set_y_scaling_threshold(widget, get_object_float_value(value, JT_TEXT_Y_SCALING_THRESHOLD, DEFAULT_WIDGET_TEXT_Y_SCALING_THRESHOLD));
                 json_value* jcolour = get_object_object_value(value, JT_TEXT_COLOUR);
                 if (jcolour) {
                     SDL_Color sdlcolour = { 0, 0, 0, 255};

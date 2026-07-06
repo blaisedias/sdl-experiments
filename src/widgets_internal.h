@@ -36,6 +36,8 @@ typedef struct {
     SDL_Rect pick_rect;
 }_slider_workspace_t;
 
+// default value 1.25 => 80% which is an empricially determined value.
+#define DEFAULT_WIDGET_TEXT_Y_SCALING_THRESHOLD 1.25
 typedef struct {
     texture_id_t texture_id;
     TTF_Font* font;
@@ -43,9 +45,10 @@ typedef struct {
     const char* format; // player format string, can be NULL
     const char* timedate_format; // time date format string, can be NULL
     const char* content;
-//    SDL_Rect content_dim;
-    SDL_Color colour;
-    SDL_Rect dst_rect;
+    SDL_Color   colour;
+    SDL_Rect    dst_rect;
+    // threshold for scaling text based on height
+    float       y_scaling_threshold;
     text_justification_t justification;
 }_text_data_t,*_text_data_ptr;
 

@@ -857,6 +857,37 @@ const char* widget_text_get_timedate_format(widget_t* wdgt) {
     return "";
 }
 
+widget_t* widget_text_set_y_scaling_threshold(widget_t* wdgt, float threshold) {
+    if (wdgt && wdgt->type == WIDGET_TEXT) {
+        wdgt->sub.text.y_scaling_threshold = threshold;
+    }
+    return wdgt;
+}
+
+
+static void text_justify(_text_data_ptr txt_w, SDL_Rect* enclosure, int w, int h, float scale) {
+    int scaled_w = w / scale;
+    int scaled_h = h / scale;
+
+    txt_w->dst_rect.w = scaled_w;
+    txt_w->dst_rect.h = scaled_h;
+    switch(txt_w->justification) {
+        case TXT_LEFT:
+            txt_w->dst_rect.x = enclosure->x;
+            txt_w->dst_rect.y = enclosure->y + ((enclosure->h - scaled_h)/2);
+            break;
+        case TXT_RIGHT:
+            txt_w->dst_rect.x = enclosure->x + ((enclosure->w - scaled_w));
+            txt_w->dst_rect.y = enclosure->y + ((enclosure->h - scaled_h)/2);
+            break;
+        case TXT_CENTRED:
+        default:
+            txt_w->dst_rect.x = enclosure->x + ((enclosure->w - scaled_w)/2);
+            txt_w->dst_rect.y = enclosure->y + ((enclosure->h - scaled_h)/2);
+            break;
+    }
+}
+
 static void text_render_surface(widget_t* wdgt) {
     if (wdgt && wdgt->type == WIDGET_TEXT) {
         _text_data_ptr txt_w = &wdgt->sub.text;
@@ -886,60 +917,15 @@ static void text_render_surface(widget_t* wdgt) {
                     }
                 }
                 tcache_set_surface(txt_w->texture_id, surface);
-//                txt_w->content_dim.w = surface->w;
-//                txt_w->content_dim.h = surface->h;
-
-                txt_w->dst_rect.w = surface->w;
-                txt_w->dst_rect.h = surface->h;
-                switch(txt_w->justification) {
-                    case TXT_LEFT:
-                        txt_w->dst_rect.x = wdgt->rect.x;
-                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
-                        break;
-                    case TXT_RIGHT:
-                        txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - surface->w));
-                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
-                        break;
-                    case TXT_CENTRED:
-                    default:
-                        txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - surface->w)/2);
-                        txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - surface->h)/2);
-                        break;
-                }
                 
                 // for now scale text to fit content.
-                float scale_x = (float)surface->w/wdgt->rect.w;
+                float scale_x = MAX((float)surface->w/wdgt->rect.w, 1.0);
                 float scale_y = (float)surface->h/wdgt->rect.h;
-                if (scale_x > 1 || scale_y > 1) {
-                    float scale = scale_x > scale_y ? scale_x : scale_y;
-                    int scaled_w = surface->w / scale;
-                    int scaled_h = surface->h / scale;
-                    error_printf("text_render_surface: scaling text to fit %f (x=%f,y=%f) from %dx%d to %dx%d\n%s\n",
-                            1/scale, 1/scale_x, 1/scale_y,
-                            surface->w, surface->h,
-                            scaled_w, scaled_h,
-                            txt_w->content
-                            );
-                    txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - scaled_w)/2);
-                    txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
-                    txt_w->dst_rect.w = scaled_w;
-                    txt_w->dst_rect.h = scaled_h;
-                    
-                    switch(txt_w->justification) {
-                        case TXT_LEFT:
-                            txt_w->dst_rect.x = wdgt->rect.x;
-                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
-                            break;
-                        case TXT_RIGHT:
-                            txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - scaled_w));
-                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
-                            break;
-                        case TXT_CENTRED:
-                        default:
-                            txt_w->dst_rect.x = wdgt->rect.x + ((wdgt->rect.w - scaled_w)/2);
-                            txt_w->dst_rect.y = wdgt->rect.y + ((wdgt->rect.h - scaled_h)/2);
-                            break;
-                    }
+
+                if (scale_y > txt_w->y_scaling_threshold && scale_y > scale_x) {
+                    text_justify(txt_w, &wdgt->rect, surface->w, surface->h, scale_y);
+                } else {
+                    text_justify(txt_w, &wdgt->rect, surface->w, surface->h, scale_x);
                 }
             }
         }
