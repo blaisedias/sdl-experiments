@@ -552,6 +552,12 @@ static void my_render_foreground(app_context_ptr app_ctx) {
     }
 }
 
+static void print_tcache_stats(){
+    unsigned texture_bytes = tcache_get_texture_bytes_count();
+    unsigned surface_bytes = tcache_get_surface_bytes_count();
+    printf("\n texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
+}
+
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
     static  SDL_Scancode prev_keydown;
     static int64_t keydown_start_time = 0;
@@ -570,6 +576,9 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             widget_list_react(pv->list, USEREVENT_NEXT_VISU ? NEXT_VISU: NEXT_VU, NULL);
                         }
                     }
+#if 1
+                    print_tcache_stats();
+#endif
                 }break;
             case USEREVENT_PREV_VISU:
             case USEREVENT_PREV_VU:
@@ -584,6 +593,9 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             widget_list_react(pv->list, USEREVENT_PREV_VISU ? PREV_VISU: PREV_VU, NULL);
                         }
                     }
+#if 1
+                    print_tcache_stats();
+#endif
                 }break;
             case SDL_QUIT:
                 puts("");
@@ -622,11 +634,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     dispatch_action(ACTION_PLAY_PAUSE, 0);
                     break;
                 case SDL_SCANCODE_TAB:
-                    {
-                        unsigned texture_bytes = tcache_get_texture_bytes_count();
-                        unsigned surface_bytes = tcache_get_surface_bytes_count();
-                        printf("\n texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
-                    }
+                    print_tcache_stats();
                     break;
                 case SDL_SCANCODE_PRINTSCREEN:
                     tcache_dump();
