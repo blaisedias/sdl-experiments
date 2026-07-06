@@ -92,6 +92,8 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
 #ifdef  VUMETERS_CHECK_ON_INIT
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
             error_printf("failed to load media for %s\n", props->name);
+// temporary: fail fast change
+            exit(EXIT_FAILURE);
             continue;
         }
 #endif
