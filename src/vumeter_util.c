@@ -139,7 +139,14 @@ static int64_t ms_2;
 // to check and reset performance counters when vumeter is changed.
 static const vumeter_t* prev_vumeter;
 
-static inline void renderPlacement(vu_placement_t* pve, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer, float scale_factor) {
+static inline void renderPlacement(int indx, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer, float scale_factor) {
+    if (indx < 0 || indx >= vu->placements.count) {
+        error_printf("renderPlacement: invalid index %d max=%d\n",
+                indx, vu->placements.count);
+        exit(EXIT_FAILURE);
+    }
+
+    vu_placement_t* pve = &vu->placements.elements[indx]; 
 #define VU_SCALE(val) ((val)*scale_factor + 0.5)
     SDL_Rect    render_rect= {
         .x = VU_SCALE(pve->rect.x),
@@ -170,7 +177,7 @@ void VUMeter_draw_background(SDL_Renderer* renderer, vumeter_properties_t* vu, c
     if (vumeter->background) {
         const vu_background_t* bg = vumeter->background;
         for(int ix=0; ix < bg->placement_count; ++ix) {
-            renderPlacement(vu->placements.elements+bg->placements[ix],
+            renderPlacement(bg->placements[ix],
                     enclosure, vu, renderer,
                     //FIXME: should be for the vumeter rectangle 
                     channel_parms[0].scale_factor);
@@ -179,7 +186,7 @@ void VUMeter_draw_background(SDL_Renderer* renderer, vumeter_properties_t* vu, c
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
         const vu_background_t* bg = vumeter->backgrounds[ix_chan];
         for(int ix=0; ix < bg->placement_count; ++ix) {
-            renderPlacement(vu->placements.elements+bg->placements[ix],
+            renderPlacement(bg->placements[ix],
                     &channel_parms[ix_chan].channel_rect, vu, renderer,
                     channel_parms[ix_chan].scale_factor);
         }
@@ -230,7 +237,7 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
     }
 
 #define _RENDER_VOLUME_LEVEL_(value, chn) \
-    renderPlacement(vu->placements.elements+comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
+    renderPlacement(comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
             channel_parms[chn].scale_factor)
 
     for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
