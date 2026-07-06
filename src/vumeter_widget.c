@@ -242,7 +242,13 @@ static bool vumeter_select(widget_t *wdgt, int indx) {
         //VUMeter_unload_media(vw->meters[vumeter_index(vw)].props);
         vumeter_properties_t* props = vw->meters[indx].props;
         if (!VUMeter_load_media(wdgt->view->app->renderer, props)) {
-            exit(EXIT_FAILURE);
+            error_printf("failed to load VUMeter media, limping along!");
+            {
+                unsigned texture_bytes = tcache_get_texture_bytes_count();
+                unsigned surface_bytes = tcache_get_surface_bytes_count();
+                error_printf("texture cache memory: texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
+            }
+//            exit(EXIT_FAILURE);
         }
         wdgt->redraw_required = true;
     }
