@@ -74,7 +74,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
     }
 
     if (TTF_Init()) {
-        error_printf("initializing SDL_ttf: %s\n", IMG_GetError());
+        error_printf("initializing SDL_ttf: %s\n", TTF_GetError());
         return true;
     }
 
