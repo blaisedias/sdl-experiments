@@ -37,6 +37,8 @@ struct vumeter_widget {
     int     atomic_meter_indx;
     bool    locked;
     bool    equal_horizontal_spacing;
+    // only used by render code. 
+    volatile int render_meter_indx;
     runtime_volume_t vol_runtimes[NUM_VU_CHANNELS];
 };
 
@@ -168,11 +170,19 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
 static void vumeter_render_bg(widget_t* wdgt) {
     if (true) {
         vumeter_widget_t* vw = wdgt->sub.vu;
+        int index = vumeter_index(vw);
+        if (index < 0 || index >= vw->num_meters) {
+            error_printf("vumeter_render_bg: invalid vu meter index %d, resetting to 0\n", index);
+            vumeter_set_index(vw, 0);
+            index = 0;
+        }
+        _vw_meter_t* vmt = &vw->meters[index];
+        vw->render_meter_indx = index;
         VUMeter_draw_background(wdgt->view->app->renderer,
-            vw->meters[vumeter_index(vw)].props,
-            vw->meters[vumeter_index(vw)].meter,
-            &vw->meters[vumeter_index(vw)].vu_rect,
-            vw->meters[vumeter_index(vw)].channel_parms);
+            vmt->props,
+            vmt->meter,
+            &vmt->vu_rect,
+            vmt->channel_parms);
     }
     wdgt->redraw_required = false;
 }
@@ -184,21 +194,24 @@ static void vumeter_render_fg(widget_t* wdgt) {
     translate_draw_rect(&draw_rect);
 */    
     vumeter_widget_t* vw = wdgt->sub.vu;
+    // assert valid render_meter_indx?
+     _vw_meter_t* vmt = &vw->meters[vw->render_meter_indx];
     int vols[2];
     visualizer_vumeter(vols);
     if (vw->num_meters) {
-        if(vw->meters[vumeter_index(vw)].props->volume_levels != 49) {
-            vols[0] = vols[0] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
-            vols[1] = vols[1] * vw->meters[vumeter_index(vw)].props->volume_levels/50;
+// FIXME:        
+        if(vmt->props->volume_levels != 49) {
+            vols[0] = vols[0] * vmt->props->volume_levels/50;
+            vols[1] = vols[1] * vmt->props->volume_levels/50;
         }
         VUMeter_draw_foreground(wdgt->view->app->renderer,
-               vw->meters[vumeter_index(vw)].props,
-               vw->meters[vumeter_index(vw)].meter, vols,
+               vmt->props,
+               vmt->meter, vols,
 //               &draw_rect,
-               &vw->meters[vumeter_index(vw)].vu_rect,
-               vw->meters[vumeter_index(vw)].channel_parms,
+               &vmt->vu_rect,
+               vmt->channel_parms,
                vw->vol_runtimes,
-               vw->meters[vumeter_index(vw)].decay_unit);
+               vmt->decay_unit);
     }
 }
 
@@ -235,6 +248,7 @@ widget_t *vumeter_widget_destroy(widget_t *wdgt) {
 static bool vumeter_select(widget_t *wdgt, int indx) {
     vumeter_widget_t* vw = wdgt->sub.vu;
     if (indx < 0 || indx >= vw->num_meters) {
+        error_printf("vumeter_select: invalid index %d\n", indx);
         return false;
     }
     perf_printf("\n");
