@@ -52,7 +52,7 @@ typedef struct {
     text_justification_t justification;
 }_text_data_t,*_text_data_ptr;
 
-struct widget {
+struct widget_s_t {
     widget_t*    next;
     widget_t*   prev;
     const       widget_type_t type;
@@ -126,7 +126,7 @@ struct widget {
     }sub;
 };
 
-struct widget_list{
+struct widget_list_s_t {
     widget_t head;
     widget_t tail;
 };

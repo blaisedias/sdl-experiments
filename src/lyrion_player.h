@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "types.h"
 
-typedef struct lyrion_player* lyrion_player_ptr;
+typedef struct lyrion_player_s_t* lyrion_player_ptr;
 
 typedef struct {
     int elapsed_secs;

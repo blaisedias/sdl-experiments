@@ -43,13 +43,13 @@ typedef struct {
     int64_t  micros;
 }fps_sample_point;
 
-void ___app_input_loop(app_context* app_ctx);
+void ___app_input_loop(app_context_t* app_ctx);
 
 //#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC|SDL_INIT_GAMECONTROLLER|SDL_INIT_EVENTS
 #define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_EVENTS
 
 bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_ctx->input_thread =  SDL_CreateThread((SDL_ThreadFunction)___app_input_loop, "input", app_ctx);
 
 //    app_ctx->workspace.player_mode = PLAYER_MODE_UNDEFINED;
@@ -297,7 +297,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
 }
 
 void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     if (app_ctx->input_thread) {
         input_loop = false;
         __atomic_store_n(&render_ready, true, __ATOMIC_RELEASE);
@@ -329,7 +329,7 @@ void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
 }
 
 void app_render_loop(app_context_ptr app_ctx_in) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_printf("+++ render start\n"); fflush(stdout);
 
     SDL_Rect dst_rect;
@@ -429,19 +429,19 @@ void app_render_loop(app_context_ptr app_ctx_in) {
     }
 }
 
-int app_render(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip) {
+int app_render(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip) {
     return SDL_RenderCopyEx(app_ctx->renderer, texture, srcrect, dstrect, 0, center, flip);
 }
 
-int app_render_rotated(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double angle) {
+int app_render_rotated(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double angle) {
     return SDL_RenderCopyEx(app_ctx->renderer, texture, srcrect, dstrect, angle, center, flip);
 }
 
 
-//void app_input_loop(app_context* app_ctx) {
+//void app_input_loop(app_context_t* app_ctx) {
 //}
 
-void ___app_input_loop(app_context* app_ctx) {
+void ___app_input_loop(app_context_t* app_ctx) {
     while(__atomic_load_n(&render_ready, __ATOMIC_ACQUIRE) == 0) {
         sleep_milli_seconds(100);
     }
@@ -496,6 +496,6 @@ int64_t app_get_render_count() {
 }
 
 void app_set_multiple_views(app_context_ptr app_ctx_in, bool val) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_ctx->workspace.have_multiple_views = val;
 }

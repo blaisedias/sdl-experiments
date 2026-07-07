@@ -9,14 +9,14 @@ typedef struct {
     bool            have_multiple_views;
 } app_workspace_t;
 
-typedef struct app_context app_context;
-typedef const struct app_context* app_context_ptr;
+typedef struct app_context_s_t app_context_t;
+typedef const app_context_t* app_context_ptr;
 
 typedef bool (*query_renderfn)(app_context_ptr app_ctx);
 typedef void (*renderfn)(app_context_ptr app_ctx);
 typedef void (*inputfn)(app_context_ptr app_ctx, SDL_Event* event);
 
-struct app_context {
+struct app_context_s_t {
     float           orientation;
     SDL_Window*     window;
     SDL_Rect        window_rect;
@@ -68,8 +68,8 @@ void app_cleanup(app_context_ptr app, int exit_status);
 void app_stop(app_context_ptr app_ctx);
 //void app_input_loop(app_context_ptr app_ctx);
 void app_render_loop(app_context_ptr app_ctx);
-int app_render(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip);
-int app_render_rotated(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double rotate);
+int app_render(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip);
+int app_render_rotated(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double rotate);
 bool app_running(app_context_ptr app_ctx);
 void app_wait_ready();
 int64_t app_get_render_count();

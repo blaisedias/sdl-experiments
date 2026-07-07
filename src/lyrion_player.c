@@ -319,7 +319,7 @@ typedef struct {
     FILE *fp;
 }lms_io, *lms_io_ptr;
 
-struct lyrion_player {
+struct lyrion_player_s_t {
     union {
         struct sockaddr sock_addr;
         struct sockaddr_in sin_addr;

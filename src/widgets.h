@@ -67,11 +67,12 @@ typedef enum {
     SLIDER_RESOURCE_COUNT
 }slider_reosurce_ID_t;
 
-typedef struct vumeter_widget vumeter_widget_t;
-typedef struct spmeter_widget spmeter_widget_t;
+typedef struct vumeter_widget_s_t vumeter_widget_t;
+typedef struct spmeter_widget_s_t spmeter_widget_t;
 
-typedef struct widget widget_t;
-typedef struct view_context view_context_t, *view_context_ptr;
+typedef struct widget_s_t widget_t;
+typedef struct view_context_s_t view_context_t;
+typedef const view_context_t* view_context_ptr;
 
 bool widget_highlighted(widget_t* wdgt); 
 void widget_set_highlight(widget_t* wdgt, bool onoff);
@@ -161,8 +162,8 @@ widget_t* widget_set_renderhf(widget_t* wdgt);
 widget_t* widget_unset_renderhf(widget_t* wdgt);
 
 // Widget list and view
-typedef struct widget_list widget_list_t;
-struct view_context {
+typedef struct widget_list_s_t widget_list_t;
+struct view_context_s_t {
     app_context_ptr     app;
     widget_list_t*      list;
 };

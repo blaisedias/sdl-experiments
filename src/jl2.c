@@ -79,8 +79,8 @@ static bool monitor_tcache = false;
 
 #define MAX_NP_VIEWS   10
 static volatile view_context_ptr current_view = NULL;
-static view_context_ptr main_view = NULL;
-static view_context_ptr np_views[MAX_NP_VIEWS];
+static view_context_t* main_view = NULL;
+static view_context_t* np_views[MAX_NP_VIEWS];
 static volatile int np_view_indx=0;
 static volatile bool refresh_widget_contents = false;
 // TODO make value configurable, if true, visualiser change actions
@@ -95,7 +95,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
 
 
-static app_context app_ctx = {
+static app_context_t app_ctx = {
 //        .window = NULL,
 //        .renderer = NULL,
         .screen_width = 800,
@@ -369,8 +369,8 @@ void select_main_view() {
 }
 
 
-static view_context_ptr load_json_view(const char* json_path, app_context_ptr app_ctx) {
-    view_context_ptr vw = calloc(sizeof(*vw),1);
+static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx) {
+    view_context_t* vw = calloc(sizeof(*vw),1);
     if(NULL == vw) {
         return vw;
     }
@@ -407,7 +407,7 @@ printf("starting controller\n"); fflush(stdout);
     if (endtime) {
         endtime += get_milli_seconds();
     }
-    view_context_ptr vw = load_json_view("main.json", app_ctx);
+    view_context_t* vw = load_json_view("main.json", app_ctx);
     if(NULL == vw) {
         exit(EXIT_FAILURE);
     }

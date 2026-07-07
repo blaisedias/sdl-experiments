@@ -30,7 +30,7 @@ typedef struct {
     SDL_Rect                vu_rect;
 }_vw_meter_t;
 
-struct vumeter_widget {
+struct vumeter_widget_s_t {
     vumeter_properties_t* props;
     _vw_meter_t meters[100];
     int     num_meters;
