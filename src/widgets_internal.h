@@ -127,8 +127,12 @@ struct widget_s_t {
 };
 
 struct widget_list_s_t {
-    widget_t head;
-    widget_t tail;
+    // FIXME: widget list render functions are not locked,
+    // as that would potentially block the render function for unacceptable
+    // durations.
+    SDL_mutex*  mutex;
+    widget_t    head;
+    widget_t    tail;
 };
 
 // Generic
@@ -136,6 +140,7 @@ widget_t* widget_create(const view_context_t *view);
 void render_none(widget_t* wdgt);
 void widget_render_foreground_default(widget_t* wdgt);
 void widget_dispatch_action(widget_t* wdgt);
+void widget_list_add_widget(widget_list_t* widget_list, widget_t* wdgt);
 
 // VUmeter
 widget_t *vumeter_widget_destroy(widget_t *wdgt);

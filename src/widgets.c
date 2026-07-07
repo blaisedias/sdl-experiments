@@ -450,16 +450,12 @@ bool widget_get_focussed(widget_t* wdgt) {
 
 widget_t* widget_create(const view_context_t *view) {
     widget_t* wdgt = calloc(sizeof(*wdgt), 1);
-    if (wdgt) {
+    if (wdgt && view && view->list) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
         wdgt->render_backdrop = render_none;
         wdgt->render_foreground = render_none;
-        if (view->list) {
-            wdgt->next = &view->list->tail;
-            wdgt->prev = view->list->tail.prev;
-            wdgt->prev->next = wdgt->next->prev = wdgt;
-        }
+        widget_list_add_widget(view->list, wdgt);
         wdgt->redraw_required = true;
     }
     return wdgt;
@@ -1102,6 +1098,13 @@ void widget_dispatch_action(widget_t* wdgt) {
 
 static widget_list_t* widget_list_initialise(widget_list_t* list, view_context_t* view) {
     if (list) {
+        if (NULL == list->mutex) {
+            list->mutex = SDL_CreateMutex();
+            if (list->mutex == NULL) {
+                error_printf("Failed to create mutex for widget list\n");
+                exit(EXIT_FAILURE);
+            }
+        }
         list->head.next = &list->tail;
         *((widget_type_t*)(&list->head.type)) = WIDGET_NONE;
         list->tail.prev = &list->head;
@@ -1142,18 +1145,25 @@ widget_list_t* destroy_widgets_in_list(widget_list_t* list) {
 widget_list_t* destroy_widget_list(widget_list_t* list) {
     if (list) {
         destroy_widgets_in_list(list);
+        if (NULL != list->mutex) {
+            SDL_DestroyMutex(list->mutex);
+            list->mutex = NULL;
+        }
         free(list);
     }
     return NULL;
 }
 
 void widget_list_load_media(const widget_list_t* list, const char* resource_path) {
+    SDL_LockMutex(list->mutex);
     for (widget_t* widget = list->head.next; widget != NULL; widget = widget->next) {
         widget_load_media(widget, resource_path);
     }
+    SDL_UnlockMutex(list->mutex);
 }
 
 void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt) {
+    SDL_LockMutex(list->mutex);
     bool selected = false;
     if(pt) {
         input_printf("%d: %04d,%04d -> ", input, pt->x, pt->y);
@@ -1247,9 +1257,10 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
             }
             break;
     }
+    SDL_UnlockMutex(list->mutex);
 }
 
-
+// called from render thread so DO NOT lock
 bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list) {
     if (wdgt_list) {
         for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
@@ -1261,6 +1272,7 @@ bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list) {
     return false;
 }
 
+// called from render thread so DO NOT lock
 void widget_list_render_backdrop(const widget_list_t* wdgt_list) {
     if (NULL == wdgt_list) {
         return;
@@ -1279,6 +1291,7 @@ void widget_list_render_backdrop(const widget_list_t* wdgt_list) {
 
 }
 
+// called from render thread so DO NOT lock
 void widget_list_render_foreground(const widget_list_t* wdgt_list) {
     if (NULL == wdgt_list) {
         return;
@@ -1291,17 +1304,37 @@ void widget_list_render_foreground(const widget_list_t* wdgt_list) {
     }
 }
 
-widget_t* widget_list_head(const widget_list_t* wdgt_list) {
-    return wdgt_list->head.next;
+void widget_list_add_widget(widget_list_t* wdgt_list, widget_t* wdgt) {
+    SDL_LockMutex(wdgt_list->mutex);
+    wdgt->next = &wdgt_list->tail;
+    wdgt->prev = wdgt_list->tail.prev;
+    wdgt->prev->next = wdgt->next->prev = wdgt;
+    SDL_UnlockMutex(wdgt_list->mutex);
 }
-widget_t* widget_list_next(const widget_list_t* widget_list, widget_t *widget) {
-    return widget->next != &widget_list->tail ? widget->next: NULL; 
+
+widget_t* widget_list_head(const widget_list_t* wdgt_list) {
+    SDL_LockMutex(wdgt_list->mutex);
+    widget_t* wdgt = wdgt_list->head.next;
+    SDL_UnlockMutex(wdgt_list->mutex);
+    return wdgt;
+}
+widget_t* widget_list_next(const widget_list_t* wdgt_list, widget_t *widget) {
+    SDL_LockMutex(wdgt_list->mutex);
+    widget_t* wdgt = widget->next != &wdgt_list->tail ? widget->next: NULL; 
+    SDL_UnlockMutex(wdgt_list->mutex);
+    return wdgt;
 }
 
 
 widget_t* widget_list_tail(const widget_list_t* wdgt_list) {
-    return wdgt_list->tail.prev;
+    SDL_LockMutex(wdgt_list->mutex);
+    widget_t* wdgt = wdgt_list->tail.prev;
+    SDL_UnlockMutex(wdgt_list->mutex);
+    return wdgt;
 }
-widget_t* widget_list_prev(const widget_list_t* widget_list, widget_t *widget) {
-    return widget->prev != &widget_list->head ? widget->prev: NULL; 
+widget_t* widget_list_prev(const widget_list_t* wdgt_list, widget_t *widget) {
+    SDL_LockMutex(wdgt_list->mutex);
+    widget_t* wdgt = widget->prev != &wdgt_list->head ? widget->prev: NULL; 
+    SDL_UnlockMutex(wdgt_list->mutex);
+    return wdgt;
 }
