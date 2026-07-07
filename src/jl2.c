@@ -863,7 +863,9 @@ printf("starting player_poll_loop\n"); fflush(stdout);
                                 widget_multistate_button_set_state(t, pvalue.integer);
                             } else if (widget_is_slider(t)) {
                                 if (strcmp("time", player_value_key)) {
-                                    widget_slider_update_value(t, pvalue.integer);
+                                    bool in_range;
+                                    widget_slider_update_value(t, pvalue.integer, &in_range);
+                                    if (!in_range) { refresh_widget_contents = true; }
                                 }
                             }
                             break;
@@ -933,13 +935,15 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             if (player_value_key) {
                 if (0 == strcmp("VOLUME", player_value_key)) {
                     if (widget_is_slider(t)) {
-                        widget_slider_update_value(t, volume);
+                        widget_slider_update_value(t, volume, NULL);
                         widget_slider_set_interactive(t, can_change_volume);
                     }
                 }
                 if (duration && 0 == strcmp("time", player_value_key)) {
                     if (widget_is_slider(t)) {
-                        widget_slider_update_value(t, elapsed);
+                        bool in_range;
+                        widget_slider_update_value(t, elapsed, &in_range);
+                        if (!in_range) { refresh_widget_contents = true; }
                     }
                 }
                 if (wtype == WIDGET_TEXT) {

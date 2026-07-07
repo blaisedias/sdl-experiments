@@ -689,7 +689,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 {
                     json_value* slider_v =get_object_value(value, JT_SLIDER_VALUE);
                     if (slider_v && slider_v->type == json_integer) {
-                        widget_slider_update_value(widget, slider_v->u.integer);
+                        widget_slider_update_value(widget, slider_v->u.integer, NULL);
                     }
                 }
             }break;

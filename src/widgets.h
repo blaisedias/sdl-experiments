@@ -139,7 +139,7 @@ widget_t* widget_slider_image_paths(widget_t* , slider_reosurce_ID_t id, const c
 widget_t* widget_slider_image_width(widget_t* , slider_reosurce_ID_t id, int width);
 widget_t* widget_slider_image_height(widget_t* , slider_reosurce_ID_t id, int height);
 widget_t* widget_slider_range(widget_t* , int start, int end);
-widget_t* widget_slider_update_value(widget_t* wdgt, int value);
+widget_t* widget_slider_update_value(widget_t* wdgt, int value, bool* in_range);
 widget_t* widget_slider_set_interactive(widget_t* wdgt, bool yn);
 widget_t* widget_slider_define_interactive(widget_t* wdgt, bool yn);
 widget_t* widget_slider_get_value(widget_t* wdgt, int* value);

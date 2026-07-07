@@ -341,10 +341,12 @@ widget_t *widget_slider_tracking_commit(widget_t* wdgt, const SDL_Point *pt) {
     return wdgt;
 }
 
-widget_t *widget_slider_update_value(widget_t* wdgt, int value) {
+widget_t *widget_slider_update_value(widget_t* wdgt, int value, bool* in_range) {
+    if (in_range) { *in_range = false; }
     if (_is_slider(wdgt)) {
         if (value >= wdgt->sub.slider.range.start
                 && value <= wdgt->sub.slider.range.end) {
+            if (in_range) { *in_range = true;}
             if (!slider_wk_is_initialised(wdgt)) {
                  slider_reconfigure(wdgt);
             }
@@ -401,7 +403,7 @@ widget_t *widget_slider_set_interactive(widget_t* wdgt, bool yn) {
             int value;
             widget_slider_get_value(wdgt, &value);
             slider_reconfigure(wdgt);
-            widget_slider_update_value(wdgt, value);
+            widget_slider_update_value(wdgt, value, NULL);
             wdgt->redraw_required = true;
         }
     }
