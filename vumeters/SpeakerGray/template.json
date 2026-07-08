@@ -29,22 +29,39 @@
     ],
     "License": "See Authors",
     "kind": "vumeter",
-    "vutype": "frames",
-    "format": "compose2",
-    "format_version": 2,
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
     "#volume_levels": [
         "equivalent to number of frames,",
         "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
     ],
     "volume_levels": 48,
     "#dimensions": [
-        "natural width and height of the vumeter",
+        "unscaled width and height of the vumeter",
         "for this vu meter:",
         "width = left_margin + dial_width + spacing + dial_width + right_margin",
-        "margins=50, spacing=50, dial_width=1024",
-        "height=768"
+        "      = 50          + 2000       + 100     + 2000       + 50          ",
+        "height=2000"
     ],
-    "dimensions" :{ "h": 2000, "w": 4200 },
+    "dimensions" :{ "h": 2000, "w": 4150 },
+    "layout" : {
+        "w": 4150,
+        "h": 2000,
+        "left": {
+                "x": 50,
+                "y": 0,
+                "w": 2000,
+                "h": 2000
+        },
+        "right": {
+                "x": 2100,
+                "y": 0,
+                "w": 2000,
+                "h": 2000
+        },
+        "arrangement": "HORIZONTAL_ARRANGEMENT"
+    },
     "#files": [
         "The set of images required to render this VU-Meter"
     ],
@@ -138,7 +155,7 @@
             ]
         }
     },
-    "vumeters#": [
+    "#vumeters": [
         "associative arrays keyed on VU Meter name",
         " contents of each associative array are 2 keys",
         "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",

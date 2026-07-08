@@ -28,9 +28,9 @@
   ],
   "License": "See Authors",
   "kind": "vumeter",
-  "vutype": "frames",
-  "format": "compose2",
-  "format_version": 2,
+  "vutype": "compose2",
+  "format": "associative",
+  "format_version": 0,
   "#volume_levels": [
     "equivalent to number of frames,",
     "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"

@@ -84,304 +84,504 @@
   ],
   "resources": {
     "LEFT_BG": {
-      "imagefile": "L-frame2000.png"
+      "imagefile": "L-frame2000.png",
+      "w": 2000,
+      "h": 2000
     },
     "RIGHT_BG": {
-      "imagefile": "R-frame2000.png"
+      "imagefile": "R-frame2000.png",
+      "w": 2000,
+      "h": 2000
     },
     "L00": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L01": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L02": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L03": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L04": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L05": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L06": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L07": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L08": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L09": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L10": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L11": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L12": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L13": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L14": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L15": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L16": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L17": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L18": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L19": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L20": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L21": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L22": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L23": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L24": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L25": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L26": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L27": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L28": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L29": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L30": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L31": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L32": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L33": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L34": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L35": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L36": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L37": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L38": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L39": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L40": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L41": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L42": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L43": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L44": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L45": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L46": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L47": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "L48": {
-      "imagefile": "L-lsp1620.png"
+      "imagefile": "L-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R00": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R01": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R02": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R03": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R04": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R05": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R06": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R07": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R08": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R09": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R10": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R11": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R12": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R13": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R14": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R15": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R16": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R17": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R18": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R19": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R20": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R21": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R22": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R23": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R24": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R25": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R26": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R27": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R28": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R29": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R30": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R31": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R32": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R33": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R34": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R35": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R36": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R37": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R38": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R39": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R40": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R41": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R42": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R43": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R44": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R45": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R46": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R47": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     },
     "R48": {
-      "imagefile": "R-lsp1620.png"
+      "imagefile": "R-lsp1620.png",
+      "w": 1620,
+      "h": 1620
     }
   },
   "#placement": [

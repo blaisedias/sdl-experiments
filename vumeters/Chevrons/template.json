@@ -7,6 +7,8 @@
     "License": "CC-BY-SA-4.0",
     "kind": "vumeter",
     "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
     "#volume_levels": [
         "equivalent to number of frames,",
         "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
@@ -16,6 +18,29 @@
         "natural width and height of the vumeter"
     ],
     "dimensions": {"h": 648, "w": 1935 },
+    "layout" : {
+        "w": 1935,
+        "h": 648,
+        "left": {
+                "x": 0,
+                "y": 0,
+                "w": 1915,
+                "h": 260
+        },
+        "right": {
+                "x": 0,
+                "y": 388,
+                "w": 1915,
+                "h": 260
+        },
+        "static": {
+                "x": 10,
+                "y": 274,
+                "w": 1918,
+                "h": 100
+        },
+        "arrangement": "VERTICAL_ARRANGEMENT"
+    },
     "#files": [
         "The set of images required to render this VU-Meter",
         "derived from resources"
@@ -50,40 +75,41 @@
     ],
     "#resources" :[
         "associative array of image resources, which serve as symbolic links",
-        "to image file names and their dimensions"
+        "to image file names"
     ],
     "resources": {
-        "WO_center": "white-orange-center.png",
-        "W_left": "white-left.png",
-        "W_right": "white-right.png",
+        "white_amber_center": "white-orange-center.png",
+        "quad_center": "quad-center.png",
+        "white_left_legend": "white-left.png",
+        "white_right_legend": "white-right.png",
 
-        "PGR_center": "pastel-green-red-center.png",
-        "PG_left": "pastel-green-left.png",
-        "PG_right": "pastel-green-right.png",
+        "pastel_green_red_center": "pastel-green-red-center.png",
+        "pastel_green_left": "pastel-green-left.png",
+        "pastel_green_right": "pastel-green-right.png",
 
-        "CO_center": "cyan-orange-center.png",
-        "C_left": "cyan-left.png",
-        "C_right": "cyan-right.png",
+        "cyan_orange_center": "cyan-orange-center.png",
+        "cyan_left": "cyan-left.png",
+        "cyan_right": "cyan-right.png",
 
-        "GR_center": "green-red-center.png",
-        "G_left": "green-left.png",
-        "G_right": "green-right.png",
+        "green_red_center": "green-red-center.png",
+        "green_left_legend": "green-left.png",
+        "green_right_legend": "green-right.png",
 
-        "W_on": "white-bar-on.png",
-        "C_on": "cyan-bar-on.png",
-        "G_on": "green-bar-on.png",
-        "O_on": "orange-bar-on.png",
-        "R_on": "red-bar-on.png",
-        "PG_on": "pastel-green-bar-on.png",
-        "PR_on": "pastel-red-bar-on.png",
+        "white_on": "white-bar-on.png",
+        "cyan_on": "cyan-bar-on.png",
+        "green_on": "green-bar-on.png",
+        "amber_on": "orange-bar-on.png",
+        "red_on": "red-bar-on.png",
+        "pastel_green_on": "pastel-green-bar-on.png",
+        "pastel_red_on": "pastel-red-bar-on.png",
 
-        "W_off": "white-bar-off.png",
-        "C_off": "cyan-bar-off.png",
-        "G_off": "green-bar-off.png",
-        "O_off": "orange-bar-off.png",
-        "R_off": "red-bar-off.png",
-        "PG_off": "pastel-green-bar-off.png",
-        "PR_off": "pastel-red-bar-off.png"
+        "white_off": "white-bar-off.png",
+        "cyan_off": "cyan-bar-off.png",
+        "green_off": "green-bar-off.png",
+        "amber_off": "orange-bar-off.png",
+        "red_off": "red-bar-off.png",
+        "pastel_green_off": "pastel-green-bar-off.png",
+        "pastel_red_off": "pastel-red-bar-off.png"
     },
     "#placement": [
         "placement is an associative array of image aliases to coordinates",
@@ -93,55 +119,43 @@
     ],
     "placement": {
         "$SEQUENCE" : [
-            { "prefix": "WL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "W_on" },
-            { "prefix": "CL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "C_on" },
-            { "prefix": "GL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "G_on" },
-            { "prefix": "wl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "W_off" },
-            { "prefix": "cl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "C_off" },
-            { "prefix": "gl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "G_off" },
-            { "prefix": "WR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "W_on" },
-            { "prefix": "CR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "C_on" },
-            { "prefix": "GR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "G_on" },
-            { "prefix": "wr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "W_off" },
-            { "prefix": "cr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "C_off" },
-            { "prefix": "gr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "G_off" },
+            { "prefix": "white_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "white_on" },
+            { "prefix": "white_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "white_off" },
 
-            { "prefix": "PGL", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "PG_on" },
-            { "prefix": "pgl", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "PG_off" },
-            { "prefix": "PGR", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "PG_on" },
-            { "prefix": "pgr", "x":108, "y":388, "xstep": 36, "start":1, "end":36, "resource": "PG_off" },
+            { "prefix": "cyan_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "cyan_on" },
+            { "prefix": "cyan_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "cyan_off" },
 
+            { "prefix": "green_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "green_on" },
+            { "prefix": "green_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "green_off" },
 
-            { "prefix": "OL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "O_on" },
-            { "prefix": "ol", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "O_off" },
-            { "prefix": "RL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "R_on" },
-            { "prefix": "rl", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "R_off" },
+            { "prefix": "amber_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "amber_on" },
+            { "prefix": "amber_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "amber_off" },
 
-            { "prefix": "OR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "O_on" },
-            { "prefix": "or", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "O_off" },
-            { "prefix": "RR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "R_on" },
-            { "prefix": "rr", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "R_off" },
+            { "prefix": "red_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "red_on" },
+            { "prefix": "red_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "red_off" },
 
-            { "prefix": "PRL", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "PR_on" },
-            { "prefix": "prl", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "PR_off" },
-            { "prefix": "PRR", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "PR_on" },
-            { "prefix": "prr", "x":108, "y":388, "xstep": 36, "start":37, "end":49, "resource": "PR_off" }
+            { "prefix": "pastel_green_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "pastel_green_on" },
+            { "prefix": "pastel_green_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "pastel_green_off" },
+
+            { "prefix": "pastel_red_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "pastel_red_on" },
+            { "prefix": "pastel_red_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "pastel_red_off" }
         ],
-        "WO_center" : { "x":0, "y":274},
-        "W_left"  : { "x":0, "y":0},
-        "W_right"  : { "x":0, "y":388},
+        "quad_center" : { "x":0, "y":274},
+        "white_amber_center" : { "x":0, "y":274},
+        "white_left_legend"  : { "x":0, "y":0},
+        "white_right_legend"  : { "x":0, "y":0},
 
-        "PGR_center" : { "x":0, "y":274},
-        "PG_left"  : { "x":0, "y":0},
-        "PG_right"  : { "x":0, "y":388},
+        "pastel_green_red_center" : { "x":0, "y":274},
+        "pastel_green_left"  : { "x":0, "y":0},
+        "pastel_green_right"  : { "x":0, "y":0},
 
-        "CO_center" : { "x":0, "y":274},
-        "C_left"  : { "x":0, "y":0},
-        "C_right"  : { "x":0, "y":388},
+        "cyan_orange_center" : { "x":0, "y":274},
+        "cyan_left"  : { "x":0, "y":0},
+        "cyan_right"  : { "x":0, "y":0},
 
-        "GR_center" : { "x":0, "y":274},
-        "G_left"  : { "x":0, "y":0},
-        "G_right"  : { "x":0, "y":388}
+        "green_red_center" : { "x":0, "y":274},
+        "green_left_legend"  : { "x":0, "y":0},
+        "green_right_legend"  : { "x":0, "y":0}
     },
     "#backgrounds" : [
         "associative arrays keyed on background name",
@@ -150,71 +164,152 @@
         " each channels is an array of placements - there is no volume level associated with these placements"
     ],
     "backgrounds": {
-        "white_orange": {
-            "bg": {
+        "quad_color": {
+            "shared": {
                 "placements": [
-                    "WO_center"
+                    "quad_center"
+               ]
+            },
+            "left": {
+                "placements" : [
+                    "white_left_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "white_off{index}"},
+                            { "start": 19, "end": 36, "value": "cyan_off{index}"},
+                            { "start": 37, "end": 42, "value": "amber_off{index}"},
+                            { "start": 43, "end": 49, "value": "red_off{index}"}
+                        ]
+                    }
+                 ]
+            },
+            "right": {
+               "placements": [
+                   "white_right_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 18, "value": "white_off{index}"},
+                            { "start": 19, "end": 36, "value": "cyan_off{index}"},
+                            { "start": 37, "end": 42, "value": "amber_off{index}"},
+                            { "start": 43, "end": 49, "value": "red_off{index}"}
+                        ]
+                    }
+                ]
+            }
+        },
+        "white_orange": {
+            "shared": {
+                "placements": [
+                    "white_amber_center"
                 ]
             },
             "left": {
                 "placements" : [
-                    "W_left"
+                    "white_left_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "white_off{index}"},
+                            { "start": 37, "end": 49, "value": "amber_off{index}"}
+                        ]
+                    }
                 ]
             },
             "right": {
                "placements": [
-                   "W_right"
+                   "white_right_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "white_off{index}"},
+                            { "start": 37, "end": 49, "value": "amber_off{index}"}
+                        ]
+                    }
                ]
             }
         },
         "cyan_orange": {
-            "bg": {
+            "shared": {
                 "placements": [
-                    "CO_center"
+                    "cyan_orange_center"
                 ]
             },
             "left": {
                 "placements" : [
-                    "C_left"
+                    "cyan_left",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "cyan_off{index}"},
+                            { "start": 37, "end": 49, "value": "amber_off{index}"}
+                        ]
+                    }
                 ]
             },
             "right": {
                "placements": [
-                   "C_right"
+                   "cyan_right",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "cyan_off{index}"},
+                            { "start": 37, "end": 49, "value": "amber_off{index}"}
+                        ]
+                    }
                ]
             }
         },
         "green_red": {
-            "bg": {
+            "shared": {
                 "placements": [
-                    "GR_center"
+                    "green_red_center"
                 ]
             },
             "left": {
                 "placements" : [
-                    "G_left"
+                    "green_left_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "green_off{index}"},
+                            { "start": 37, "end": 49, "value": "red_off{index}"}
+                        ]
+                    }
                 ]
             },
             "right": {
                "placements": [
-                   "G_right"
+                   "green_right_legend",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "green_off{index}"},
+                            { "start": 37, "end": 49, "value": "red_off{index}"}
+                        ]
+                    }
                ]
             }
         },
         "pastel_green_red": {
-            "bg": {
+            "shared": {
                 "placements": [
-                    "PGR_center"
+                    "pastel_green_red_center"
                 ]
             },
             "left": {
                 "placements" : [
-                    "PG_left"
+                    "pastel_green_left",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
+                            { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
+                        ]
+                    }
                 ]
             },
             "right": {
                "placements": [
-                   "PG_right"
+                   "pastel_green_right",
+                    {
+                        "$SEQUENCE": [
+                            { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
+                            { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
+                        ]
+                    }
                ]
             }
         }
@@ -248,21 +343,10 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "WL{index}"},
-                            { "start": 19, "end": 36, "value": "CL{index}"},
-                            { "start": 37, "end": 42, "value": "OL{index}"},
-                            { "start": 43, "end": 49, "value": "RL{index}"}
-                        ]
-                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "wl{index}"},
-                            { "start": 19, "end": 36, "value": "cl{index}"},
-                            { "start": 37, "end": 42, "value": "ol{index}"},
-                            { "start": 43, "end": 49, "value": "rl{index}"}
+                            { "start": 1,  "end": 18, "value": "white_on{index}"},
+                            { "start": 19, "end": 36, "value": "cyan_on{index}"},
+                            { "start": 37, "end": 42, "value": "amber_on{index}"},
+                            { "start": 43, "end": 49, "value": "red_on{index}"}
                         ]
                     }
                 }
@@ -273,23 +357,12 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "WR{index}"},
-                            { "start": 19, "end": 36, "value": "CR{index}"},
-                            { "start": 37, "end": 42, "value": "OR{index}"},
-                            { "start": 43, "end": 49, "value": "RR{index}"}
+                            { "start": 1,  "end": 18, "value": "white_on{index}"},
+                            { "start": 19, "end": 36, "value": "cyan_on{index}"},
+                            { "start": 37, "end": 42, "value": "amber_on{index}"},
+                            { "start": 43, "end": 49, "value": "red_on{index}"}
                         ]
                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "wr{index}"},
-                            { "start": 19, "end": 36, "value": "cr{index}"},
-                            { "start": 37, "end": 42, "value": "or{index}"},
-                            { "start": 43, "end": 49, "value": "rr{index}"}
-                        ]
-                    }
                 }
             ]
         },
@@ -300,17 +373,8 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "WL{index}"},
-                            { "start": 37, "end": 49, "value": "OL{index}"}
-                        ]
-                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "wl{index}"},
-                            { "start": 37, "end": 49, "value": "ol{index}"}
+                            { "start": 1,  "end": 36, "value": "white_on{index}"},
+                            { "start": 37, "end": 49, "value": "amber_on{index}"}
                         ]
                     }
                 }
@@ -321,19 +385,10 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "WR{index}"},
-                            { "start": 37, "end": 49, "value": "OR{index}"}
+                            { "start": 1,  "end": 36, "value": "white_on{index}"},
+                            { "start": 37, "end": 49, "value": "amber_on{index}"}
                         ]
                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "wr{index}"},
-                            { "start": 37, "end": 49, "value": "or{index}"}
-                        ]
-                    }
                 }
             ]
         },
@@ -344,17 +399,8 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "CL{index}"},
-                            { "start": 37, "end": 49, "value": "OL{index}"}
-                        ]
-                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cl{index}"},
-                            { "start": 37, "end": 49, "value": "ol{index}"}
+                            { "start": 1,  "end": 36, "value": "cyan_on{index}"},
+                            { "start": 37, "end": 49, "value": "amber_on{index}"}
                         ]
                     }
                 }
@@ -365,19 +411,10 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "CR{index}"},
-                            { "start": 37, "end": 49, "value": "OR{index}"}
+                            { "start": 1,  "end": 36, "value": "cyan_on{index}"},
+                            { "start": 37, "end": 49, "value": "amber_on{index}"}
                         ]
                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cr{index}"},
-                            { "start": 37, "end": 49, "value": "or{index}"}
-                        ]
-                    }
                 }
             ]
         },
@@ -388,17 +425,8 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "GL{index}"},
-                            { "start": 37, "end": 49, "value": "RL{index}"}
-                        ]
-                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "gl{index}"},
-                            { "start": 37, "end": 49, "value": "rl{index}"}
+                            { "start": 1,  "end": 36, "value": "green_on{index}"},
+                            { "start": 37, "end": 49, "value": "red_on{index}"}
                         ]
                     }
                 }
@@ -409,19 +437,10 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "GR{index}"},
-                            { "start": 37, "end": 49, "value": "RR{index}"}
+                            { "start": 1,  "end": 36, "value": "green_on{index}"},
+                            { "start": 37, "end": 49, "value": "red_on{index}"}
                         ]
                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "gr{index}"},
-                            { "start": 37, "end": 49, "value": "rr{index}"}
-                        ]
-                    }
                 }
             ]
         },
@@ -432,17 +451,8 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "PGL{index}"},
-                            { "start": 37, "end": 49, "value": "PRL{index}"}
-                        ]
-                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pgl{index}"},
-                            { "start": 37, "end": 49, "value": "prl{index}"}
+                            { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
+                            { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
                         ]
                     }
                 }
@@ -453,24 +463,15 @@
                     "peak" : "hold",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "PGR{index}"},
-                            { "start": 37, "end": 49, "value": "PRR{index}"}
+                            { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
+                            { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
                         ]
                    }
-                },
-                {
-                    "render": "aggregateoff",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pgr{index}"},
-                            { "start": 37, "end": 49, "value": "prr{index}"}
-                        ]
-                    }
                 }
             ]
         }
     },
-    "vumeters#": [
+    "#vumeters": [
         "Associate array of VU Meters defined in this file keyed on VU Meter name",
         "In turn contents are associative arrays containing 2 keys",
         "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
@@ -478,7 +479,7 @@
     ],
     "vumeters": {
         "Chevrons": {
-            "background": "white_orange",
+            "background": "quad_color",
             "levels":  "levels_quad_colour"
         },
         "Chevrons WhiteOrange": {

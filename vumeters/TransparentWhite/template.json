@@ -6,22 +6,39 @@
     ],
     "License": "CC-BY-SA-4.0",
     "kind": "vumeter",
-    "vutype": "frames",
-    "format": "compose2",
-    "format_version": 2,
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
     "#volume_levels": [
         "equivalent to number of frames,",
         "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
     ],
     "volume_levels": 49,
     "#dimensions": [
-        "natural width and height of the vumeter",
+        "unscaled width and height of the vumeter",
         "for this vu meter:",
         "width = left_margin + dial_width + spacing + dial_width + right_margin",
-        "margins=50, spacing=50, dial_width=1024",
+        "      = 32          + 1024       + 32      + 1024       + 32          ",
         "height=768"
     ],
-    "dimensions" :{ "h": 600, "w": 2198 },
+    "dimensions" :{ "h": 600, "w": 2144 },
+    "layout" : {
+        "w": 2144,
+        "h": 600,
+        "left": {
+                "x": 32,
+                "y": 0,
+                "w": 1024,
+                "h": 600
+        },
+        "right": {
+                "x": 1088,
+                "y": 0,
+                "w": 1024,
+                "h": 600
+        },
+        "arrangement": "HORIZONTAL_ARRANGEMENT"
+    },
     "#files": [
         "The set of images required to render this VU-Meter"
     ],
@@ -32,7 +49,7 @@
         "associative array of image resources"
     ],
     "resources": {
-        "LEFT_BG": "background.png", "RIGHT_BG": "background.png",
+        "BG": "background.png",
         "needle": "needle.png"
     },
     "#rotaries": [
@@ -83,11 +100,9 @@
         "alias: { x-coordinate, y-coordinate} "
     ],
     "placement": {
-        "LEFT_BG": { "x": 50, "y": 0 },
-        "RIGHT_BG": { "x": 1124, "y": 0 },
+        "BG": { "x": 0, "y": 0 },
         "$ROTATION_SEQUENCE" : [
-            {"prefix": "L", "x":50, "y": 0, "start":0, "end": 48, "start_angle": 6.0, "angle_step": 3.5, "rotary": "rot_needle"},
-            {"prefix": "R", "x":1124, "y": 0, "start":0, "end": 48, "start_angle": 6.0, "angle_step": 3.5, "rotary": "rot_needle"}
+            {"prefix": "N", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 6.0, "angle_step": 3.5, "rotary": "rot_needle"}
         ]
     },
     "#backgrounds" : [
@@ -100,12 +115,12 @@
         "tsp_white": {
             "left": {
                 "placements": [
-                    "LEFT_BG"
+                    "BG"
                 ]
             },
             "right": {
                 "placements": [
-                    "RIGHT_BG"
+                    "BG"
                 ]
             }
         }
@@ -139,7 +154,7 @@
                     "peak": "decay",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "L{index}"}
+                            { "start": 0,  "end": 48, "value": "N{index}"}
                        ]
                     }
                 }
@@ -150,14 +165,14 @@
                     "peak": "decay",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "R{index}"}
+                            { "start": 0,  "end": 48, "value": "N{index}"}
                        ]
                     }
                 }
             ]
         }
     },
-    "vumeters#": [
+    "#vumeters": [
         "associative arrays keyed on VU Meter name",
         " contents of each associative array are 2 keys",
         "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",

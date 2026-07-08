@@ -113,173 +113,285 @@
   ],
   "resources": {
     "LEFT_BG": {
-      "imagefile": "background.png"
+      "imagefile": "background.png",
+      "w": 1024,
+      "h": 768
     },
     "RIGHT_BG": {
-      "imagefile": "background.png"
+      "imagefile": "background.png",
+      "w": 1024,
+      "h": 768
     },
     "DIAL": {
-      "imagefile": "trimmed-dial.png"
+      "imagefile": "trimmed-dial.png",
+      "w": 917,
+      "h": 440
     },
     "LEFT_LEGEND": {
-      "imagefile": "left-legend.png"
+      "imagefile": "left-legend.png",
+      "w": 84,
+      "h": 57
     },
     "RIGHT_LEGEND": {
-      "imagefile": "right-legend.png"
+      "imagefile": "right-legend.png",
+      "w": 117,
+      "h": 61
     },
     "ROUNDEL": {
-      "imagefile": "roundel.png"
+      "imagefile": "roundel.png",
+      "w": 55,
+      "h": 55
     },
     "ROUNDEL_PEAK": {
-      "imagefile": "roundel_peak.png"
+      "imagefile": "roundel_peak.png",
+      "w": 55,
+      "h": 55
     },
     "#$SEQUENCE ": "needles00.png ... needles10.png....needles49.png",
     "POS_00": {
-      "imagefile": "needles00.png"
+      "imagefile": "needles00.png",
+      "w": 390,
+      "h": 178
     },
     "POS_01": {
-      "imagefile": "needles01.png"
+      "imagefile": "needles01.png",
+      "w": 381,
+      "h": 196
     },
     "POS_02": {
-      "imagefile": "needles02.png"
+      "imagefile": "needles02.png",
+      "w": 372,
+      "h": 214
     },
     "POS_03": {
-      "imagefile": "needles03.png"
+      "imagefile": "needles03.png",
+      "w": 361,
+      "h": 231
     },
     "POS_04": {
-      "imagefile": "needles04.png"
+      "imagefile": "needles04.png",
+      "w": 350,
+      "h": 248
     },
     "POS_05": {
-      "imagefile": "needles05.png"
+      "imagefile": "needles05.png",
+      "w": 338,
+      "h": 264
     },
     "POS_06": {
-      "imagefile": "needles06.png"
+      "imagefile": "needles06.png",
+      "w": 325,
+      "h": 280
     },
     "POS_07": {
-      "imagefile": "needles07.png"
+      "imagefile": "needles07.png",
+      "w": 312,
+      "h": 293
     },
     "POS_08": {
-      "imagefile": "needles08.png"
+      "imagefile": "needles08.png",
+      "w": 297,
+      "h": 308
     },
     "POS_09": {
-      "imagefile": "needles09.png"
+      "imagefile": "needles09.png",
+      "w": 284,
+      "h": 322
     },
     "POS_10": {
-      "imagefile": "needles10.png"
+      "imagefile": "needles10.png",
+      "w": 269,
+      "h": 335
     },
     "POS_11": {
-      "imagefile": "needles11.png"
+      "imagefile": "needles11.png",
+      "w": 253,
+      "h": 347
     },
     "POS_12": {
-      "imagefile": "needles12.png"
+      "imagefile": "needles12.png",
+      "w": 236,
+      "h": 358
     },
     "POS_13": {
-      "imagefile": "needles13.png"
+      "imagefile": "needles13.png",
+      "w": 219,
+      "h": 369
     },
     "POS_14": {
-      "imagefile": "needles14.png"
+      "imagefile": "needles14.png",
+      "w": 201,
+      "h": 379
     },
     "POS_15": {
-      "imagefile": "needles15.png"
+      "imagefile": "needles15.png",
+      "w": 183,
+      "h": 388
     },
     "POS_16": {
-      "imagefile": "needles16.png"
+      "imagefile": "needles16.png",
+      "w": 164,
+      "h": 396
     },
     "POS_17": {
-      "imagefile": "needles17.png"
+      "imagefile": "needles17.png",
+      "w": 145,
+      "h": 403
     },
     "POS_18": {
-      "imagefile": "needles18.png"
+      "imagefile": "needles18.png",
+      "w": 126,
+      "h": 409
     },
     "POS_19": {
-      "imagefile": "needles19.png"
+      "imagefile": "needles19.png",
+      "w": 106,
+      "h": 412
     },
     "POS_20": {
-      "imagefile": "needles20.png"
+      "imagefile": "needles20.png",
+      "w": 86,
+      "h": 417
     },
     "POS_21": {
-      "imagefile": "needles21.png"
+      "imagefile": "needles21.png",
+      "w": 66,
+      "h": 420
     },
     "POS_22": {
-      "imagefile": "needles22.png"
+      "imagefile": "needles22.png",
+      "w": 46,
+      "h": 423
     },
     "POS_23": {
-      "imagefile": "needles23.png"
+      "imagefile": "needles23.png",
+      "w": 26,
+      "h": 424
     },
     "POS_24": {
-      "imagefile": "needles24.png"
+      "imagefile": "needles24.png",
+      "w": 5,
+      "h": 424
     },
     "POS_25": {
-      "imagefile": "needles25.png"
+      "imagefile": "needles25.png",
+      "w": 25,
+      "h": 424
     },
     "POS_26": {
-      "imagefile": "needles26.png"
+      "imagefile": "needles26.png",
+      "w": 45,
+      "h": 423
     },
     "POS_27": {
-      "imagefile": "needles27.png"
+      "imagefile": "needles27.png",
+      "w": 65,
+      "h": 420
     },
     "POS_28": {
-      "imagefile": "needles28.png"
+      "imagefile": "needles28.png",
+      "w": 85,
+      "h": 417
     },
     "POS_29": {
-      "imagefile": "needles29.png"
+      "imagefile": "needles29.png",
+      "w": 105,
+      "h": 412
     },
     "POS_30": {
-      "imagefile": "needles30.png"
+      "imagefile": "needles30.png",
+      "w": 125,
+      "h": 409
     },
     "POS_31": {
-      "imagefile": "needles31.png"
+      "imagefile": "needles31.png",
+      "w": 144,
+      "h": 403
     },
     "POS_32": {
-      "imagefile": "needles32.png"
+      "imagefile": "needles32.png",
+      "w": 163,
+      "h": 396
     },
     "POS_33": {
-      "imagefile": "needles33.png"
+      "imagefile": "needles33.png",
+      "w": 182,
+      "h": 388
     },
     "POS_34": {
-      "imagefile": "needles34.png"
+      "imagefile": "needles34.png",
+      "w": 200,
+      "h": 379
     },
     "POS_35": {
-      "imagefile": "needles35.png"
+      "imagefile": "needles35.png",
+      "w": 218,
+      "h": 369
     },
     "POS_36": {
-      "imagefile": "needles36.png"
+      "imagefile": "needles36.png",
+      "w": 235,
+      "h": 358
     },
     "POS_37": {
-      "imagefile": "needles37.png"
+      "imagefile": "needles37.png",
+      "w": 252,
+      "h": 347
     },
     "POS_38": {
-      "imagefile": "needles38.png"
+      "imagefile": "needles38.png",
+      "w": 268,
+      "h": 335
     },
     "POS_39": {
-      "imagefile": "needles39.png"
+      "imagefile": "needles39.png",
+      "w": 283,
+      "h": 322
     },
     "POS_40": {
-      "imagefile": "needles40.png"
+      "imagefile": "needles40.png",
+      "w": 296,
+      "h": 308
     },
     "POS_41": {
-      "imagefile": "needles41.png"
+      "imagefile": "needles41.png",
+      "w": 311,
+      "h": 293
     },
     "POS_42": {
-      "imagefile": "needles42.png"
+      "imagefile": "needles42.png",
+      "w": 324,
+      "h": 280
     },
     "POS_43": {
-      "imagefile": "needles43.png"
+      "imagefile": "needles43.png",
+      "w": 337,
+      "h": 264
     },
     "POS_44": {
-      "imagefile": "needles44.png"
+      "imagefile": "needles44.png",
+      "w": 349,
+      "h": 248
     },
     "POS_45": {
-      "imagefile": "needles45.png"
+      "imagefile": "needles45.png",
+      "w": 360,
+      "h": 231
     },
     "POS_46": {
-      "imagefile": "needles46.png"
+      "imagefile": "needles46.png",
+      "w": 371,
+      "h": 214
     },
     "POS_47": {
-      "imagefile": "needles47.png"
+      "imagefile": "needles47.png",
+      "w": 380,
+      "h": 196
     },
     "POS_48": {
-      "imagefile": "needles48.png"
+      "imagefile": "needles48.png",
+      "w": 389,
+      "h": 178
     }
   },
   "#placement": [
@@ -292,395 +404,283 @@
     "DIAL": {
       "x": 56,
       "y": 122,
-      "resource": "DIAL",
-      "w": 917,
-      "h": 440
+      "resource": "DIAL"
     },
     "LEFT_BG": {
       "x": 0,
       "y": 0,
-      "resource": "LEFT_BG",
-      "w": 1024,
-      "h": 768
+      "resource": "LEFT_BG"
     },
     "LEFT_LEGEND": {
       "x": 479,
       "y": 277,
-      "resource": "LEFT_LEGEND",
-      "w": 84,
-      "h": 57
+      "resource": "LEFT_LEGEND"
     },
     "POS_00": {
       "x": 124,
       "y": 439,
-      "resource": "POS_00",
-      "w": 390,
-      "h": 178
+      "resource": "POS_00"
     },
     "POS_01": {
       "x": 133,
       "y": 421,
-      "resource": "POS_01",
-      "w": 381,
-      "h": 196
+      "resource": "POS_01"
     },
     "POS_02": {
       "x": 142,
       "y": 403,
-      "resource": "POS_02",
-      "w": 372,
-      "h": 214
+      "resource": "POS_02"
     },
     "POS_03": {
       "x": 153,
       "y": 386,
-      "resource": "POS_03",
-      "w": 361,
-      "h": 231
+      "resource": "POS_03"
     },
     "POS_04": {
       "x": 164,
       "y": 369,
-      "resource": "POS_04",
-      "w": 350,
-      "h": 248
+      "resource": "POS_04"
     },
     "POS_05": {
       "x": 176,
       "y": 353,
-      "resource": "POS_05",
-      "w": 338,
-      "h": 264
+      "resource": "POS_05"
     },
     "POS_06": {
       "x": 189,
       "y": 337,
-      "resource": "POS_06",
-      "w": 325,
-      "h": 280
+      "resource": "POS_06"
     },
     "POS_07": {
       "x": 202,
       "y": 323,
-      "resource": "POS_07",
-      "w": 312,
-      "h": 293
+      "resource": "POS_07"
     },
     "POS_08": {
       "x": 217,
       "y": 308,
-      "resource": "POS_08",
-      "w": 297,
-      "h": 308
+      "resource": "POS_08"
     },
     "POS_09": {
       "x": 231,
       "y": 294,
-      "resource": "POS_09",
-      "w": 284,
-      "h": 322
+      "resource": "POS_09"
     },
     "POS_10": {
       "x": 246,
       "y": 281,
-      "resource": "POS_10",
-      "w": 269,
-      "h": 335
+      "resource": "POS_10"
     },
     "POS_11": {
       "x": 262,
       "y": 269,
-      "resource": "POS_11",
-      "w": 253,
-      "h": 347
+      "resource": "POS_11"
     },
     "POS_12": {
       "x": 279,
       "y": 258,
-      "resource": "POS_12",
-      "w": 236,
-      "h": 358
+      "resource": "POS_12"
     },
     "POS_13": {
       "x": 296,
       "y": 247,
-      "resource": "POS_13",
-      "w": 219,
-      "h": 369
+      "resource": "POS_13"
     },
     "POS_14": {
       "x": 314,
       "y": 237,
-      "resource": "POS_14",
-      "w": 201,
-      "h": 379
+      "resource": "POS_14"
     },
     "POS_15": {
       "x": 332,
       "y": 228,
-      "resource": "POS_15",
-      "w": 183,
-      "h": 388
+      "resource": "POS_15"
     },
     "POS_16": {
       "x": 351,
       "y": 220,
-      "resource": "POS_16",
-      "w": 164,
-      "h": 396
+      "resource": "POS_16"
     },
     "POS_17": {
       "x": 370,
       "y": 213,
-      "resource": "POS_17",
-      "w": 145,
-      "h": 403
+      "resource": "POS_17"
     },
     "POS_18": {
       "x": 389,
       "y": 207,
-      "resource": "POS_18",
-      "w": 126,
-      "h": 409
+      "resource": "POS_18"
     },
     "POS_19": {
       "x": 409,
       "y": 203,
-      "resource": "POS_19",
-      "w": 106,
-      "h": 412
+      "resource": "POS_19"
     },
     "POS_20": {
       "x": 429,
       "y": 198,
-      "resource": "POS_20",
-      "w": 86,
-      "h": 417
+      "resource": "POS_20"
     },
     "POS_21": {
       "x": 449,
       "y": 195,
-      "resource": "POS_21",
-      "w": 66,
-      "h": 420
+      "resource": "POS_21"
     },
     "POS_22": {
       "x": 469,
       "y": 192,
-      "resource": "POS_22",
-      "w": 46,
-      "h": 423
+      "resource": "POS_22"
     },
     "POS_23": {
       "x": 489,
       "y": 191,
-      "resource": "POS_23",
-      "w": 26,
-      "h": 424
+      "resource": "POS_23"
     },
     "POS_24": {
       "x": 510,
       "y": 191,
-      "resource": "POS_24",
-      "w": 5,
-      "h": 424
+      "resource": "POS_24"
     },
     "POS_25": {
       "x": 510,
       "y": 191,
-      "resource": "POS_25",
-      "w": 25,
-      "h": 424
+      "resource": "POS_25"
     },
     "POS_26": {
       "x": 510,
       "y": 192,
-      "resource": "POS_26",
-      "w": 45,
-      "h": 423
+      "resource": "POS_26"
     },
     "POS_27": {
       "x": 510,
       "y": 195,
-      "resource": "POS_27",
-      "w": 65,
-      "h": 420
+      "resource": "POS_27"
     },
     "POS_28": {
       "x": 510,
       "y": 198,
-      "resource": "POS_28",
-      "w": 85,
-      "h": 417
+      "resource": "POS_28"
     },
     "POS_29": {
       "x": 510,
       "y": 203,
-      "resource": "POS_29",
-      "w": 105,
-      "h": 412
+      "resource": "POS_29"
     },
     "POS_30": {
       "x": 510,
       "y": 207,
-      "resource": "POS_30",
-      "w": 125,
-      "h": 409
+      "resource": "POS_30"
     },
     "POS_31": {
       "x": 510,
       "y": 213,
-      "resource": "POS_31",
-      "w": 144,
-      "h": 403
+      "resource": "POS_31"
     },
     "POS_32": {
       "x": 510,
       "y": 220,
-      "resource": "POS_32",
-      "w": 163,
-      "h": 396
+      "resource": "POS_32"
     },
     "POS_33": {
       "x": 510,
       "y": 228,
-      "resource": "POS_33",
-      "w": 182,
-      "h": 388
+      "resource": "POS_33"
     },
     "POS_34": {
       "x": 510,
       "y": 237,
-      "resource": "POS_34",
-      "w": 200,
-      "h": 379
+      "resource": "POS_34"
     },
     "POS_35": {
       "x": 510,
       "y": 247,
-      "resource": "POS_35",
-      "w": 218,
-      "h": 369
+      "resource": "POS_35"
     },
     "POS_36": {
       "x": 510,
       "y": 258,
-      "resource": "POS_36",
-      "w": 235,
-      "h": 358
+      "resource": "POS_36"
     },
     "POS_37": {
       "x": 510,
       "y": 269,
-      "resource": "POS_37",
-      "w": 252,
-      "h": 347
+      "resource": "POS_37"
     },
     "POS_38": {
       "x": 510,
       "y": 281,
-      "resource": "POS_38",
-      "w": 268,
-      "h": 335
+      "resource": "POS_38"
     },
     "POS_39": {
       "x": 510,
       "y": 294,
-      "resource": "POS_39",
-      "w": 283,
-      "h": 322
+      "resource": "POS_39"
     },
     "POS_40": {
       "x": 511,
       "y": 308,
-      "resource": "POS_40",
-      "w": 296,
-      "h": 308
+      "resource": "POS_40"
     },
     "POS_41": {
       "x": 511,
       "y": 323,
-      "resource": "POS_41",
-      "w": 311,
-      "h": 293
+      "resource": "POS_41"
     },
     "POS_42": {
       "x": 511,
       "y": 337,
-      "resource": "POS_42",
-      "w": 324,
-      "h": 280
+      "resource": "POS_42"
     },
     "POS_43": {
       "x": 511,
       "y": 353,
-      "resource": "POS_43",
-      "w": 337,
-      "h": 264
+      "resource": "POS_43"
     },
     "POS_44": {
       "x": 511,
       "y": 369,
-      "resource": "POS_44",
-      "w": 349,
-      "h": 248
+      "resource": "POS_44"
     },
     "POS_45": {
       "x": 511,
       "y": 386,
-      "resource": "POS_45",
-      "w": 360,
-      "h": 231
+      "resource": "POS_45"
     },
     "POS_46": {
       "x": 511,
       "y": 403,
-      "resource": "POS_46",
-      "w": 371,
-      "h": 214
+      "resource": "POS_46"
     },
     "POS_47": {
       "x": 511,
       "y": 421,
-      "resource": "POS_47",
-      "w": 380,
-      "h": 196
+      "resource": "POS_47"
     },
     "POS_48": {
       "x": 511,
       "y": 439,
-      "resource": "POS_48",
-      "w": 389,
-      "h": 178
+      "resource": "POS_48"
     },
     "RIGHT_BG": {
       "flip": 1,
       "x": 0,
       "y": 0,
-      "resource": "RIGHT_BG",
-      "w": 1024,
-      "h": 768
+      "resource": "RIGHT_BG"
     },
     "RIGHT_LEGEND": {
       "x": 460,
       "y": 278,
-      "resource": "RIGHT_LEGEND",
-      "w": 117,
-      "h": 61
+      "resource": "RIGHT_LEGEND"
     },
     "ROUNDEL": {
       "x": 485,
       "y": 587,
-      "resource": "ROUNDEL",
-      "w": 55,
-      "h": 55
+      "resource": "ROUNDEL"
     },
     "ROUNDEL_PEAK": {
       "x": 485,
       "y": 587,
-      "resource": "ROUNDEL_PEAK",
-      "w": 55,
-      "h": 55
+      "resource": "ROUNDEL_PEAK"
     }
   },
   "#backgrounds": [

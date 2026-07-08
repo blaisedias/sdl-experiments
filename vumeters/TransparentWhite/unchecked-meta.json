@@ -60,10 +60,14 @@
   ],
   "resources": {
     "BG": {
-      "imagefile": "background.png"
+      "imagefile": "background.png",
+      "w": 1024,
+      "h": 600
     },
     "needle": {
-      "imagefile": "needle.png"
+      "imagefile": "needle.png",
+      "w": 389,
+      "h": 43
     }
   },
   "#rotaries": [
@@ -117,9 +121,7 @@
     "BG": {
       "x": 0,
       "y": 0,
-      "resource": "BG",
-      "w": 1024,
-      "h": 600
+      "resource": "BG"
     },
     "N00": {
       "x": 145,
