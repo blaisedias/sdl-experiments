@@ -699,7 +699,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
     }
 }
 
-void deserialise_widgets(json_value* value, view_context_t* ctx) {
+static void deserialise_widgets(json_value* value, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_widgets value==NULL\n");
         return;
@@ -718,7 +718,7 @@ void deserialise_widgets(json_value* value, view_context_t* ctx) {
     }
 }
 
-bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) {
+static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) {
     if (value == NULL) {
         error_printf("deserialise_screen value==NULL\n");
         return false;
@@ -740,7 +740,7 @@ bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) 
     return false;
 }
 
-int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
+static int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
     json_value* value = json_parse(json_string, len);
 
     if (value == NULL) {
