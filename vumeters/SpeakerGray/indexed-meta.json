@@ -28,9 +28,9 @@
   ],
   "License": "See Authors",
   "kind": "vumeter",
-  "vutype": "frames",
-  "format": "compose2-indexed",
-  "format_version": 2,
+  "vutype": "compose2",
+  "format": "indexed",
+  "format_version": 0,
   "volume_levels": 48,
   "dimensions": {
     "h": 2000,

@@ -6,9 +6,9 @@
   ],
   "License": "CC-BY-SA-4.0",
   "kind": "vumeter",
-  "vutype": "frames",
-  "format": "compose2-indexed",
-  "format_version": 2,
+  "vutype": "compose2",
+  "format": "indexed",
+  "format_version": 0,
   "volume_levels": 49,
   "dimensions": {
     "h": 600,

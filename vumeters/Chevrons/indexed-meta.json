@@ -7,8 +7,8 @@
   "License": "CC-BY-SA-4.0",
   "kind": "vumeter",
   "vutype": "compose2",
-  "format": "compose2-indexed",
-  "format_version": 2,
+  "format": "indexed",
+  "format_version": 0,
   "volume_levels": 50,
   "dimensions": {
     "h": 648,
