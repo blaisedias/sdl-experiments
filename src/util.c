@@ -1037,3 +1037,17 @@ void print_sdl_key_scancode(SDL_Scancode scancode) {
     }
     fflush(stdout);
 }
+
+int strcmp_ex(const char* const x, const char* const y) {
+    if (x == y) return 0;
+    if (x == NULL) return -1;
+    if (y == NULL) return 1;
+    return strcmp(x, y);
+}
+
+void free_ex(void** tgt) {
+    if (tgt && *tgt) {
+        free(*tgt);
+    }
+    *tgt = NULL;
+}

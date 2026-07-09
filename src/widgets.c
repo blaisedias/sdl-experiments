@@ -29,15 +29,6 @@ static char* widget_type_strings[] = {
 static unsigned text_widget_id = 1;
 static void text_render_surface(widget_t* wdgt);
 
-static inline void free_ex(void** tgt) {
-    if (*tgt) {
-        free(*tgt);
-    }
-    *tgt = NULL;
-}
-
-#define FREE(x) free_ex((void **)(&x))
-
 bool widget_highlighted(widget_t* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_highlight, __ATOMIC_ACQUIRE);
 }

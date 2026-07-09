@@ -30,14 +30,6 @@ static bool input_ready = false;
 #define FPS_DIST_MAX  120
 static int fps_distribution[FPS_DIST_MAX+1];
 
-static inline void free_ex(void** tgt) {
-    if (*tgt) {
-        free(*tgt);
-    }
-    *tgt = NULL;
-}
-#define FREE(x) free_ex((void **)(&x))
-
 typedef struct {
     int64_t render_count;
     int64_t  micros;

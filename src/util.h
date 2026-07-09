@@ -22,4 +22,9 @@ void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef);
 void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef);
 void print_sdl_key_scancode(SDL_Scancode scancode);
 
+//
+int strcmp_ex(const char* const x, const char* const y);
+void free_ex(void** tgt);
+#define FREE(x) free_ex((void **)(&x))
+
 #endif // __jl_util_h_

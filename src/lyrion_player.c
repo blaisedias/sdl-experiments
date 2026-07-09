@@ -86,13 +86,6 @@ repeat_all				= repeat_2
  */
 #define SET_READONLY_CHAR_PTR(x, v) *(const char **)(&(x)) = (v)
 
-int strcmp_ex(const char* const x, const char* const y) {
-    if (x == y) return 0;
-    if (x == NULL) return -1;
-    if (y == NULL) return 1;
-    return strcmp(x, y);
-}
-
 typedef enum {
     BIT_INDEX_player_name,
     BIT_INDEX_player_connected,

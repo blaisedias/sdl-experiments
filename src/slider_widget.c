@@ -11,16 +11,6 @@
 //FIXME: duplicate of var in widgets.c
 static SDL_RendererFlip flip = SDL_FLIP_NONE;
 
-static inline void free_ex(void** tgt) {
-    if (*tgt) {
-        free(*tgt);
-    }
-    *tgt = NULL;
-}
-
-#define FREE(x) free_ex((void **)(&x))
-
-
 static inline bool _is_slider(widget_t* wdgt) {
     return (wdgt && (wdgt->type == WIDGET_SLIDER || wdgt->type == WIDGET_VSLIDER));
 }

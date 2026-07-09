@@ -109,14 +109,6 @@ static app_context_t app_ctx = {
         .cb_input = my_event_handler,
     };
 
-static inline void free_ex(void** tgt) {
-    if (*tgt) {
-        free(*tgt);
-    }
-    *tgt = NULL;
-}
-#define FREE(x) free_ex((void **)(&x))
-
 static void controller(app_context_ptr app_ctx);
 
 static void invalid_args(const char* opt) {
