@@ -61,7 +61,6 @@ typedef struct {
 }runtime_volume_t, *runtime_volume_ptr;
 
 typedef struct {
-    const vu_background_t*  background;
     const int               component_count;
     const vu_component_t*   components;
 }vu_channel_t;
