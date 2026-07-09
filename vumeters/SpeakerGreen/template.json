@@ -60,7 +60,7 @@
                 "w": 2000,
                 "h": 2000
         },
-        "arrangement": "HORIZONTAL_ARRANGEMENT"
+        "arrangement": "horizontal"
     },
     "#files": [
         "The set of images required to render this VU-Meter"

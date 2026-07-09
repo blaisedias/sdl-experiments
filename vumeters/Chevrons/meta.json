@@ -42,7 +42,7 @@
       "w": 1918,
       "h": 100
     },
-    "arrangement": "VERTICAL_ARRANGEMENT"
+    "arrangement": "vertical"
   },
   "#files": [
     "The set of images required to render this VU-Meter",

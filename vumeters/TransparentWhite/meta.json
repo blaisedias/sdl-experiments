@@ -40,7 +40,7 @@
       "w": 1024,
       "h": 600
     },
-    "arrangement": "HORIZONTAL_ARRANGEMENT",
+    "arrangement": "horizontal",
     "static": {
       "x": 0,
       "y": 0,

@@ -62,7 +62,7 @@
       "w": 2000,
       "h": 2000
     },
-    "arrangement": "HORIZONTAL_ARRANGEMENT",
+    "arrangement": "horizontal",
     "static": {
       "x": 0,
       "y": 0,

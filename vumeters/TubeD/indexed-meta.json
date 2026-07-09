@@ -17,7 +17,7 @@
   "layout": {
     "w": 2144,
     "h": 768,
-    "arrangement": "HORIZONTAL_ARRANGEMENT",
+    "arrangement": "horizontal",
     "rects": [
       {
         "x": 0,
