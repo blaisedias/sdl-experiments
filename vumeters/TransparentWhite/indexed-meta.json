@@ -685,8 +685,8 @@
     {
       "left": [
         {
-          "render": "single",
-          "peak": "decay",
+          "render_op": "single",
+          "volume_type": "decay",
           "placements": [
             2,
             3,
@@ -742,8 +742,8 @@
       ],
       "right": [
         {
-          "render": "single",
-          "peak": "decay",
+          "render_op": "single",
+          "volume_type": "decay",
           "placements": [
             2,
             3,

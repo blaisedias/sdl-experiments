@@ -19,17 +19,18 @@ typedef enum {
 } layout_arrangement;
 
 typedef enum {
+    STATIC,
     SINGLE,
     AGGREGATE,
     AGGREGATEOFF,
-} render_typ;
+} component_render_op_t;
 
 typedef enum {
-    PEAK_NONE,
-    HOLD,
+    SAMPLED,
+    PEAK_HOLD_AND_SAMPLED,
     DECAY,
-    HOLD_DECAY,
-}peak_typ;
+    PEAK_HOLD_AND_DECAY,
+}component_volume_type_t;
 
 typedef struct {
 //    const char* image;
@@ -41,8 +42,8 @@ typedef struct {
 }vu_placement_t;
 
 typedef struct {
-    const render_typ    render;
-    const peak_typ      peak;
+    const component_render_op_t     render_op;
+    const component_volume_type_t   volume_type;
     const int           placement_count;
     const int           placements[50];
 }vu_component_t;

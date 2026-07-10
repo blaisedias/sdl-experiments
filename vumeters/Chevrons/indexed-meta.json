@@ -3313,8 +3313,8 @@
     {
       "left": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             14,
@@ -3371,8 +3371,8 @@
       ],
       "right": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             14,
@@ -3431,8 +3431,8 @@
     {
       "left": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             14,
@@ -3489,8 +3489,8 @@
       ],
       "right": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             14,
@@ -3549,8 +3549,8 @@
     {
       "left": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             86,
@@ -3607,8 +3607,8 @@
       ],
       "right": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             86,
@@ -3667,8 +3667,8 @@
     {
       "left": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             158,
@@ -3725,8 +3725,8 @@
       ],
       "right": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             158,
@@ -3785,8 +3785,8 @@
     {
       "left": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             282,
@@ -3843,8 +3843,8 @@
       ],
       "right": [
         {
-          "render": "aggregate",
-          "peak": "hold",
+          "render_op": "aggregate",
+          "volume_type": "peak-hold+sampled",
           "placements": [
             0,
             282,

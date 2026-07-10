@@ -97,15 +97,17 @@
     "#levels*":[
         "associative arrays with keys 'left' and 'right'",
         "The contents of each key must be objects which are associative arrays with 3 keys",
-        "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
-        "   'aggregateoff' => render all placements beyond the volume level",
-        "'peak' : one of 'hold', 'decay', 'hold+decay'",
-        "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
         "                 lower volume levels are rendered to match sampled values",
         "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
-        "       'hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
         "                      lower volume levels follows peak volume level decaying at configured rate",
         "       Notes: ",
         "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
@@ -119,8 +121,8 @@
         "levels_1": {
             "left": [
                 {
-                    "render": "single",
-                    "peak": "decay",
+                    "render_op": "single",
+                    "volume_type": "decay",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 0,  "end": 48, "value": "POS_{index}"}
@@ -128,7 +130,7 @@
                     }
                 },
                 {
-                    "render": "aggregate",
+                    "render_op": "aggregate",
                     "placements": {
                         "0": "ROUNDEL",
                         "36": "ROUNDEL_PEAK"
@@ -137,8 +139,8 @@
             ],
             "right": [
                 {
-                    "render": "single",
-                    "peak": "decay",
+                    "render_op": "single",
+                    "volume_type": "decay",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 0,  "end": 48, "value": "POS_{index}"}
@@ -146,7 +148,7 @@
                     }
                 },
                 {
-                    "render": "aggregate",
+                    "render_op": "aggregate",
                     "placements": {
                     "0": "ROUNDEL",
                     "36": "ROUNDEL_PEAK"

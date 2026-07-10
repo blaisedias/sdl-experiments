@@ -295,7 +295,7 @@ static const vu_background_t bg_right_dial = {
 //Levels
 static vu_component_t levels_1_left[] = {
     {
-        .render=SINGLE, .peak=DECAY,
+        .render_op=SINGLE, .volume_type=DECAY,
         .placements={
             PLCMNT_POS_00,
             PLCMNT_POS_01,
@@ -349,7 +349,7 @@ static vu_component_t levels_1_left[] = {
         },
     },
     {
-        .render=AGGREGATE, .peak=PEAK_NONE,
+        .render_op=AGGREGATE, .volume_type=SAMPLED,
         .placements={
             PLCMNT_ROUNDEL,
             0,
@@ -409,7 +409,7 @@ static vu_channel_t channel_levels_1_left = { .component_count=2,.components=lev
 
 static vu_component_t levels_1_right[] = {
     {
-        .render=SINGLE, .peak=DECAY,
+        .render_op=SINGLE, .volume_type=DECAY,
         .placements={
             PLCMNT_POS_00,
             PLCMNT_POS_01,
@@ -463,7 +463,7 @@ static vu_component_t levels_1_right[] = {
         },
     },
     {
-        .render=AGGREGATE, .peak=PEAK_NONE,
+        .render_op=AGGREGATE, .volume_type=SAMPLED,
         .placements={
             PLCMNT_ROUNDEL,
             0,

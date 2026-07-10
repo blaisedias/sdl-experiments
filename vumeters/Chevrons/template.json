@@ -315,32 +315,34 @@
         }
     },
     "#levels*":[
-        "Associative arrays keyed on level name, of level associative arrays with keys 'left' and 'right'",
+        "associative arrays with keys 'left' and 'right'",
         "The contents of each key must be objects which are associative arrays with 3 keys",
-        "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
-        "   'aggregateoff' => render all placements beyond the volume level",
-        "'peak' : one of 'hold', 'decay', 'hold+decay'",
-        "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
-        "                 lower volume levels are rendered to match sampled values.",
-        "                 For use with digital VU Meters, where multiple volume level can be rendered simultaneously",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
         "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
-        "                 For use with 'analog' VU Meters simulating needle movement",
-        "       'hold+decay': peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
         "                      lower volume levels follows peak volume level decaying at configured rate",
-        "       if peak is not set then volume levels are rendered to match sampled values",
-        "'placements': an associative arrays mapping volume level to placements",
-        "Each object does not have to contain placements for all volume levels",
-        "However the combination of objects SHOULD contain placements for all volume levels",
-        "if not then absent volume levels will not be rendered"
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays of volume level to placements",
+        "Each object does not have to contain placement references for each volume level",
+        "However the combination of objects SHOULD contain placement references for each volume level"
     ],
     "levels": {
         "levels_quad_colour": {
             "left": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 18, "value": "white_on{index}"},
@@ -353,8 +355,8 @@
             ],
             "right": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 18, "value": "white_on{index}"},
@@ -369,8 +371,8 @@
         "levels_white_orange": {
             "left": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "white_on{index}"},
@@ -381,8 +383,8 @@
             ],
             "right": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "white_on{index}"},
@@ -395,8 +397,8 @@
         "levels_cyan_orange": {
             "left": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "cyan_on{index}"},
@@ -407,8 +409,8 @@
             ],
             "right": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "cyan_on{index}"},
@@ -421,8 +423,8 @@
         "levels_green_red": {
             "left": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "green_on{index}"},
@@ -433,8 +435,8 @@
             ],
             "right": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "green_on{index}"},
@@ -447,8 +449,8 @@
         "levels_pastel_green_red": {
             "left": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
@@ -459,8 +461,8 @@
             ],
             "right": [
                 {
-                    "render": "aggregate",
-                    "peak" : "hold",
+                    "render_op": "aggregate",
+                    "volume_type" : "peak-hold+sampled",
                     "placements": {
                         "$SEQUENCE": [
                             { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},

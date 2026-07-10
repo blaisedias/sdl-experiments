@@ -1,0 +1,30 @@
+{
+    "enums": [
+        {
+            "name" : "layout_arrangement",
+            "enum": [
+                { "string": "none", "symbol": "NO_ARRANGEMENT"},
+                { "string": "horizontal", "symbol": "HORIZONTAL_ARRANGEMENT"},
+                { "string": "vertical", "symbol": "VERTICAL_ARRANGEMENT"}
+            ]
+        },
+        {
+            "name" : "vu_component_render_mode",
+            "enum": [
+                { "string": "static", "symbol": "STATIC"},
+                { "string": "single", "symbol": "SINGLE"},
+                { "string": "aggregate", "symbol": "AGGREGATE"},
+                { "string": "aggregate-off", "symbol": "AGGREGATEOFF"}
+            ]
+        },
+        {
+            "name" : "vu_component_level",
+            "enum": [
+                { "string": "sampled", "symbol": "SAMPLED"},
+                { "string": "peak-hold+sampled", "symbol": "PEAK_HOLD_SAMPLED"},
+                { "string": "decay", "symbol": "DECAY"},
+                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_DECAY"}
+            ]
+        }
+    ]
+}

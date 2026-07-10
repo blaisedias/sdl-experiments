@@ -451,7 +451,7 @@ static const vu_background_t bg_right_speakerGreen = {
 //Levels
 static vu_component_t levels_1_left[] = {
     {
-        .render=SINGLE, .peak=DECAY,
+        .render_op=SINGLE, .volume_type=DECAY,
         .placements={
             PLCMNT_L00,
             PLCMNT_L01,
@@ -510,7 +510,7 @@ static vu_channel_t channel_levels_1_left = { .component_count=1,.components=lev
 
 static vu_component_t levels_1_right[] = {
     {
-        .render=SINGLE, .peak=DECAY,
+        .render_op=SINGLE, .volume_type=DECAY,
         .placements={
             PLCMNT_R00,
             PLCMNT_R01,

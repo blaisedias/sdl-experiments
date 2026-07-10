@@ -246,11 +246,14 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
         const vu_component_t* comp = channel->components;
         runtime_volume_ptr runtime = vol_runtimes + ix_chan;
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
-            switch(comp->render) {
+            switch(comp->render_op) {
+                case STATIC:
+                    // TODO 
+                    break;
                 case SINGLE:
                     {
-                        switch(comp->peak) {
-                            case PEAK_NONE:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
                                 vol_printf("SPN:%02d ", runtime->vol);
                                 _RENDER_VOLUME_LEVEL_(runtime->vol, ix_chan);
                                 break;
@@ -258,10 +261,10 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
                                 vol_printf("SD:%02d ", (int)(runtime->decay_vol + 0.5));
                                 _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
                                 break;
-                            case HOLD_DECAY:
+                            case PEAK_HOLD_AND_DECAY:
                                 vol_printf("SHD:%02d ", (int)(runtime->decay_vol + 0.5));
                                 _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
-                            case HOLD:
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol_printf("SH:%02d ", runtime->peak_hold_vol);
                                 _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol, ix_chan);
                                 break;
@@ -271,13 +274,13 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
                     {
                         int vol = 0;
                         int peak_vol = 0;
-                        switch(comp->peak) {
-                            case PEAK_NONE:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
                                 vol = runtime->vol;
                                 peak_vol = 0;
                                 vol_printf("A v:%02d ", vol);
                                 break;
-                            case HOLD_DECAY:
+                            case PEAK_HOLD_AND_DECAY:
                                 vol = (int)(runtime->decay_vol + 0.5);
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
@@ -287,7 +290,7 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
                                 peak_vol = 0;
                                 vol_printf("A v:%02d ", vol);
                                 break;
-                            case HOLD:
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol = runtime->vol;
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
@@ -304,13 +307,13 @@ void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, c
                 case AGGREGATEOFF:
                     {
                         int vol = 0;
-                        switch(comp->peak) {
-                            case PEAK_NONE:
-                            case HOLD:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol = runtime->vol;
                                 break;
                             case DECAY:
-                            case HOLD_DECAY:
+                            case PEAK_HOLD_AND_DECAY:
                                 vol = (int)(runtime->decay_vol + 0.5);
                                 break;
                         }
@@ -407,7 +410,7 @@ void VUMeter_dump_props(const vumeter_properties_t* props) {
         const vu_component_t* comp = channel->components;
         printf("channel %d, components count %d\n", ix_chan, channel->component_count);
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
-            printf("channel %d), component %d) %d, %d %p\n", ix_chan, ic, comp->render, comp->peak, comp);
+            printf("channel %d), component %d) %d, %d %p\n", ix_chan, ic, comp->render_op, comp->volume_type, comp);
             for(int value =0; value < props->volume_levels; ++value) {
                 int pi = comp->placements[value];
                 int ti = props->placements.elements[pi].texture_index;

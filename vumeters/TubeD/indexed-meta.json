@@ -486,8 +486,8 @@
     {
       "left": [
         {
-          "render": "single",
-          "peak": "decay",
+          "render_op": "single",
+          "volume_type": "decay",
           "placements": [
             2,
             3,
@@ -541,7 +541,7 @@
           ]
         },
         {
-          "render": "aggregate",
+          "render_op": "aggregate",
           "placements": [
             51,
             0,
@@ -597,8 +597,8 @@
       ],
       "right": [
         {
-          "render": "single",
-          "peak": "decay",
+          "render_op": "single",
+          "volume_type": "decay",
           "placements": [
             2,
             3,
@@ -652,7 +652,7 @@
           ]
         },
         {
-          "render": "aggregate",
+          "render_op": "aggregate",
           "placements": [
             51,
             0,

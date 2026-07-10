@@ -1444,7 +1444,7 @@ static const vu_background_t bg_right_pastel_green_red = {
 //Levels
 static vu_component_t levels_quad_colour_left[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_white_on01,
@@ -1505,7 +1505,7 @@ static vu_channel_t channel_levels_quad_colour_left = { .component_count=1,.comp
 
 static vu_component_t levels_quad_colour_right[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_white_on01,
@@ -1566,7 +1566,7 @@ static vu_channel_t channel_levels_quad_colour_right = { .component_count=1,.com
 
 static vu_component_t levels_white_orange_left[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_white_on01,
@@ -1627,7 +1627,7 @@ static vu_channel_t channel_levels_white_orange_left = { .component_count=1,.com
 
 static vu_component_t levels_white_orange_right[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_white_on01,
@@ -1688,7 +1688,7 @@ static vu_channel_t channel_levels_white_orange_right = { .component_count=1,.co
 
 static vu_component_t levels_cyan_orange_left[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_cyan_on01,
@@ -1749,7 +1749,7 @@ static vu_channel_t channel_levels_cyan_orange_left = { .component_count=1,.comp
 
 static vu_component_t levels_cyan_orange_right[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_cyan_on01,
@@ -1810,7 +1810,7 @@ static vu_channel_t channel_levels_cyan_orange_right = { .component_count=1,.com
 
 static vu_component_t levels_green_red_left[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_green_on01,
@@ -1871,7 +1871,7 @@ static vu_channel_t channel_levels_green_red_left = { .component_count=1,.compon
 
 static vu_component_t levels_green_red_right[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_green_on01,
@@ -1932,7 +1932,7 @@ static vu_channel_t channel_levels_green_red_right = { .component_count=1,.compo
 
 static vu_component_t levels_pastel_green_red_left[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_pastel_green_on01,
@@ -1993,7 +1993,7 @@ static vu_channel_t channel_levels_pastel_green_red_left = { .component_count=1,
 
 static vu_component_t levels_pastel_green_red_right[] = {
     {
-        .render=AGGREGATE, .peak=HOLD,
+        .render_op=AGGREGATE, .volume_type=PEAK_HOLD_AND_SAMPLED,
         .placements={
             0,
             PLCMNT_pastel_green_on01,
