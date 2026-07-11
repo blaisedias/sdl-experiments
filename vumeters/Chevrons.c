@@ -41,7 +41,7 @@ enum resources_enum {
 };
 
 
-static const char* resource_names[] = {
+static char* resource_names[] = {
    NULL,
    "white-orange-center.png",
    "quad-center.png",
@@ -846,14 +846,14 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const vu_background_t bg_shared_quad_color = {
+static vu_background_t bg_shared_quad_color = {
     .placement_count=1,
     .placements={
         PLCMNT_quad_center,
     },
 };
 
-static const vu_background_t bg_left_quad_color = {
+static vu_background_t bg_left_quad_color = {
     .placement_count=50,
     .placements={
         PLCMNT_white_left_legend,
@@ -909,7 +909,7 @@ static const vu_background_t bg_left_quad_color = {
     },
 };
 
-static const vu_background_t bg_right_quad_color = {
+static vu_background_t bg_right_quad_color = {
     .placement_count=50,
     .placements={
         PLCMNT_white_right_legend,
@@ -965,14 +965,14 @@ static const vu_background_t bg_right_quad_color = {
     },
 };
 
-static const vu_background_t bg_shared_white_orange = {
+static vu_background_t bg_shared_white_orange = {
     .placement_count=1,
     .placements={
         PLCMNT_white_amber_center,
     },
 };
 
-static const vu_background_t bg_left_white_orange = {
+static vu_background_t bg_left_white_orange = {
     .placement_count=50,
     .placements={
         PLCMNT_white_left_legend,
@@ -1028,7 +1028,7 @@ static const vu_background_t bg_left_white_orange = {
     },
 };
 
-static const vu_background_t bg_right_white_orange = {
+static vu_background_t bg_right_white_orange = {
     .placement_count=50,
     .placements={
         PLCMNT_white_right_legend,
@@ -1084,14 +1084,14 @@ static const vu_background_t bg_right_white_orange = {
     },
 };
 
-static const vu_background_t bg_shared_cyan_orange = {
+static vu_background_t bg_shared_cyan_orange = {
     .placement_count=1,
     .placements={
         PLCMNT_cyan_orange_center,
     },
 };
 
-static const vu_background_t bg_left_cyan_orange = {
+static vu_background_t bg_left_cyan_orange = {
     .placement_count=50,
     .placements={
         PLCMNT_cyan_left,
@@ -1147,7 +1147,7 @@ static const vu_background_t bg_left_cyan_orange = {
     },
 };
 
-static const vu_background_t bg_right_cyan_orange = {
+static vu_background_t bg_right_cyan_orange = {
     .placement_count=50,
     .placements={
         PLCMNT_cyan_right,
@@ -1203,14 +1203,14 @@ static const vu_background_t bg_right_cyan_orange = {
     },
 };
 
-static const vu_background_t bg_shared_green_red = {
+static vu_background_t bg_shared_green_red = {
     .placement_count=1,
     .placements={
         PLCMNT_green_red_center,
     },
 };
 
-static const vu_background_t bg_left_green_red = {
+static vu_background_t bg_left_green_red = {
     .placement_count=50,
     .placements={
         PLCMNT_green_left_legend,
@@ -1266,7 +1266,7 @@ static const vu_background_t bg_left_green_red = {
     },
 };
 
-static const vu_background_t bg_right_green_red = {
+static vu_background_t bg_right_green_red = {
     .placement_count=50,
     .placements={
         PLCMNT_green_right_legend,
@@ -1322,14 +1322,14 @@ static const vu_background_t bg_right_green_red = {
     },
 };
 
-static const vu_background_t bg_shared_pastel_green_red = {
+static vu_background_t bg_shared_pastel_green_red = {
     .placement_count=1,
     .placements={
         PLCMNT_pastel_green_red_center,
     },
 };
 
-static const vu_background_t bg_left_pastel_green_red = {
+static vu_background_t bg_left_pastel_green_red = {
     .placement_count=50,
     .placements={
         PLCMNT_pastel_green_left,
@@ -1385,7 +1385,7 @@ static const vu_background_t bg_left_pastel_green_red = {
     },
 };
 
-static const vu_background_t bg_right_pastel_green_red = {
+static vu_background_t bg_right_pastel_green_red = {
     .placement_count=50,
     .placements={
         PLCMNT_pastel_green_right,

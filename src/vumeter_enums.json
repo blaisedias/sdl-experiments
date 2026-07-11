@@ -9,7 +9,7 @@
             ]
         },
         {
-            "name" : "vu_component_render_mode",
+            "name" : "component_render_op",
             "enum": [
                 { "string": "static", "symbol": "STATIC"},
                 { "string": "single", "symbol": "SINGLE"},
@@ -18,12 +18,12 @@
             ]
         },
         {
-            "name" : "vu_component_level",
+            "name" : "component_volume_type",
             "enum": [
                 { "string": "sampled", "symbol": "SAMPLED"},
-                { "string": "peak-hold+sampled", "symbol": "PEAK_HOLD_SAMPLED"},
+                { "string": "peak-hold+sampled", "symbol": "PEAK_HOLD_AND_SAMPLED"},
                 { "string": "decay", "symbol": "DECAY"},
-                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_DECAY"}
+                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_AND_DECAY"}
             ]
         }
     ]

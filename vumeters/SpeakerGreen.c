@@ -114,7 +114,7 @@ enum resources_enum {
 };
 
 
-static const char* resource_names[] = {
+static char* resource_names[] = {
    NULL,
    "frame2000.png",
    "frame2000.png",
@@ -434,14 +434,14 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const vu_background_t bg_left_speakerGreen = {
+static vu_background_t bg_left_speakerGreen = {
     .placement_count=1,
     .placements={
         PLCMNT_LEFT_BG,
     },
 };
 
-static const vu_background_t bg_right_speakerGreen = {
+static vu_background_t bg_right_speakerGreen = {
     .placement_count=1,
     .placements={
         PLCMNT_RIGHT_BG,

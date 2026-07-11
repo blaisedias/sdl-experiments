@@ -70,7 +70,7 @@ enum resources_enum {
 };
 
 
-static const char* resource_names[] = {
+static char* resource_names[] = {
    NULL,
    "background.png",
    "background.png",
@@ -258,7 +258,7 @@ static vu_placement_t placements[] = {
 
 //Background
 // background placements
-static const vu_background_t bg_left_purpletastic = {
+static vu_background_t bg_left_purpletastic = {
     .placement_count=3,
     .placements={
         PLCMNT_LEFT_BG,
@@ -267,7 +267,7 @@ static const vu_background_t bg_left_purpletastic = {
     },
 };
 
-static const vu_background_t bg_right_purpletastic = {
+static vu_background_t bg_right_purpletastic = {
     .placement_count=3,
     .placements={
         PLCMNT_RIGHT_BG,
@@ -276,7 +276,7 @@ static const vu_background_t bg_right_purpletastic = {
     },
 };
 
-static const vu_background_t bg_left_dial = {
+static vu_background_t bg_left_dial = {
     .placement_count=2,
     .placements={
         PLCMNT_DIAL,
@@ -284,7 +284,7 @@ static const vu_background_t bg_left_dial = {
     },
 };
 
-static const vu_background_t bg_right_dial = {
+static vu_background_t bg_right_dial = {
     .placement_count=2,
     .placements={
         PLCMNT_DIAL,

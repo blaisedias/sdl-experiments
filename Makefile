@@ -38,12 +38,14 @@ endif
 
 DEFS = $(TARG_DEFS)
 SRC = ./src
+GENERATED = ./generated
 JSON-PARSER-SRC = ./json-parser
 CITYHASH-SRC = ./cityhash-c
 VUMETERS-SRC = ./vumeters
 INCLUDES-JSON-PARSER = -I $(JSON-PARSER-SRC)
 INCLUDES-CITYHASH = -I $(CITYHASH-SRC)
-INCLUDES = -I $(SRC) $(INCLUDES-JSON-PARSER) $(INCLUDES-CITYHASH) $(INCLUDE_TSLIB)
+INCLUDES-GENERATED = -I $(GENERATED)
+INCLUDES = -I $(SRC) $(INCLUDES-GENERATED) $(INCLUDES-JSON-PARSER) $(INCLUDES-CITYHASH) $(INCLUDE_TSLIB)
 
 BIN_DIR = ./bin
 OBJS_DIR = ./obj
@@ -92,6 +94,7 @@ TSP_OBJS =  \
 		  $(OBJS_DIR)/vis_vumeter.o \
 		  $(OBJS_DIR)/slider_widget.o \
 		  $(OBJS_DIR)/vumeter_widget.o \
+		  $(OBJS_DIR)/vumeter_enum.o \
 
 
 
@@ -108,13 +111,16 @@ clean:
 	rm -f $(OBJS_DIR)/*
 	rm -f $(BIN_DIR)/*
 	rm -f $(LIB_DIR)/*
+	rm -f $(GENERATED)/*
+
+generated: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h
 
 #{
 Makefile.deps: \
 		$(SRC)/*.c $(JSON-PARSER-SRC)/*.c $(CITYHASH-SRC)/*.c $(VUMETERS-SRC)/*.c \
 		$(SRC)/*.h $(JSON-PARSER-SRC)/*.h $(CITYHASH-SRC)/*.h \
-		./scripts/mkdeps.py $(GLOBAL_DEPS)
-	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(VUMETERS-SRC)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
+		./scripts/mkdeps.py $(GLOBAL_DEPS) generated 
+	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(VUMETERS-SRC)' '$(GENERATED)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
 
 include Makefile.deps
 #}
@@ -148,6 +154,9 @@ $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJS_DIR)
 $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.c | $(OBJS_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES-CITYHASH)
 
+$(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
+	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)
+
 #$(BIN_DIR)/sqvumeter : $(SQVUMETER_OBJS) | $(BIN_DIR)
 #	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
 
@@ -157,6 +166,13 @@ $(OBJS_DIR)/%.o: $(VUMETERS-SRC)/%.c | $(OBJS_DIR)
 
 $(LIB_DIR)/%.so: $(OBJS_DIR)/%.o | $(LIB_DIR)
 	$(CC) $(CF_SHARED) $(INCLUDES) $< -o $@
+
+# generated code
+$(GENERATED)/vumeter_enum.c: src/vumeter_enums.json
+	./scripts/generate_enums_with_strings.py --src src/vumeter_enums.json --destdir generated/ --name vumeter_enum
+
+$(GENERATED)/vumeter_enum.h: src/vumeter_enums.json
+	./scripts/generate_enums_with_strings.py --src src/vumeter_enums.json --destdir generated/ --name vumeter_enum
 
 # test executables
 # 1. texture cache
