@@ -501,6 +501,7 @@ static vu_component_t levels_1_left[] = {
             PLCMNT_L45,
             PLCMNT_L46,
             PLCMNT_L47,
+            PLCMNT_L48,
         },
     },
 };
@@ -560,6 +561,7 @@ static vu_component_t levels_1_right[] = {
             PLCMNT_R45,
             PLCMNT_R46,
             PLCMNT_R47,
+            PLCMNT_R48,
         },
     },
 };
@@ -579,7 +581,7 @@ static vumeter_t vumeters[] = {
 // VU Meter properties
 vumeter_properties_t VuProperties = {
     .name="SpeakerGray",
-    .volume_levels=48,    .vumeter_count=1, .vumeters=vumeters,
+    .volume_levels=49,    .vumeter_count=1, .vumeters=vumeters,
     .layout={ .w=4150,.h=2000, .arrangement=HORIZONTAL_ARRANGEMENT,
         .rects={
             { .x=0,  .y=0,  .w=0,  .h=0 }, 

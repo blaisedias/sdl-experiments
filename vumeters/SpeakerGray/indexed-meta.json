@@ -31,7 +31,7 @@
   "vutype": "compose2",
   "format": "indexed",
   "format_version": 0,
-  "volume_levels": 48,
+  "volume_levels": 49,
   "dimensions": {
     "h": 2000,
     "w": 4150
@@ -846,7 +846,8 @@
             45,
             46,
             47,
-            48
+            48,
+            49
           ]
         }
       ],
@@ -902,7 +903,8 @@
             95,
             96,
             97,
-            98
+            98,
+            99
           ]
         }
       ]
