@@ -1,0 +1,75 @@
+{
+    "screen" : {
+        "comment" : "values are scaled to match",
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 480
+    },
+    "widgets": [
+        {
+            "image": {
+                "location": {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 0,
+                        "h": 0
+                    }
+                },
+                "image": "./images/wallpapers/HD_IceCold2.png",
+                "#comment": "image_scaling is one of [fit, center, stretch]",
+                "image_scaling": "center",
+                "focus_enable": false
+            }
+        },
+        {
+            "text": {
+                "location": {
+                    "position": {
+                        "x": 0,
+                        "w": -1,
+                        "y": 100,
+                        "h": -100
+                    }
+                },
+                "content": "NN MMM hh:mm:ss 20XX",
+                "timedate-format": "{weekday} {day} {month} {hour}:{minutes}:{seconds} {year}",
+                "font": "fonts/Montserrat/static/Montserrat-Regular.ttf",
+                "font_size": 60,
+                "colour": {
+                    "red" : 255,
+                    "green" : 255
+                }
+            }
+        },
+        {
+            "button": {
+                "location": {
+                    "position": {
+                        "x": -32,
+                        "y": 0,
+                        "w": 32,
+                        "h": 32
+                    }
+                },
+                "image": "./images/sd/music_note_1000dp_1F1F1F_FILL0_wght700_GRAD0_opsz48.png",
+                "action": "nowplaying_view"
+            }
+        },
+        {
+            "button": {
+                "location": {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 32,
+                        "h": 32
+                    }
+                },
+                "image": "./images/sd/close.png",
+                "action": "quit"
+            }
+        }
+    ]
+}

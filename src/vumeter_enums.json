@@ -1,0 +1,30 @@
+{
+    "enums": [
+        {
+            "name" : "layout_arrangement",
+            "enum": [
+                { "string": "none", "symbol": "NO_ARRANGEMENT"},
+                { "string": "horizontal", "symbol": "HORIZONTAL_ARRANGEMENT"},
+                { "string": "vertical", "symbol": "VERTICAL_ARRANGEMENT"}
+            ]
+        },
+        {
+            "name" : "component_render_op",
+            "enum": [
+                { "string": "static", "symbol": "STATIC"},
+                { "string": "single", "symbol": "SINGLE"},
+                { "string": "aggregate", "symbol": "AGGREGATE"},
+                { "string": "aggregate-off", "symbol": "AGGREGATEOFF"}
+            ]
+        },
+        {
+            "name" : "component_volume_type",
+            "enum": [
+                { "string": "sampled", "symbol": "SAMPLED"},
+                { "string": "peak-hold+sampled", "symbol": "PEAK_HOLD_AND_SAMPLED"},
+                { "string": "decay", "symbol": "DECAY"},
+                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_AND_DECAY"}
+            ]
+        }
+    ]
+}

@@ -24,11 +24,11 @@ static const SDL_RendererFlip flipValues[4] = {
 static int peak_hold_counter_init_value = 30;
 // fine tune decay behaviour - default is 0 so decay immediately
 // @60 FPS 4 appears to be a reasonable value.
-static int decay_hold_counter_init_value = 0;
+static int decay_hold_counter_init_value = 3;
 
-static int perf_level;
-void VUMeter_set_perf_level(int l) {
-    perf_level = l;
+static int profile_level;
+void VUMeter_set_profile_level(int l) {
+    profile_level = l;
 }
 
 void VUMeter_set_peak_hold(int peak_hold) {
@@ -39,114 +39,8 @@ void VUMeter_set_decay_hold(int decay_hold) {
     decay_hold_counter_init_value = decay_hold;
 }
 
-
-static void center_vu_element(SDL_Rect* outer, SDL_Rect* inner, SDL_Rect* dst, float orientation) {
-    int dx = (outer->w - inner->w)/2;
-    int dy = (outer->h - inner->h)/2;
-    if (orientation == 90.0) {
-        dx = 0 - dx;
-    }
-    if (orientation == 180.0) {
-        dx = 0 - dx;
-        dy = 0 - dy;
-    }
-    if (orientation == 270.0) {
-        dy = 0 - dy;
-    }
-    dst->x += dx;
-    dst->y += dy;
-}
-
-
-void VUMeter_rebase(vumeter_properties* vu, SDL_Rect* enclosure) {
-    if(!vu) {
-        return;
-    }
-    int indx;
-    {
-        vumeter_element *ve = vu->placements.elements;
-        SDL_Rect rbs = {
-            .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
-            .w=vu->w, .h=vu->h
-        };
-        debug_printf(" VUMeter_rebase   : enclosure: {%4d,%4d,%4d,%4d}\n", enclosure->x, enclosure->y, enclosure->w, enclosure->h);
-        debug_printf("                  : rebased  : {%4d,%4d,%4d,%4d}\n", rbs.x, rbs.y, rbs.w, rbs.h);
-        for(indx = 0; indx < vu->placements.count; ++indx, ++ve) {
-            center_vu_element(enclosure, &rbs, &ve->rect, 0.0);
-        }
-    }
-}
- 
-/*
-void VUMeter_orientate(vumeter_properties* vu, float rotation, SDL_Rect* enclosure) {
-    if (!vu) {
-        return;
-    }
-    int indx;
-    vu->rotation = rotation;
-    if (rotation == 0.0) {
-        vumeter_element *ve = vu->placements.elements;
-        SDL_Rect rbs = {
-            .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
-            .w=vu->w, .h=vu->h
-        };
-        debug_printf(" VUMeter_orientate: enclosure: {%4d,%4d,%4d,%4d}\n", enclosure->x, enclosure->y, enclosure->w, enclosure->h);
-        debug_printf("                  : rotated  : {%4d,%4d,%4d,%4d}\n", rbs.x, rbs.y, rbs.w, rbs.h);
-        for(indx = 0; indx < vu->placements.count; ++indx, ++ve) {
-            center_vu_element(enclosure, &rbs, &ve->rect, 0.0);
-        }
-    } else if (rotation == 180.0) {
-        vumeter_element *ve = vu->placements.elements;
-        SDL_Rect rbs = {
-            .x=(enclosure->w-vu->w)/2, .y=(enclosure->h-vu->h)/2,
-            .w=vu->w, .h=vu->h
-        };
-        debug_printf(" VUMeter_orientate: enclosure: {%4d,%4d,%4d,%4d}\n", enclosure->x, enclosure->y, enclosure->w, enclosure->h);
-        debug_printf("                  : rotated  : {%4d,%4d,%4d,%4d}\n", rbs.x, rbs.y, rbs.w, rbs.h);
-        for(indx = 0; indx < vu->placements.count; ++indx, ++ve) {
-            SDL_Rect* r = &ve->rect;;
-            r->x = enclosure->w - r->x - r->w;
-            r->y = enclosure->h - r->y - r->h;
-            center_vu_element(enclosure, &rbs, &ve->rect, 180.0);
-        }
-    } else if (rotation == 90.0) {
-        vumeter_element *ve = vu->placements.elements;
-        SDL_Rect rbs = {
-            .x=(enclosure->w-vu->h)/2, .y=(enclosure->h-vu->w)/2,
-            .w=vu->h, .h=vu->w
-        };
-        debug_printf(" VUMeter_orientate: enclosure: {%4d,%4d,%4d,%4d}\n", enclosure->x, enclosure->y, enclosure->w, enclosure->h);
-        debug_printf("                  : rotated  : {%4d,%4d,%4d,%4d}\n", rbs.x, rbs.y, rbs.w, rbs.h);
-        for(indx = 0; indx < vu->placements.count; ++indx, ++ve) {
-            SDL_Rect* r = &ve->rect;
-            int x =  r->x;
-            int y =  r->y;
-            r->x = enclosure->w - r->h - y + ((r->h - r->w)/2);
-            r->y = x + ((r->w - r->h)/2);
-            center_vu_element(enclosure, &rbs, &ve->rect, 180.0);
-        }
-    } else if (rotation == 270.0) {
-        vumeter_element *ve = vu->placements.elements;
-        SDL_Rect rbs = {
-            .x=(enclosure->w-vu->h)/2, .y=(enclosure->h-vu->w)/2,
-            .w=vu->h, .h=vu->w
-        };
-        debug_printf(" VUMeter_orientate: enclosure: {%4d,%4d,%4d,%4d}\n", enclosure->x, enclosure->y, enclosure->w, enclosure->h);
-        debug_printf("                  : rotated  : {%4d,%4d,%4d,%4d}\n", rbs.x, rbs.y, rbs.w, rbs.h);
-        for(indx = 0; indx < vu->placements.count; ++indx, ++ve) {
-            SDL_Rect* r = &ve->rect;
-            int x =  r->x;
-            int y =  r->y;
-            r->x = y + ((r->h - r->w)/2);
-            r->y = enclosure->h - r->w -x + ((r->w - r->h)/2);
-            center_vu_element(enclosure, &rbs, &ve->rect, 270.0);
-        }
-    }
-}
-*/
-
 static char load_buffer[4096];
-SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties* vu) {
+SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties_t* vu) {
     if (!vu) {
         return false;
     }
@@ -192,7 +86,7 @@ SDL_bool VUMeter_load_media(SDL_Renderer* renderer, vumeter_properties* vu) {
     return ok;
 }
 
-void VUMeter_unload_media(vumeter_properties* vu) {
+void VUMeter_unload_media(vumeter_properties_t* vu) {
     if (vu) {
         load_printf("unload media: %p\n"
                 "resources: count=%d names=%p textures=%p\n",
@@ -208,18 +102,7 @@ void VUMeter_unload_media(vumeter_properties* vu) {
     }
 }
 
-static void release_properties(vumeter_properties*vu) {
-    if (vu) {
-        VUMeter_unload_media(vu);
-        free(vu->placements.elements);
-        free(vu->resources.textures);
-        // created by strdup assigned to const char*
-        free((void *)(vu->resource_path));
-        free(vu);
-    }
-}
-
-char* VUMeter_resource_path(const char *root, vumeter_properties* vu) {
+char* VUMeter_resource_path(const char *root, vumeter_properties_t* vu) {
     if (!vu) {
         return strdup(root);
     }
@@ -239,137 +122,13 @@ char* VUMeter_resource_path(const char *root, vumeter_properties* vu) {
     return strdup(load_buffer);
 }
 
-vumeter_properties* VUMeter_scale(vumeter_properties* vu, int w, int h, const char* resource_path) {
+float VUMeter_scale_factor(vumeter_properties_t* vu, int w, int h) {
     if (!vu) {
-        return NULL;
+        return 1;
     }
-#define VU_SCALEV(v) (int)(scalef * (v))
-    float scalef = MIN((float)w/(float)vu->w, (float)h/(float)vu->h);
-    int scaled_w = VU_SCALEV(vu->w);
-    int scaled_h = VU_SCALEV(vu->h);
-    int dx = 0;
-    int dy = 0;
-//    dx = (w-scaled_w)/2;
-//    dy = (h-scaled_h)/2;
-    scale_printf(
-            "scale request:%dx%d"
-            " actual:%dx%d -> %dx%d"
-            " deltaxy:%d,%d"
-            " scale_factor:%f"
-            "\n",
-            w, h,
-            vu->w, vu->h,
-            scaled_w, scaled_h,
-            dx,dy,
-            scalef
-            );
-
-
-    vumeter_properties* resized_vu = calloc(1, sizeof(*resized_vu));
-    if (NULL == resized_vu) {
-        error_printf("OOM vumeter_properties\n");
-        return NULL;
-    }
-
-    {
-        // initialise resized vu meter struct, this method preserves the const attributes
-        // whilst allowing insitialisation of the dynamically allocated vu meter struct
-        vumeter_properties scaled_props = {
-            .name = vu->name,
-            .volume_levels = vu->volume_levels,
-            .w = scaled_w,
-            .h = scaled_h,
-            .resources = {
-                .count = vu->resources.count,
-                .names = vu->resources.names,
-                .textures = NULL,
-            },
-            .vumeters = vu->vumeters,
-            .placements = {
-                .count = vu->placements.count,
-                .elements = NULL,
-            },
-//            .fn_release = &release_properties,
-            .vumeter_count = vu->vumeter_count,
-        };
-
-//        scaled_props.resource_path = VUMeter_resource_path(resource_path, &scaled_props);
-        scaled_props.resource_path = strdup(vu->resource_path);
-        memcpy(resized_vu, &scaled_props, sizeof(*resized_vu));
-    }
-
-    resized_vu->resources.textures = calloc(vu->resources.count, sizeof(resized_vu->resources.textures[0]));
-    if (NULL == resized_vu->resources.textures ) {
-        error_printf("OOM textures\n");
-        release_properties(resized_vu);
-        return  NULL;
-    }
-
-    resized_vu->placements.elements = calloc(vu->placements.count, sizeof(resized_vu->placements.elements[0]));
-    if (NULL == resized_vu->placements.elements ) {
-        error_printf("OOM placements\n");
-        release_properties(resized_vu);
-        return  NULL;
-    }
-
-    for(int indx = 0; indx < vu->placements.count; ++indx) {
-        vumeter_element *src_elem = vu->placements.elements + indx;
-        vumeter_element *dst_elem = resized_vu->placements.elements + indx;
-        dst_elem->rect.x = dx + VU_SCALEV(src_elem->rect.x);
-        dst_elem->rect.y = dy + VU_SCALEV(src_elem->rect.y);
-        dst_elem->rect.w = VU_SCALEV(src_elem->rect.w);
-        dst_elem->rect.h = VU_SCALEV(src_elem->rect.h);
-        dst_elem->texture_index = src_elem->texture_index;
-        dst_elem->flip = src_elem->flip;
-    }
-#undef VU_SCALE
-#if     0
-    static char command_buffer[10240];
-    sprintf(command_buffer, "mkdir -p %s", resized_vu->resource_path);
-    if (system(command_buffer)) {
-        error_printf("failed: %s", command_buffer);
-        release_properties(resized_vu);
-        return NULL;
-    }
-    for(int indx = 0; indx < vu->placements.count; ++indx) {
-        int resource_id =  vu->placements.elements[indx].texture_index;
-        if (vu->resources.names[resource_id] != NULL) {
-            {
-                sprintf(command_buffer, "%s/%s", resized_vu->resource_path, resized_vu->resources.names[resource_id]);
-                FILE* fd = fopen(command_buffer, "r");
-                if (fd != NULL) {
-                    fclose(fd);
-                    continue;
-                }
-            }
-
-            int n = snprintf(command_buffer, sizeof(command_buffer),
-                    "magick convert -resize %dx%d +repage %s/%s %s/%s >& /dev/null",
-                    resized_vu->placements.elements[indx].rect.w,
-                    resized_vu->placements.elements[indx].rect.h,
-                    vu->resource_path, vu->resources.names[resource_id],
-                    resized_vu->resource_path, resized_vu->resources.names[resource_id]
-            );
-            if (0 > n || n >= sizeof(command_buffer)) {
-                error_printf("snprintf "
-                    "magick convert -resize %dx%d +repage %s/%s %s/%s\n >& /dev/null",
-                    resized_vu->placements.elements[indx].rect.w,
-                    resized_vu->placements.elements[indx].rect.h,
-                    vu->resource_path, vu->resources.names[resource_id],
-                    resized_vu->resource_path, resized_vu->resources.names[resource_id]
-                );
-            }
-            puts(command_buffer);
-            if (system(command_buffer)) {
-                error_printf("failed: %s", command_buffer);
-                release_properties(resized_vu);
-                return NULL;
-            }
-        }
-    }
-#endif
-    return resized_vu;
+    return MIN((float)w/(float)vu->layout.w, (float)h/(float)vu->layout.h);
 }
+
 
 static uint64_t frame_count;
 static uint32_t sample_frame_count;
@@ -378,11 +137,63 @@ static int64_t max_render_time;
 static int64_t ms_1;
 static int64_t ms_2;
 // to check and reset performance counters when vumeter is changed.
-static const vumeter* prev_vumeter;
+static const vumeter_t* prev_vumeter;
+
+static inline void renderPlacement(int indx, SDL_Rect* enclosure, vumeter_properties_t* vu, SDL_Renderer* renderer, float scale_factor) {
+    if (indx < 0 || indx >= vu->placements.count) {
+        error_printf("renderPlacement: invalid index %d max=%d\n",
+                indx, vu->placements.count);
+        exit(EXIT_FAILURE);
+    }
+
+    vu_placement_t* pve = &vu->placements.elements[indx]; 
+#define VU_SCALE(val) ((val)*scale_factor + 0.5)
+    SDL_Rect    render_rect= {
+        .x = VU_SCALE(pve->rect.x),
+        .y = VU_SCALE(pve->rect.y),
+        .w = VU_SCALE(pve->rect.w),
+        .h = VU_SCALE(pve->rect.h),
+    };
+    SDL_Point   center = {
+        .x = VU_SCALE(pve->center.x),
+        .y = VU_SCALE(pve->center.y),
+    };
+    rebaseRect(enclosure, &render_rect, &render_rect);
+    SDL_RenderCopyEx(renderer,
+            tcache_quick_get_texture(vu->resources.textures[pve->texture_index], renderer),
+            NULL,
+            &render_rect,
+            vu->rotation + pve->angle,
+            &center,
+            flipValues[pve->flip]);
+#undef VU_SCALE
+}
 
 
-void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter* vumeter, int* vols, SDL_Rect* enclosure) {
-//    SDL_RenderClear(renderer);
+void VUMeter_draw_background(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms ) {
+    if (!vu) {
+        return;
+    }
+    if (vumeter->background) {
+        const vu_background_t* bg = vumeter->background;
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(bg->placements[ix],
+                    enclosure, vu, renderer,
+                    //FIXME: should be for the vumeter rectangle 
+                    channel_parms[0].scale_factor);
+        }
+    }
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        const vu_background_t* bg = vumeter->backgrounds[ix_chan];
+        for(int ix=0; ix < bg->placement_count; ++ix) {
+            renderPlacement(bg->placements[ix],
+                    &channel_parms[ix_chan].channel_rect, vu, renderer,
+                    channel_parms[ix_chan].scale_factor);
+        }
+    }
+}
+
+void VUMeter_draw_foreground(SDL_Renderer* renderer, vumeter_properties_t* vu, const vumeter_t* vumeter, int* vols, SDL_Rect* enclosure, vu_channel_params_ptr channel_parms, runtime_volume_ptr vol_runtimes, float decay_unit) {
     if (!vu) {
         return;
     }
@@ -400,85 +211,62 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
 
     int64_t ms0 = get_micro_seconds();
 
-    int i;
+    vol_runtimes[0].vol = vols[0];
+    vol_runtimes[1].vol = vols[1];
 
-    runtime_volume *runtimes[2] = {
-        &vumeter->channels[0]->runtime,
-        &vumeter->channels[1]->runtime,
-    };
-
-    runtimes[0]->vol = vols[0];
-    runtimes[1]->vol = vols[1];
-
-    SDL_Rect render_rect;
-
-    for (i=0; i < 2; ++i) {
-        if (runtimes[i]->vol > runtimes[i]->peak_hold_vol) {
-//            runtimes[i].peak_hold_counter = peak_hold_counter_start;
-            runtimes[i]->peak_hold_counter = peak_hold_counter_init_value;
-            runtimes[i]->peak_hold_vol = runtimes[i]->vol;
+    for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        vol_runtimes[ix_chan].vol = vols[ix_chan];
+        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
+//            vol_runtimes[ix_chan].eak_hold_counter = peak_hold_counter_start;
+            vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
+            vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
         }
-        if (--runtimes[i]->peak_hold_counter < 0) {
-            runtimes[i]->peak_hold_vol = 0;
-            runtimes[i]->peak_hold_counter = 0;
+        if (--vol_runtimes[ix_chan].peak_hold_counter < 0) {
+            vol_runtimes[ix_chan].peak_hold_vol = 0;
+            vol_runtimes[ix_chan].peak_hold_counter = 0;
         }
-        if (runtimes[i]->vol > runtimes[i]->decay_vol) {
-            runtimes[i]->decay_vol = runtimes[i]->vol;
-            runtimes[i]->decay_hold_counter = decay_hold_counter_init_value;
+        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].decay_vol) {
+            vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
+            vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
         } else {
-            if (--runtimes[i]->decay_hold_counter < 0) {
-                runtimes[i]->decay_vol -= runtimes[i]->decay_unit;
-                runtimes[i]->decay_hold_counter = 0;
+            if (--vol_runtimes[ix_chan].decay_hold_counter < 0) {
+                vol_runtimes[ix_chan].decay_vol -= decay_unit;
+                vol_runtimes[ix_chan].decay_hold_counter = 0;
             }
         }
     }
 
-    if (vumeter->background) {
-        const int *bg = vumeter->background->bg;
-        while(bg != NULL && 0 != *bg) {
-            vumeter_element *p = &vu->placements.elements[*bg];
-            rebaseRect(enclosure, &p->rect, &render_rect);
-            SDL_RenderCopyEx(renderer,
-                    tcache_quick_get_texture(vu->resources.textures[p->texture_index], renderer),
-                    NULL, &render_rect, vu->rotation, NULL,
-                    flipValues[p->flip]);
-            ++bg;
-        }
-    }
+#define _RENDER_VOLUME_LEVEL_(value, chn) \
+    renderPlacement(comp->placements[value], &channel_parms[chn].channel_rect, vu, renderer,\
+            channel_parms[chn].scale_factor)
 
-#define _RENDER_VOLUME_LEVEL_(value) \
-        rebaseRect(enclosure, &vu->placements.elements[comp->placements[value]].rect, &render_rect); \
-        SDL_RenderCopyEx(renderer,\
-        tcache_quick_get_texture(vu->resources.textures[vu->placements.elements[comp->placements[value]].texture_index], renderer),\
-        NULL,\
-        &render_rect,\
-        vu->rotation, NULL, \
-        flipValues[vu->placements.elements[comp->placements[value]].flip])
-
-    for(i=0; i<2; ++i) {
-        vol_printf("%2d) ", i);
-        channel* channel = vumeter->channels[i];
-        const component* comp = channel->components;
-        runtime_volume *runtime = runtimes[i];
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        vol_printf("%2d) ", ix_chan);
+        const vu_channel_t* channel = vumeter->channels[ix_chan];
+        const vu_component_t* comp = channel->components;
+        runtime_volume_ptr runtime = vol_runtimes + ix_chan;
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
-            switch(comp->render) {
+            switch(comp->render_op) {
+                case STATIC:
+                    // TODO 
+                    break;
                 case SINGLE:
                     {
-                        switch(comp->peak) {
-                            case PEAK_NONE:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
                                 vol_printf("SPN:%02d ", runtime->vol);
-                                _RENDER_VOLUME_LEVEL_(runtime->vol);
+                                _RENDER_VOLUME_LEVEL_(runtime->vol, ix_chan);
                                 break;
                             case DECAY:
-                                vol_printf("SD:%02d ", (int)runtime->decay_vol);
-                                _RENDER_VOLUME_LEVEL_((int)runtime->decay_vol);
+                                vol_printf("SD:%02d ", (int)(runtime->decay_vol + 0.5));
+                                _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
                                 break;
-                            case HOLD_DECAY:
-                                vol_printf("SHD:%02d ", (int)runtime->decay_vol);
-                                _RENDER_VOLUME_LEVEL_((int)runtime->decay_vol);
-                            case HOLD:
+                            case PEAK_HOLD_AND_DECAY:
+                                vol_printf("SHD:%02d ", (int)(runtime->decay_vol + 0.5));
+                                _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5), ix_chan);
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol_printf("SH:%02d ", runtime->peak_hold_vol);
-                                _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol);
+                                _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol, ix_chan);
                                 break;
                         }
                     }break;
@@ -486,23 +274,23 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
                     {
                         int vol = 0;
                         int peak_vol = 0;
-                        switch(comp->peak) {
-                            case PEAK_NONE:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
                                 vol = runtime->vol;
                                 peak_vol = 0;
                                 vol_printf("A v:%02d ", vol);
                                 break;
-                            case HOLD_DECAY:
-                                vol = (int)runtime->decay_vol;
+                            case PEAK_HOLD_AND_DECAY:
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
                                 break;
                             case DECAY:
-                                vol = (int)runtime->decay_vol;
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 peak_vol = 0;
                                 vol_printf("A v:%02d ", vol);
                                 break;
-                            case HOLD:
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol = runtime->vol;
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
@@ -510,28 +298,28 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
                         }
 
                         for(int lvl=0; lvl <= vol; ++lvl) {
-                            _RENDER_VOLUME_LEVEL_(lvl);
+                            _RENDER_VOLUME_LEVEL_(lvl, ix_chan);
                         }
                         if (peak_vol > vol) {
-                           _RENDER_VOLUME_LEVEL_(peak_vol);
+                           _RENDER_VOLUME_LEVEL_(peak_vol, ix_chan);
                         }
                     }break;
                 case AGGREGATEOFF:
                     {
                         int vol = 0;
-                        switch(comp->peak) {
-                            case PEAK_NONE:
-                            case HOLD:
+                        switch(comp->volume_type) {
+                            case SAMPLED:
+                            case PEAK_HOLD_AND_SAMPLED:
                                 vol = runtime->vol;
                                 break;
                             case DECAY:
-                            case HOLD_DECAY:
-                                vol = (int)runtime->decay_vol;
+                            case PEAK_HOLD_AND_DECAY:
+                                vol = (int)(runtime->decay_vol + 0.5);
                                 break;
                         }
                         vol_printf("a v:%02d ", vol);
                         for(int lvl=vol+1; lvl< vu->volume_levels; ++lvl) {
-                            _RENDER_VOLUME_LEVEL_(lvl);
+                            _RENDER_VOLUME_LEVEL_(lvl, ix_chan);
                         }
                     }break;
             }
@@ -552,7 +340,7 @@ void VUMeter_draw(SDL_Renderer* renderer, vumeter_properties* vu, const vumeter*
     if (sample_frame_count >= 100) {
         ms_2 = get_micro_seconds();
         float fps = 1000000.0 * sample_frame_count/(ms_2-ms_1);
-        switch(perf_level) {
+        switch(profile_level) {
             case 3:
             case 2:
             default:
@@ -575,8 +363,7 @@ void VUMeter_diag() {
     printf("visualizer rate= %u\n", vis_get_rate());
 }
 
-
-void VUMeter_dump_props(const vumeter_properties* props) {
+void VUMeter_dump_props(const vumeter_properties_t* props) {
     if(!props) {
         return;
     }
@@ -584,7 +371,7 @@ void VUMeter_dump_props(const vumeter_properties* props) {
             props,
             props->resource_path,
             props->name,
-            props->volume_levels, props->w, props->h,
+            props->volume_levels, props->layout.w, props->layout.h,
             props->vumeters
            );
     printf("resources: count=%d names=%p textures=%p\n",
@@ -603,10 +390,11 @@ void VUMeter_dump_props(const vumeter_properties* props) {
                  props->resources.names[indx]
                );
     }
-    const vumeter* vumeter = props->vumeters;
+    const vumeter_t* vumeter = props->vumeters;
+/*    
     const int *bg = vumeter->background->bg;
     while(bg != NULL && 0 != *bg) {
-        vumeter_element *p = &props->placements.elements[*bg];
+        vu_placement_t *p = &props->placements.elements[*bg];
         printf("bg, texture_index=%02d texture=%d, rect=(%d, %d, %d, %d) flip=%d %s\n",
                 p->texture_index,
                 props->resources.textures[p->texture_index],
@@ -616,12 +404,13 @@ void VUMeter_dump_props(const vumeter_properties* props) {
                );
         ++bg;
     }
-    for(int i=0; i<2; ++i) {
-        channel* channel = vumeter->channels[i];
-        const component* comp = channel->components;
-        printf("channel %d, components count %d\n", i, channel->component_count);
+    */
+    for(int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+        const vu_channel_t* channel = vumeter->channels[ix_chan];
+        const vu_component_t* comp = channel->components;
+        printf("channel %d, components count %d\n", ix_chan, channel->component_count);
         for(int ic=0; ic < channel->component_count; ++ic, ++comp) {
-            printf("channel %d), component %d) %d, %d %p\n", i, ic, comp->render, comp->peak, comp);
+            printf("channel %d), component %d) %d, %d %p\n", ix_chan, ic, comp->render_op, comp->volume_type, comp);
             for(int value =0; value < props->volume_levels; ++value) {
                 int pi = comp->placements[value];
                 int ti = props->placements.elements[pi].texture_index;

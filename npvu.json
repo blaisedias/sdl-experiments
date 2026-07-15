@@ -17,7 +17,7 @@
                         "h": 0
                     }
                 },
-                "image": "./images/wallpapers/HD_MilkyWay.png",
+                "image": "./images/wallpapers/HD_IceCold2.png",
                 "#comment": "image_scaling is one of [fit, center, stretch]",
                 "image_scaling": "center",
                 "focus_enable": false
@@ -102,6 +102,27 @@
             }
         },
         {
+            "text": {
+                "location": {
+                    "position": {
+                        "x": 400,
+                        "w": -1,
+                        "y": -15,
+                        "h": 15
+                    }
+                },
+                "content": "NN MMM hh:mm:ss 20XX",
+                "timedate-format": "{weekday} {day} {month} {hour}:{minutes} {year}",
+                "font": "fonts/Cooper/ttf/Cooper-Bold.ttf",
+                "font_size": 10,
+                "colour": {
+                    "red" : 255,
+                    "green" : 255
+                },
+                "justification": "right"
+            }
+        },
+        {
             "vumeter": {
                 "location": {
                     "position": {
@@ -109,7 +130,34 @@
                         "h": -114
                     }
                 },
-                "select" : "PurpleTastic2Transparent"
+                "select" : "PurpleTastic2Transparent",
+                "equal_horizontal_spacing": true
+            }
+        },
+        {
+            "multistate_button": {
+                "location": {
+                    "container": {
+                        "y": -110,
+                        "h": -114
+                    },
+                    "position": {
+                        "x": "right",
+                        "y": "bottom",
+                        "w": 16,
+                        "h": 16
+                    }
+                },
+                "state": 0,
+                "states": [
+                    {
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "image": "./images/sd/lock-outline.png",
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
             }
         },
         {
@@ -124,8 +172,8 @@
                     "position": {
                         "x": "center",
                         "y": "top",
-                        "w": 100,
-                        "h": 50
+                        "w": 64,
+                        "h": 32
                     }
                 },
                 "hotspot": true,
@@ -134,23 +182,25 @@
                 "states": [
                     {
                         "image": "./images/sd/hotspot-pin-offon.png",
-                        "action": "lock_visu"
+                        "action": "lock_visu",
+                        "sync_on_action": "unlock_visu"
                     },
                     {
                         "image": "./images/sd/hotspot-pin-onoff.png",
-                        "action": "unlock_visu"
+                        "action": "unlock_visu",
+                        "sync_on_action": "lock_visu"
                     }
                 ]
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 110,
                         "w": 0,
-                        "h": -50
+                        "h": -114
                     },
                     "position" : {
                         "x": "right",
@@ -161,18 +211,27 @@
                 },
                 "hotspot": true,
                 "hotspot_edge": "right",
-                "image": "./images/sd/hotspot-arrow_forward.png",
-                "action": "next_visu"
+                "state": 0,
+                "states": [
+                    {
+                        "image": "./images/sd/hotspot-arrow_forward.png",
+                        "action": "next_visu",
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "container": {
                         "x": 0,
-                        "y": 50,
+                        "y": 110,
                         "w": 0,
-                        "h": -50
+                        "h": -114
                     },
                     "position": {
                         "x": "left",
@@ -183,14 +242,23 @@
                 },
                 "hotspot": true,
                 "hotspot_edge": "left",
-                "image": "./images/sd/hotspot-arrow_back.png",
-                "action": "prev_visu"
+                "state": 0,
+                "states": [
+                    {
+                        "image": "./images/sd/hotspot-arrow_back.png",
+                        "action": "prev_visu",
+                        "sync_on_action": "unlock_visu"
+                    },
+                    {
+                        "sync_on_action": "lock_visu"
+                    }
+                ]
             }
         },
 
 
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 10,
@@ -199,8 +267,15 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/skip-previous.png",
-                "action": "previous-track",
+                "states": [
+                    {
+                        "image": "./images/sd/DIS-skip-previous.png"
+                    },
+                    {
+                        "image": "./images/sd/skip-previous.png",
+                        "action": "previous-track"
+                    }
+                ],
                 "player_value": "CAN_REW"
             }
         },
@@ -232,7 +307,7 @@
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 150,
@@ -241,13 +316,20 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/skip-next.png",
-                "action": "next-track",
+                "states":[
+                    {
+                        "image": "./images/sd/DIS-skip-next.png"
+                    },
+                    {
+                        "image": "./images/sd/skip-next.png",
+                        "action": "next-track"
+                    }
+                ],
                 "player_value": "CAN_FWD"
             }
         },
         {
-            "button": {
+            "multistate_button": {
                 "location": {
                     "position": {
                         "x": 220,
@@ -256,8 +338,21 @@
                         "h": 50
                     }
                 },
-                "image": "./images/sd/stop-circle.png",
-                "action": "stop"
+                "states": [
+                    {
+                        "image": "./images/sd/stop-circle.png",
+                        "action": "stop"
+                    },
+                    {
+                        "image": "./images/sd/stop-circle.png",
+                        "action": "stop"
+                    },
+                    {
+                        "image": "./images/sd/stop-circle-disabled.png",
+                        "action": "none"
+                    }
+                ],
+                "player_value": "MODE"
             }
         },
         {
@@ -340,7 +435,9 @@
                 },
                 "interactive": true,
                 "pick": {
-                    "image": "./images/sd/slider-pick-circle.png",
+                    "image": [
+                        "./images/sd/slider-pick-circle.png"
+                    ],
                     "width": 16,
                     "height": 16
                 },
@@ -351,11 +448,17 @@
                     ]
                 },
                 "bar_start": {
-                    "image": "./images/sd/slider-bar-left-end.png",
+                    "image": [
+                        "./images/sd/slider-bar-left-end.png",
+                        "./images/sd/slider-bar-left-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "bar_end": {
-                    "image": "./images/sd/slider-bar-right-end-empty.png",
+                    "image": [
+                        "./images/sd/slider-bar-right-end.png",
+                        "./images/sd/slider-bar-right-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "range": {
@@ -420,7 +523,9 @@
                 },
                 "interactive": true,
                 "pick": {
-                    "image": "./images/sd/slider-pick-circle.png",
+                    "image": [
+                        "./images/sd/slider-pick-circle.png"
+                    ],
                     "width": 16,
                     "height": 16
                 },
@@ -431,11 +536,17 @@
                     ]
                 },
                 "bar_start": {
-                    "image": "./images/sd/slider-bar-left-end.png",
+                    "image": [
+                        "./images/sd/slider-bar-left-end.png",
+                        "./images/sd/slider-bar-left-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "bar_end": {
-                    "image": "./images/sd/slider-bar-right-end-empty.png",
+                    "image": [
+                        "./images/sd/slider-bar-right-end.png",
+                        "./images/sd/slider-bar-right-end-empty.png"
+                    ],
                     "width": 2
                 },
                 "range": {
@@ -450,8 +561,44 @@
         {
             "button": {
                 "location": {
+                    "container": {
+                        "x": 350,
+                        "y": 0,
+                        "w": -350,
+                        "h": 32 
+                    },
+                    "position" : {
+                        "x": "center",
+                        "y": "top",
+                        "w": 32,
+                        "h": 32
+                    }
+                },
+                "hotspot": true,
+                "hotspot_edge": "top",
+                "image": "./images/sd/hotspot-arrow_up.png",
+                "action": "next-nowplaying-view"
+            }
+        },
+        {
+            "button": {
+                "location": {
                     "position": {
                         "x": 0,
+                        "y": 0,
+                        "w": 32,
+                        "h": 32
+                    }
+                },
+                "image": "./images/sd/arrow_back_ios_1000dp_1F1F1F_FILL0_wght700_GRAD0_opsz48.png",
+                "action": "main_view"
+            }
+        },
+        {
+            "#button": {
+                "location": {
+                    "position": {
+                        "x": 32,
                         "y": 0,
                         "w": 32,
                         "h": 32

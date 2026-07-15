@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "types.h"
 
-typedef struct lyrion_player* lyrion_player_ptr;
+typedef struct lyrion_player_s_t* lyrion_player_ptr;
 
 typedef struct {
     int elapsed_secs;
@@ -86,6 +86,7 @@ pfv_type get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const 
 
         string meta value keys: (these keys do not exist in LMS CLI status
             VOLUME: player volume
+            CAN_CHANGE_VOLUME: UI can change player volume
             ARTIST: one of artist, trackartist, albumartist in that order
             TITLE:  one of title, remote_title, current_title, subtitle in that order
             PLAYLIST_CURRENT: playlist_cur_index+1
@@ -108,6 +109,7 @@ void player_command(lyrion_player_ptr player, const char* command);
 #define player_play(player) player_command(player, "play")
 #define player_stop(player) player_command(player, "stop")
 #define player_pause(player) player_command(player, "pause")
+void player_play_pause_toggle(lyrion_player_ptr player);
 
 //#define player_play(player) player_command(player, "button play.single")
 //#define player_stop(player) player_command(player, "button pause.hold")
@@ -129,10 +131,11 @@ void player_command(lyrion_player_ptr player, const char* command);
 #define player_power_on(player) player_command(player, "button power_on")
 #define player_power_off(player) player_command(player, "button power_off")
 
-void player_volume_set(lyrion_player_ptr player, int delta);
-void player_volume_nudge(lyrion_player_ptr player, int delta);
-#define player_volume_inc(player) player_volume_change(player, step)
-#define player_volume_dec(player) player_volume_change(player, step*-1)
+void player_volume_set(lyrion_player_ptr player, int level);
+int player_set_volume_step(lyrion_player_ptr player, int step);
+void player_volume_step(lyrion_player_ptr player, bool up);
+#define player_volume_inc(player) player_volume_step(player, true)
+#define player_volume_dec(player) player_volume_step(player, false)
 void player_seek(lyrion_player_ptr player, int time);
 
 #endif // _lyrion_player_h_

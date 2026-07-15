@@ -6,22 +6,39 @@
     ],
     "License": "CC-BY-SA-4.0",
     "kind": "vumeter",
-    "vutype": "frames",
-    "format": "compose2",
-    "format_version": 2,
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
     "#volume_levels": [
         "equivalent to number of frames,",
         "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
     ],
     "volume_levels": 49,
     "#dimensions": [
-        "natural width and height of the vumeter",
+        "unscaled width and height of the vumeter",
         "for this vu meter:",
         "width = left_margin + dial_width + spacing + dial_width + right_margin",
-        "margins=50, spacing=50, dial_width=1024",
+        "margins=32, spacing=32, dial_width=1024",
         "height=768"
     ],
     "dimensions" :{ "h": 768, "w": 2144 },
+    "layout" : {
+        "w": 2144,
+        "h": 768,
+        "left": {
+                "x": 32,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "right": {
+                "x": 1088,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "arrangement": "horizontal"
+    },
     "#files": [
         "The set of images required to render this VU-Meter"
     ],
@@ -43,13 +60,11 @@
         "associative array of image resources"
     ],
     "resources": {
-        "LEFT_BG": "background.png", "RIGHT_BG": "background.png",
-        "LRO": "roundelRO.png", "LRP": "roundelRP.png",
-        "RRO": "roundelRO.png", "RRP": "roundelRP.png",
+        "BG": "background.png",
+        "ROUNDEL": "roundel.png", "ROUNDEL_PEAK": "roundel_peak.png",
         "#$SEQUENCE " : "needles00.png ... needles10.png....needles49.png",
         "$SEQUENCE" : [
-            { "key_prefix": "L", "start": 0, "end": 48, "value": "needles{index}.png"},
-            { "key_prefix": "R", "start": 0, "end": 48, "value": "needles{index}.png"}
+            { "key_prefix": "POS_", "start": 0, "end": 48, "value": "needles{index}.png"}
         ]
     },
     "#placement": [
@@ -69,12 +84,12 @@
         "tubeD": {
             "left": {
                 "placements": [
-                    "LEFT_BG"
+                    "BG"
                 ]
             },
             "right": {
                 "placements": [
-                    "RIGHT_BG"
+                    "BG"
                 ]
             }
         }
@@ -82,15 +97,17 @@
     "#levels*":[
         "associative arrays with keys 'left' and 'right'",
         "The contents of each key must be objects which are associative arrays with 3 keys",
-        "'render' : one of 'single', 'aggregate', 'aggregateoff'",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
-        "   'aggregateoff' => render all placements beyond the volume level",
-        "'peak' : one of 'hold', 'decay', 'hold+decay'",
-        "       'hold'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
         "                 lower volume levels are rendered to match sampled values",
         "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
-        "       'hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
         "                      lower volume levels follows peak volume level decaying at configured rate",
         "       Notes: ",
         "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
@@ -104,43 +121,43 @@
         "levels_1": {
             "left": [
                 {
-                    "render": "single",
-                    "peak": "decay",
+                    "render_op": "single",
+                    "volume_type": "decay",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "L{index}"}
+                            { "start": 0,  "end": 48, "value": "POS_{index}"}
                        ]
                     }
                 },
                 {
-                    "render": "aggregate",
+                    "render_op": "aggregate",
                     "placements": {
-                        "0": "LRO",
-                        "36": "LRP"
+                        "0": "ROUNDEL",
+                        "36": "ROUNDEL_PEAK"
                     }
                 }
             ],
             "right": [
                 {
-                    "render": "single",
-                    "peak": "decay",
+                    "render_op": "single",
+                    "volume_type": "decay",
                     "placements": {
                         "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "R{index}"}
+                            { "start": 0,  "end": 48, "value": "POS_{index}"}
                        ]
                     }
                 },
                 {
-                    "render": "aggregate",
+                    "render_op": "aggregate",
                     "placements": {
-                    "0": "RRO",
-                    "36": "RRP"
+                    "0": "ROUNDEL",
+                    "36": "ROUNDEL_PEAK"
                     }
                 }
             ]
         }
     },
-    "vumeters#": [
+    "#vumeters": [
         "associative arrays keyed on VU Meter name",
         " contents of each associative array are 2 keys",
         "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",

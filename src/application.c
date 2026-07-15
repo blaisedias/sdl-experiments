@@ -30,23 +30,18 @@ static bool input_ready = false;
 #define FPS_DIST_MAX  120
 static int fps_distribution[FPS_DIST_MAX+1];
 
-static inline void free_ex(void** tgt) {
-    if (*tgt) {
-        free(*tgt);
-    }
-    *tgt = NULL;
-}
-#define FREE(x) free_ex((void **)(&x))
-
 typedef struct {
     int64_t render_count;
     int64_t  micros;
 }fps_sample_point;
 
-void ___app_input_loop(app_context* app_ctx);
+void ___app_input_loop(app_context_t* app_ctx);
+
+//#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC|SDL_INIT_GAMECONTROLLER|SDL_INIT_EVENTS
+#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_EVENTS
 
 bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_ctx->input_thread =  SDL_CreateThread((SDL_ThreadFunction)___app_input_loop, "input", app_ctx);
 
 //    app_ctx->workspace.player_mode = PLAYER_MODE_UNDEFINED;
@@ -58,7 +53,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
         render_flags |=  SDL_RENDERER_PRESENTVSYNC;
     }
 
-    if (SDL_Init(SDL_INIT_EVERYTHING)) {
+    if (SDL_Init(MY_SDL_INIT_FLAGS)) {
         error_printf("initializing SDL: %s\n", SDL_GetError());
         return true;
     }
@@ -71,7 +66,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
     }
 
     if (TTF_Init()) {
-        error_printf("initializing SDL_ttf: %s\n", IMG_GetError());
+        error_printf("initializing SDL_ttf: %s\n", TTF_GetError());
         return true;
     }
 
@@ -248,8 +243,23 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
     }
 
     setup_orientation(app_ctx->orientation, app_ctx->screen_width, app_ctx->screen_height, &app_ctx->window_rect);
+
+#ifdef OPTIMISE_ORIENTATION_0
+    if (app_ctx->orientation == 0.0) {
+        log_printf("Optimised unrotated view: not using intermediate target texture\n");
+        app_ctx->target_texture = NULL;
+    } else {
+        app_ctx->target_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
+        app_printf("target_texture = %p %d x %d\n", app_ctx->target_texture, app_ctx->window_rect.w, app_ctx->window_rect.h);
+    }
+#else
     app_ctx->target_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
     app_printf("target_texture = %p %d x %d\n", app_ctx->target_texture, app_ctx->window_rect.w, app_ctx->window_rect.h);
+#endif  // OPTIMISE_ORIENTATION_0
+
+    app_ctx->backdrop_texture = SDL_CreateTexture(app_ctx->renderer, app_ctx->pixelFormat, SDL_TEXTUREACCESS_TARGET, app_ctx->window_rect.w, app_ctx->window_rect.h);
+    app_printf("backdrop_texture = %p %d x %d\n", app_ctx->backdrop_texture, app_ctx->window_rect.w, app_ctx->window_rect.h);
+
     {
         SDL_RendererInfo info;
         if (0 == SDL_GetRendererInfo(app_ctx->renderer, &info)) {
@@ -279,7 +289,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
 }
 
 void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     if (app_ctx->input_thread) {
         input_loop = false;
         __atomic_store_n(&render_ready, true, __ATOMIC_RELEASE);
@@ -290,20 +300,28 @@ void app_cleanup(app_context_ptr app_ctx_in, int exit_status) {
     app_printf("app_cleanup\n");
 //    close_local_player(app_ctx->player);
     tcache_shutdown();
+
     if (app_ctx->target_texture) {
         SDL_DestroyTexture(app_ctx->target_texture);
         app_ctx->target_texture = NULL;
     }
+
+    if (app_ctx->backdrop_texture) {
+        SDL_DestroyTexture(app_ctx->backdrop_texture);
+        app_ctx->backdrop_texture = NULL;
+    }
+
     SDL_DestroyRenderer(app_ctx->renderer);
     SDL_DestroyWindow(app_ctx->window);
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+    app_printf("app_cleanup OK\n");
     exit(exit_status);
 }
 
 void app_render_loop(app_context_ptr app_ctx_in) {
-    app_context* app_ctx = (app_context*)app_ctx_in;
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_printf("+++ render start\n"); fflush(stdout);
 
     SDL_Rect dst_rect;
@@ -337,16 +355,32 @@ void app_render_loop(app_context_ptr app_ctx_in) {
             }
         }
         tcache_render_prep(app_ctx->renderer);
-        SDL_RenderClear(app_ctx->renderer);
-        SDL_SetRenderTarget(app_ctx->renderer, app_ctx->target_texture);
-        SDL_RenderClear(app_ctx->renderer);
 
-        app_ctx->cb_render(app_ctx);
+        if (app_ctx->cb_query_render_backdrop(app_ctx)) {
+            if (app_ctx->debug_redraw_backdrop) {
+                log_printf("redraw backdrop\n");
+            }
+            SDL_SetRenderTarget(app_ctx->renderer, app_ctx->backdrop_texture);
+            SDL_RenderClear(app_ctx->renderer);
+            app_ctx->cb_render_backdrop(app_ctx);
+        }
 
-        SDL_SetRenderTarget(app_ctx->renderer, NULL);
-        SDL_RenderCopyEx(app_ctx->renderer,
+        if (app_ctx->target_texture == NULL) {
+            // OPTIMISE_ORIENTATION_0 and orientation is 0.0
+            SDL_SetRenderTarget(app_ctx->renderer, NULL);
+            SDL_RenderClear(app_ctx->renderer);
+            SDL_RenderCopy(app_ctx->renderer, app_ctx->backdrop_texture, NULL, NULL);
+            app_ctx->cb_render_foreground(app_ctx);
+        } else {
+            SDL_SetRenderTarget(app_ctx->renderer, app_ctx->target_texture);
+            SDL_RenderClear(app_ctx->renderer);
+            SDL_RenderCopy(app_ctx->renderer, app_ctx->backdrop_texture, NULL, NULL);
+            app_ctx->cb_render_foreground(app_ctx);
+            SDL_SetRenderTarget(app_ctx->renderer, NULL);
+            SDL_RenderCopyEx(app_ctx->renderer,
                     app_ctx->target_texture,
                     NULL, &dst_rect, app_ctx->orientation, NULL, SDL_FLIP_NONE);
+        }
         
         SDL_RenderPresent(app_ctx->renderer);
         int64_t ms_6 = get_micro_seconds();
@@ -379,27 +413,27 @@ void app_render_loop(app_context_ptr app_ctx_in) {
     input_loop = false;
     app_printf("*** render loop done ****\n");
     SDL_WaitThread(app_ctx->input_thread, NULL);
-    printf("low_fps_count=%u/%ld %f\n", low_fps_count, (long)render_iters, (float)low_fps_count*100/render_iters);
+    profile_printf("low_fps_count=%u/%ld %f\n", low_fps_count, (long)render_iters, (float)low_fps_count*100/render_iters);
     for(int i =0; i < sizeof(fps_distribution)/sizeof(fps_distribution[0]); ++i) {
         if (fps_distribution[i]) {
-            printf("    %d -> %d\n", i, fps_distribution[i]);
+            profile_printf("    %d -> %d\n", i, fps_distribution[i]);
         }
     }
 }
 
-int app_render(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip) {
+int app_render(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip) {
     return SDL_RenderCopyEx(app_ctx->renderer, texture, srcrect, dstrect, 0, center, flip);
 }
 
-int app_render_rotated(app_context* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double angle) {
+int app_render_rotated(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double angle) {
     return SDL_RenderCopyEx(app_ctx->renderer, texture, srcrect, dstrect, angle, center, flip);
 }
 
 
-//void app_input_loop(app_context* app_ctx) {
+//void app_input_loop(app_context_t* app_ctx) {
 //}
 
-void ___app_input_loop(app_context* app_ctx) {
+void ___app_input_loop(app_context_t* app_ctx) {
     while(__atomic_load_n(&render_ready, __ATOMIC_ACQUIRE) == 0) {
         sleep_milli_seconds(100);
     }
@@ -451,4 +485,9 @@ void app_wait_ready() {
 
 int64_t app_get_render_count() {
     return render_iters;
+}
+
+void app_set_multiple_views(app_context_ptr app_ctx_in, bool val) {
+    app_context_t* app_ctx = (app_context_t*)app_ctx_in;
+    app_ctx->workspace.have_multiple_views = val;
 }

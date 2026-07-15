@@ -8,42 +8,32 @@
 #define __jl_vumeterdef_h_
 #include <SDL2/SDL.h>
 #include "texture_cache.h"
+#include "vumeter_enum.h"
+
+// For now the number of channels is fix at 2
+// a future change will remove this hard-coding
+#define     NUM_VU_CHANNELS   2
 
 typedef struct {
 //    const char* image;
-    int         texture_index;
-    SDL_Rect    rect;
-    SDL_RendererFlip flip;
-} vumeter_element;
-
-typedef enum {
-    SINGLE,
-    AGGREGATE,
-    AGGREGATEOFF,
-} render_typ;
-
-typedef enum {
-    PEAK_NONE,
-    HOLD,
-    DECAY,
-    HOLD_DECAY,
-}peak_typ;
+    int                 texture_index;
+    SDL_Rect            rect;
+    SDL_RendererFlip    flip;
+    float               angle;
+    SDL_Point           center;
+}vu_placement_t;
 
 typedef struct {
-    const char* imagefile;
-    int w;
-    int h;
-}resource;
+    component_render_op_t        render_op;
+    component_volume_type_t      volume_type;
+    int           placement_count;
+    int           placements[50];
+}vu_component_t;
 
 typedef struct {
-    const int* bg;
-}background;
-
-typedef struct {
-    const render_typ  render;
-    const peak_typ    peak;
-    const int placements[50];
-}component;
+    int           placement_count;
+    int           placements[100];
+}vu_background_t;
 
 typedef struct {
     int vol;
@@ -51,41 +41,56 @@ typedef struct {
     int peak_hold_counter;
     int decay_hold_counter;
     float decay_vol;
-    float decay_unit;
-}runtime_volume;
+}runtime_volume_t, *runtime_volume_ptr;
 
 typedef struct {
-    const int component_count;
-    const component* components;
-    runtime_volume runtime;
-}channel;
+    int               component_count;
+    vu_component_t*   components;
+}vu_channel_t;
 
 typedef struct {
-    const char* name;
-    const background*   background;
-    channel*      channels[2];
-}vumeter;
+    char* name;
+    int              channel_count;
+    vu_background_t* background;
+    vu_background_t* backgrounds[NUM_VU_CHANNELS];
+    vu_channel_t*    channels[NUM_VU_CHANNELS];
+}vumeter_t;
 
 typedef struct vu_props {
-    struct vu_props* next;
-    const char* resource_path;
-    const char* name;
-    const int volume_levels;
-    const int w;
-    const int h;
-    const int vumeter_count;
-    const vumeter* vumeters;
+    struct vu_props*    next;
+    char*         resource_path;
+    char*         name;
+    int           volume_levels;
     struct {
-        const int count;
-        const char** names;
-        texture_id_t* textures;
+        int           w;
+        int           h;
+        // common + channels, common = 0, left=1, right=2
+        SDL_Rect      rects[3];
+        layout_arrangement_t  arrangement;
+    }layout;
+    int           vumeter_count;
+    vumeter_t*    vumeters;
+    struct {
+        int             count;
+        char**          names;
+        texture_id_t*   textures;
     }resources;
     struct {
-        const int count;
-        vumeter_element* elements;
+        int             count;
+        vu_placement_t* elements;
     }placements;
     float rotation;
     void * handle;
-}vumeter_properties;
+    int   format_version;
+    struct {
+        int                 count;
+        vu_component_t*     components;
+    }components;
+#ifdef DEBUG_VUMETER_JSON
+    const char* kind;
+    const char* vutype;
+    const char* format;
+#endif
+}vumeter_properties_t;
 
 #endif  // __jl_vumeterdef_h_

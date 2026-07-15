@@ -12,6 +12,11 @@
 
 #define  WH_FILL (-1)
 
+// TODO: use setter/getter functions
+extern bool debug_rects;
+extern bool show_rects;
+extern bool show_input_rects;
+
 typedef enum {
     WIDGET_NONE,
     WIDGET_IMAGE,
@@ -20,15 +25,15 @@ typedef enum {
     WIDGET_VUMETER,
     WIDGET_SLIDER,
     WIDGET_TEXT,
+    WIDGET_VSLIDER,
     WIDGET_END
-}widget_type;
-  
+}widget_type_t;
 
 typedef enum {
     IMAGE_FIT,
     IMAGE_CENTRED_FILL,
     IMAGE_STRETCH_FILL,
-}image_scaling;
+}image_scaling_t;
 
 typedef enum {
     EDGE_NONE,
@@ -36,216 +41,146 @@ typedef enum {
     EDGE_TOP,
     EDGE_RIGHT,
     EDGE_BOTTOM,
-}hotspot_edge;
+}hotspot_edge_t;
 
 typedef enum {
     POINTER_DOWN,
     POINTER_UP,
-    POINTER_MOTION
-} pointer_input;
+    POINTER_MOTION,
+    NEXT_VISU,
+    NEXT_VU,
+    PREV_VISU,
+    PREV_VU
+} pointer_input_t;
 
-typedef struct vumeter_widget vumeter_widget;
-typedef struct spmeter_widget spmeter_widget;
+typedef enum {
+    TXT_CENTRED,
+    TXT_LEFT,
+    TXT_RIGHT
+} text_justification_t;
 
-typedef struct widget widget;
-typedef struct widget_list widget_list;
-typedef struct view_context view_context;
-typedef struct view_context* view_context_ptr;
-
-typedef struct _btn_resource {
-    texture_id_t    texture_id;
-    const char      *resource_path;
-    action          action;
-}_btn_resource;
-
-typedef struct _slider_resource {
-    const char*     image_paths[2];
-    texture_id_t    texture_ids[2];
-    int w;
-    int h;
-}_slider_resource;
-    
 typedef enum {
     SLIDER_BAR,
     SLIDER_PICK,
     SLIDER_BAR_START,
     SLIDER_BAR_END,
     SLIDER_RESOURCE_COUNT
-}slider_resource_ID;
+}slider_reosurce_ID_t;
 
-typedef struct {
-    bool initialised;
-    int  value_range_delta;
-    int  half_pw;
-    int  min_pos;
-    int  max_pos;
-    int  current_pos;
-    int  drag_pos;
-    SDL_Rect bar_start_rect;
-    SDL_Rect bar_end_rect;
-    SDL_Rect bar_rect;
-    SDL_Rect bar_empty_rect;
-}_slider_workspace;
+typedef struct vumeter_widget_s_t vumeter_widget_t;
+typedef struct spmeter_widget_s_t spmeter_widget_t;
 
-typedef struct {
-    texture_id_t texture_id;
-    TTF_Font* font;
-    const char* name;   // name is used for texture cache
-    const char* format; // player format string, can be NULL
-    const char* content;
-    SDL_Rect content_dim;
-    SDL_Color colour;
-    SDL_Rect dst_rect;
-}_text_data,*_text_data_ptr;
+typedef struct widget_s_t widget_t;
+typedef struct view_context_s_t view_context_t;
+typedef const view_context_t* view_context_ptr;
 
-struct widget {
-    struct      widget *next;
-    struct      widget *prev;
-    const       widget_type type;
-    const       view_context* view;
-    
-//    void        (*action)(widget* wdgt);
-    action         action;
-    void        (*render)(struct widget*);
-    bool        focussed;
-    // 
-    bool        atomic_highlight;
-    bool        hidden;
-    bool        hotspot;
-    const bool  focus_disabled;
-    // generic image path for all widgets with single images
-    // can be NULL
-    const char* image_path;
-    
-    SDL_Rect    rect;
-    SDL_Rect    input_rect;
-    // For now 2 translated rectangles are used to handle 
-    // orientation correctly. 
-    // TODO further investigation.
-    // 1 - for rotated images
-    // SDL_Rect    image_rect;
-    // 2 - for unrotated operations like DrawRect, FillRect
-    //SDL_Rect    draw_rect;
+bool widget_highlighted(widget_t* wdgt); 
+void widget_set_highlight(widget_t* wdgt, bool onoff);
+bool widget_pressed(widget_t* wdgt);
+void widget_set_pressed(widget_t* wdgt, bool onoff);
+int  widget_get_pressed_millis(widget_t* wdgt);
 
-    bool         atomic_pressed;
-    const char*  player_value_key;
-    const char*  player_range_value_key;
-    const char*  runtime_value_key;
-
-    union {
-        vumeter_widget* vu;
-        spmeter_widget* sp;
-        struct {
-            texture_id_t texture_id;
-            int w;
-            int h;
-            image_scaling scale_op;
-            SDL_Rect src_rect;
-            SDL_Rect dst_rect;
-        }image;
-        struct {
-            texture_id_t texture_id;
-        }button;
-        struct {
-            unsigned state;
-            unsigned state_count;
-            _btn_resource* res;
-        }multistate_button;
-        struct {
-            // interactive property as defined
-            bool defined_interactive;
-            // interactive property runtime controlled
-            bool interactive;
-            struct {
-                int start;
-                int end;
-            }range;
-            _slider_resource res[SLIDER_RESOURCE_COUNT];
-            _slider_workspace wk;
-        }slider;
-        _text_data text;
-    }sub;
-};
-
-bool widget_highlight(widget* wdgt); 
-void widget_set_highlight(widget* wdgt, bool onoff);
-bool widget_pressed(widget* wdgt);
-void widget_set_pressed(widget* wdgt, bool onoff);
-
-
-extern bool debug_rects;
-extern bool show_rects;
-extern bool show_input_rects;
-
-void render_none(widget* wdgt);
-
-const char* widget_type_name(widget_type typ);
-widget* widget_rect(widget *wdgt, const SDL_Rect *rect);
-widget* widget_bounds(widget *wdgt, int x, int y, int w, int h);
-widget* widget_set_player_value_key(widget* wdgt, const char* key);
-widget* widget_set_runtime_value_key(widget* wdgt, const char* key);
+widget_type_t widget_get_type(widget_t* wdgt);
+const char* widget_type_name(widget_type_t typ);
+const char* widget_get_type_name(widget_t *);
+widget_t* widget_rect(widget_t *wdgt, const SDL_Rect *rect);
+widget_t* widget_bounds(widget_t *wdgt, int x, int y, int w, int h);
+widget_t* widget_set_player_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_player_value_key(widget_t* wdgt);
+widget_t* widget_set_runtime_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_runtime_value_key(widget_t* wdgt);
 // TODO: fix implicit range start value of 0
-widget* widget_set_player_range_value_key(widget* wdgt, const char* key);
+widget_t* widget_set_player_range_value_key(widget_t* wdgt, const char* key);
+const char* widget_get_player_range_value_key(widget_t* wdgt);
 
-/*
-widget* widget_next(widget *wdgt, widget* next);
-widget* widget_prev(widget *wdgt, widget* prev);
-*/
-widget* widget_load_media(widget* wdgt, const char* resource_path);
-widget* widget_destroy(widget* wdgt);
-widget* widget_action(widget* wdgt, action action);
-widget* widget_hide(widget* wdgt, bool hide);
-widget* widget_hotspot(widget* wdgt, bool hotspot);
-widget* widget_hotspot_edge(widget* wdgt, hotspot_edge edge, SDL_Rect *r);
-widget* widget_image_path(widget* wdgt, const char* path);
-widget* widget_focus_enable(widget* wdgt, bool f);
+widget_t* widget_load_media(widget_t* wdgt, const char* resource_path);
+widget_t* widget_destroy(widget_t* wdgt);
+widget_t* widget_action(widget_t* wdgt, action_t action);
+bool widget_has_action(widget_t* wdgt, action_t action);
+action_t widget_get_action(widget_t* wdgt);
+widget_t* widget_hide(widget_t* wdgt, bool hide);
+bool widget_is_hidden(widget_t* wdgt);
+widget_t* widget_hotspot(widget_t* wdgt, bool hotspot);
+widget_t* widget_hotspot_edge(widget_t* wdgt, hotspot_edge_t edge, SDL_Rect *r);
+bool widget_get_hotspot(widget_t* wdgt);
+widget_t* widget_image_path(widget_t* wdgt, const char* path);
+widget_t* widget_focus_enable(widget_t* wdgt, bool f);
+widget_t* widget_set_focussed(widget_t* wdgt, bool f);
+bool widget_get_focussed(widget_t* wdgt);
 
-widget* widget_create_button(const view_context*);
-widget* widget_create_multistate_button(const view_context*, int state_count);
-widget* widget_multistate_button_addstate(widget* wdgt, unsigned statenum, const char* resource_path, action);
-widget* widget_multistate_button_set_state(widget* wdgt, unsigned statenum);
-widget* widget_multistate_button_get_state(widget* wdgt, unsigned* statenum);
+// DO NOT invoke in render thread
+widget_t* widget_configure(widget_t* wdgt);
 
-widget* widget_create_image(const view_context*);
-widget* widget_image_scaling(widget *wdgt, image_scaling op);
+// Button widget
+widget_t* widget_create_button(const view_context_t*);
 
-widget *widget_create_vumeter(const view_context*);
-widget *widget_vumeter_select_next(widget *wdgt);
-widget *widget_vumeter_select_prev(widget *wdgt);
-widget *widget_vumeter_select_by_name(widget *wdgt, const char* name);
-widget *widget_vumeter_select_lock(widget *wdgt, bool lock);
+// Multistate Button widget
+widget_t* widget_create_multistate_button(const view_context_t*, int state_count);
+widget_t* widget_multistate_button_addstate(widget_t* wdgt, unsigned statenum, const char* resource_path, action_t dispatch_action, action_t sync_on_action);
+widget_t* widget_multistate_button_set_state(widget_t* wdgt, unsigned statenum);
+widget_t* widget_multistate_button_get_state(widget_t* wdgt, unsigned* statenum);
+widget_t* widget_multistate_button_sync_on_action(widget_t* wdgt, action_t act);
 
-widget *widget_create_slider(const view_context*);
-widget *widget_slider_range(widget* , int start, int end);
-widget *widget_slider_set_value(widget* wdgt, int value);
-widget *widget_slider_set_interactive(widget* wdgt, bool yn);
-widget *widget_slider_define_interactive(widget* wdgt, bool yn);
-widget *widget_slider_get_value(widget* wdgt, int* value);
-widget *widget_slider_image_paths(widget* , slider_resource_ID id, const char* path1, const char* path2);
-widget *widget_slider_image_width(widget* , slider_resource_ID id, int width);
-widget *widget_slider_image_height(widget* , slider_resource_ID id, int height);
+// Image widget
+widget_t* widget_create_image(const view_context_t*);
+widget_t* widget_image_scaling(widget_t *wdgt, image_scaling_t op);
 
-widget* widget_create_text(const view_context*);
-widget* widget_text_set_format(widget*, const char* format);
-widget* widget_text_set_content(widget*, const char* content);
-widget* widget_text_set_font(widget*, const char* font_path, int size);
-widget* widget_text_set_colour(widget*, SDL_Color colour);
+// VUMeter widget
+widget_t* widget_create_vumeter(const view_context_t*);
+widget_t* widget_vumeter_select_next(widget_t *wdgt);
+widget_t* widget_vumeter_select_prev(widget_t *wdgt);
+widget_t* widget_vumeter_select_by_name(widget_t *wdgt, const char* name);
+widget_t* widget_vumeter_select_lock(widget_t *wdgt, bool lock);
+widget_t* widget_vumeter_equal_horizontal_spacing(widget_t *wdgt, bool val);
 
-struct widget_list {
-    widget head;
-    widget tail;
-};
+// Slider widgets
+widget_t* widget_create_slider(const view_context_t*);
+widget_t *widget_create_vslider(const view_context_t* view);
+widget_t* widget_slider_image_paths(widget_t* , slider_reosurce_ID_t id, const char* path1, const char* path2);
+widget_t* widget_slider_image_width(widget_t* , slider_reosurce_ID_t id, int width);
+widget_t* widget_slider_image_height(widget_t* , slider_reosurce_ID_t id, int height);
+widget_t* widget_slider_range(widget_t* , int start, int end);
+widget_t* widget_slider_update_value(widget_t* wdgt, int value, bool* in_range);
+widget_t* widget_slider_set_interactive(widget_t* wdgt, bool yn);
+widget_t* widget_slider_define_interactive(widget_t* wdgt, bool yn);
+widget_t* widget_slider_get_value(widget_t* wdgt, int* value);
 
-struct view_context {
+// Text widget
+widget_t* widget_create_text(const view_context_t*);
+widget_t* widget_text_set_format(widget_t*, const char* format);
+const char* widget_text_get_format(widget_t*);
+widget_t* widget_text_set_timedate_format(widget_t*, const char* format);
+const char* widget_text_get_timedate_format(widget_t*);
+widget_t* widget_text_set_content(widget_t*, const char* content);
+widget_t* widget_text_set_font(widget_t*, const char* font_path, int size);
+widget_t* widget_text_set_colour(widget_t*, SDL_Color colour);
+widget_t* widget_text_set_justification(widget_t*, const char*);
+widget_t* widget_text_set_y_scaling_threshold(widget_t* wdgt, float threshold);
+
+// widget render 
+widget_t* widget_set_renderhf(widget_t* wdgt);
+widget_t* widget_unset_renderhf(widget_t* wdgt);
+
+// Widget list and view
+typedef struct widget_list_s_t widget_list_t;
+struct view_context_s_t {
     app_context_ptr     app;
-    widget_list*        list;
+    widget_list_t*      list;
 };
 
-widget_list* create_widget_list(view_context* view);
-widget_list* destroy_widget_list(widget_list*);
-widget_list* destroy_widgets_in_list(widget_list*);
+widget_list_t* create_widget_list(view_context_t* view);
+widget_list_t* destroy_widget_list(widget_list_t*);
+widget_list_t* destroy_widgets_in_list(widget_list_t*);
 
-void widget_dispatch_action(widget* wdgt);
-void widget_list_load_media(const widget_list* list, const char* resource_path);
-void widget_list_react(const widget_list* list, const pointer_input input, SDL_Point* pt);
+void widget_list_load_media(const widget_list_t* list, const char* resource_path);
+void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt);
+bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list);
+void widget_list_render_backdrop(const widget_list_t* wdgt_list);
+void widget_list_render_foreground(const widget_list_t* wdgt_list);
+widget_t* widget_list_next(const widget_list_t* widget_list, widget_t *widget);
+widget_t* widget_list_prev(const widget_list_t* widget_list, widget_t *widget);
+widget_t* widget_list_head(const widget_list_t* wdgt_list);
+widget_t* widget_list_tail(const widget_list_t* wdgt_list);
+
+bool widget_is_slider(widget_t* w);
 #endif // __jl_widgets_h_

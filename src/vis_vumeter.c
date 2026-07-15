@@ -68,15 +68,13 @@ int visualizer_vumeter(int* levels) {
 
 	sample_accumulator[0] /= num_samples;
 	sample_accumulator[1] /= num_samples;
-//    printf("%08lld %08lld ", sample_accumulator[0], sample_accumulator[1]);
 
     for(int indx =0; indx < 2; ++indx) {
         levels[indx] = 0;
-        for (int level = 49; level >=0; --level) {
+        for (int level = 48; level >=0; --level) {
             if (sample_accumulator[indx] > RMS_MAP[level]) {
                 levels[indx] = level;
-//                vol_printf("%02d %08lld %08lld ", level, sample_accumulator[indx], RMS_MAP[level]);
-                vol_printf("%02d %08lld %08lld ", level, sample_accumulator[indx], RMS_MAP[level]);
+                vol_printf("%02d a:%08lld rms:%08lld ", level, sample_accumulator[indx], RMS_MAP[level]);
                 break;
             }
         }

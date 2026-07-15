@@ -1,10 +1,10 @@
 #include "application.h"
 #include "actions.h"
+//FIXME
 #include "widgets.h"
 #include "logging.h"
 #include "lyrion_player.h"
-
-extern lyrion_player_ptr get_player();
+#include "nowplaying.h"
 
 static SDL_Event quit_event = {.type = SDL_QUIT };
 static SDL_Event next_visu_event = {.type = USEREVENT_NEXT_VISU };
@@ -14,110 +14,113 @@ static SDL_Event prev_vu_event = {.type = USEREVENT_PREV_VISU };
 static SDL_Event next_sp_event = {.type = USEREVENT_NEXT_SP };
 static SDL_Event prev_sp_event = {.type = USEREVENT_PREV_SP };
 
-static void action_quit(widget* wdgt) {
-    SDL_PushEvent(&quit_event);
-}
+static const char* action_strings[] = {
+        "",                 /* NONE */
+        "quit",
+        "next_visu",
+        "prev_visu",
+        "next_vu",
+        "prev_vu",
+        "next_sp",
+        "prev_sp",
+        "lock_vumeter",
+        "unlock_vumeter",
+        "lock_visu",
+        "unlock_visu",
 
-static void action_next_visu(widget* wdgt) {
-    SDL_PushEvent(&next_visu_event);
-}
+        "play",
+        "pause",
+        "stop",
+        "play_pause",
 
-static void action_prev_visu(widget* wdgt) {
-    SDL_PushEvent(&prev_visu_event);
-}
+        "next-track",
+        "previous-track",
 
-static void action_next_vu(widget* wdgt) {
-    SDL_PushEvent(&next_vu_event);
-}
+        "repeat-once",
+        "repeat",
+        "repeat-off",
 
-static void action_prev_vu(widget* wdgt) {
-    SDL_PushEvent(&prev_vu_event);
-}
+        "shuffle",
+        "shuffle-album",
+        "shuffle-off",
 
-static void action_next_sp(widget* wdgt) {
-    SDL_PushEvent(&next_sp_event);
-}
+        "music-information",
 
-static void action_prev_sp(widget* wdgt) {
-    SDL_PushEvent(&prev_sp_event);
-}
+        "set-volume-level",
+        "increment-volume",
+        "decrement-volume",
 
-static void action_none(widget* wdgt) {
-}
+        "seek",
 
-static void action_lock_vumeter(widget* wdgt) {
-    widget *w = &wdgt->view->list->head;
-    while(w != NULL) {
-        if (w->type == WIDGET_VUMETER) {
-            widget_vumeter_select_lock(w, true);
+        "next-nowplaying-view",
+        "prev-nowplaying-view",
+
+        "nowplaying_view",
+        "main_view",
+        "",                 /* END */
+};
+
+action_t action_from_string(const char* str) {
+    if (str != NULL ) {
+        for(int a=0; a < sizeof(action_strings)/sizeof(action_strings[0]); ++a) {
+            if (0 == strcmp(action_strings[a], str)) {
+                return a;
+            }
         }
-        w = w->next;
     }
-    widget_multistate_button_set_state(wdgt, 1);
-}
-
-static void action_unlock_vumeter(widget* wdgt) {
-    widget *w = &wdgt->view->list->head;
-    while(w != NULL) {
-        if (w->type == WIDGET_VUMETER) {
-            widget_vumeter_select_lock(w, false);
-        }
-        w = w->next;
+    if (str) {
+        error_printf("unknown action %s\n", str);
     }
-    widget_multistate_button_set_state(wdgt, 0);
+    return ACTION_NONE;
 }
 
-static void action_lock_visu(widget* wdgt) {
-    action_lock_vumeter(wdgt);
+const char* action_to_string(action_t action) {
+    if (action > ACTION_NONE && action < ACTION_END ) {
+        return action_strings[action];
+    }
+    if (action == ACTION_NONE) return "ACTION_NONE";
+    if (action == ACTION_END) return "ACTION_NONE(END)";
+    return "ACTION_UNKNOWN";
 }
 
-static void action_unlock_visu(widget* wdgt) {
-    action_unlock_vumeter(wdgt);
-}
-
-static void widget_dispatch_action_explicit(widget* wdgt, action act) {
-    action_printf("%p %d %s\n", wdgt, act, action_to_string(act));
+void dispatch_action(action_t act, int value) {
     switch(act) {
         case ACTION_NONE:
-            action_none(wdgt);
             break;
         case ACTION_QUIT:
-            action_quit(wdgt);
+            SDL_PushEvent(&quit_event);
             break;
         case ACTION_NEXT_VISU:
-            action_next_visu(wdgt);
+            SDL_PushEvent(&next_visu_event);
             break;
         case ACTION_PREV_VISU:
-            action_prev_visu(wdgt);
+            SDL_PushEvent(&prev_visu_event);
             break;
         case ACTION_NEXT_VU:
-            action_next_vu(wdgt);
+            SDL_PushEvent(&next_vu_event);
             break;
         case ACTION_PREV_VU:
-            action_prev_vu(wdgt);
+            SDL_PushEvent(&prev_vu_event);
             break;
         case ACTION_NEXT_SP:
-            action_next_sp(wdgt);
+            SDL_PushEvent(&next_sp_event);
             break;
         case ACTION_PREV_SP:
-            action_prev_sp(wdgt);
+            SDL_PushEvent(&prev_sp_event);
             break;
         case ACTION_LOCK_VUMETER:
-            action_lock_vumeter(wdgt);
+            lock_vu_meters();
             break;
         case ACTION_UNLOCK_VUMETER:
-            action_unlock_vumeter(wdgt);
+            unlock_vu_meters();
             break;
         case ACTION_LOCK_VISU:
-            action_lock_visu(wdgt);
+            lock_visualisers();
             break;
         case ACTION_UNLOCK_VISU:
-            action_unlock_visu(wdgt);
+            unlock_visualisers();
             break;
-        case ACTION_MULTISTATE_BUTTON:
-            error_printf("multistate action %d for %p type=%d\n", act, wdgt, wdgt->type);
-            break;
-
+            
         case ACTION_PLAY:
             player_play(get_player());
             break;
@@ -126,6 +129,9 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
             break;
         case ACTION_STOP:
             player_stop(get_player());
+            break;
+        case ACTION_PLAY_PAUSE:
+            player_play_pause_toggle(get_player());
             break;
 
         case ACTION_NEXT_TRACK:
@@ -157,115 +163,44 @@ static void widget_dispatch_action_explicit(widget* wdgt, action act) {
             break;
 
         case ACTION_MUSIC_INFORMATION:
+            // TODO
             break;
 
         case ACTION_SET_VOLUME:
-            if (wdgt->type == WIDGET_SLIDER) {
-                int level;
-                widget_slider_get_value(wdgt, &level);
-                action_printf("volume level = %d\n", level);
-                player_volume_set(get_player(), level);
-            }
+            action_printf("volume level = %d\n", value);
+            player_volume_set(get_player(), value);
+            break;
+
+        case ACTION_INCREMENT_VOLUME:
+            player_volume_inc(get_player());
+            break;
+        case ACTION_DECREMENT_VOLUME:
+            player_volume_dec(get_player());
             break;
 
         case ACTION_SEEK:
-            if (wdgt->type == WIDGET_SLIDER) {
-                int track_time;
-                widget_slider_get_value(wdgt, &track_time);
-                action_printf("seek = %d\n", track_time);
-                player_seek(get_player(), track_time);
-            }
+            action_printf("seek = %d\n", value);
+            player_seek(get_player(), value);
+            // TODO nothing?
+            break;
+
+        case ACTION_NEXT_NP_VIEW:
+            next_np_view();
+            break;
+        case ACTION_PREV_NP_VIEW:
+            prev_np_view();
+            break;
+
+        case ACTION_NP_VIEW:
+            select_np_view();
+            break;
+        case ACTION_MAIN_VIEW:
+            select_main_view();
             break;
 
         case ACTION_END:
             break;
-        default:
-            error_printf("unknown action %d for %p type=%d\n", act, wdgt, wdgt->type);
-            break;
     }
 }
 
-static void action_multi_state_button(widget* wdgt) {
-    action_printf("action_multistate_button action state=%d %d %s\n", 
-            wdgt->sub.multistate_button.state,
-            wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action,
-            action_to_string( wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action));
-    widget_dispatch_action_explicit(wdgt, wdgt->sub.multistate_button.res[wdgt->sub.multistate_button.state].action);
-//    wdgt->sub.multistate_button.state = (wdgt->sub.multistate_button.state + 1) % wdgt->sub.multistate_button.state_count;
-}
 
-void widget_dispatch_action(widget* wdgt) {
-    if (wdgt->type == WIDGET_SLIDER && (!wdgt->sub.slider.defined_interactive || !wdgt->sub.slider.interactive)) {
-        return;
-    }
-    switch(wdgt->action) {
-        default:
-            widget_dispatch_action_explicit(wdgt, wdgt->action);
-            break;
-        case ACTION_MULTISTATE_BUTTON:
-            action_multi_state_button(wdgt);
-            break;
-    }
-}
-
-static const char* action_strings[] = {
-        "",                 /* NONE */
-        "quit",
-        "next_visu",
-        "prev_visu",
-        "next_vu",
-        "prev_vu",
-        "next_sp",
-        "prev_sp",
-        "lock_vumeter",
-        "unlock_vumeter",
-        "lock_visu",
-        "unlock_visu",
-        "multistate_button",
-
-        "play",
-        "pause",
-        "stop",
-
-        "next-track",
-        "previous-track",
-
-        "repeat-once",
-        "repeat",
-        "repeat-off",
-
-        "shuffle",
-        "shuffle-album",
-        "shuffle-off",
-
-        "music-information",
-
-        "set-volume-level",
-
-        "seek",
-
-        "",                 /* END */
-};
-
-action action_from_string(const char* str) {
-    if (str != NULL ) {
-        for(int a=0; a < sizeof(action_strings)/sizeof(action_strings[0]); a++) {
-            if (0 == strcmp(action_strings[a], str)) {
-                return a;
-            }
-        }
-    }
-    if (str) {
-        error_printf("unknown action %s\n", str);
-    }
-    return ACTION_NONE;
-}
-
-const char* action_to_string(action action) {
-    if (action > ACTION_NONE && action < ACTION_END ) {
-        return action_strings[action];
-    }
-    if (action == ACTION_NONE) return "ACTION_NONE";
-    if (action == ACTION_END) return "ACTION_NONE(END)";
-    return "ACTION_UNKNOWN";
-}

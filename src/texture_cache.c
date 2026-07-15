@@ -27,10 +27,11 @@ struct tcache_entry {
     const SDL_Texture*  texture;
     SDL_Surface*        surface;
     int                 w,h;
-    int                 num_bytes;
+    size_t              num_bytes;
     bool                ejected;
     bool                locked;
     bool                delete;
+    size_t              num_surface_bytes;
 };
 
 static tcache_entry empty_tce = {
@@ -60,10 +61,10 @@ static inline bool unoccupied_tce(tcache_entry* tce) {
 // rollover @60 Hz -> 67 years,  @120 Hz -> 33 years
 // so should be sufficient.
 static uint32_t lru_counter = 1;
-unsigned num_texture_bytes = 0;
-unsigned max_num_texture_bytes = 0;
 unsigned char delete_requested = 0;
-unsigned num_surface_bytes = 0;
+size_t num_texture_bytes = 0;
+size_t max_num_texture_bytes = 0;
+size_t num_surface_bytes = 0;
 
 #define PRIME2K 2039
 #define PRIME4k 4093
@@ -255,6 +256,9 @@ texture_id_t tcache_create_entry(const char* path) {
         error_printf("tcache_create_entry: path pointer is NULL\n");
         exit(EXIT_FAILURE);
     }
+    if (0 == strcmp(path, "__EMPTY__")) {
+        return EMPTY_TEXTURE_ID;
+    }
     uint32_t hashv = hashfn(path);
     texture_id_t indx = hashv%HASHTPRIME;
     int hop_count = 0;
@@ -377,8 +381,9 @@ SDL_Texture* tcache_quick_get_texture(texture_id_t texture_id, SDL_Renderer* ren
                 SDL_ClearError();
             }
             update_texture(tce, texture);
+            __atomic_sub_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
+            tce->num_surface_bytes = 0;
             SDL_FreeSurface(tce->surface);
-            __atomic_sub_fetch(&num_surface_bytes, 4 * tce->w * tce->h, __ATOMIC_ACQ_REL);
             tce->surface = NULL;
             profile_texture_printf("texture_resolve: create_texture: %06lu usec %u/%u\n", ms_ct_1 - ms_ct_0, num_texture_bytes, max_num_texture_bytes);
         }
@@ -575,11 +580,12 @@ bool tcache_load_from_file(texture_id_t texture_id, SDL_Renderer* renderer) {
             tcache_printf("tcache_load_from_file: : %d %s\n", texture_id, tce->path);
             tce->surface = IMG_Load(tce->path);
             if (tce->surface == NULL)  {
-                error_printf("tcache_load_from_file: failed: %d %s\n", texture_id, tce->path);
+                error_printf("tcache_load_from_file: failed: %d %s %s\n", texture_id, tce->path, IMG_GetError());
             } else {
                 tce->w = tce->surface->w;
                 tce->h = tce->surface->h;
-                __atomic_add_fetch(&num_surface_bytes, 4 * tce->w * tce->h, __ATOMIC_ACQ_REL);
+                tce->num_surface_bytes = tce->surface->pitch * tce->h;
+                __atomic_add_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
                 tcache_eject_printf("tcache_load_from_file: loaded: %s\n", tce->path);
             }
         } else {
@@ -609,11 +615,16 @@ bool tcache_set_surface(texture_id_t texture_id, SDL_Surface* surface) {
     if (external_tce(tce)) {
         if (tce->surface == NULL ) {
             tce->surface = surface;
+            tce->w = surface->w;
+            tce->h = surface->h;
+            tce->num_surface_bytes = tce->surface->pitch * tce->h;
+            __atomic_add_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
             return true;
         } else {
             SDL_Surface *obsolete = __atomic_exchange_n(&tce->surface, surface, __ATOMIC_ACQ_REL);
             __atomic_store_n(&tce->lru_count, lru_counter, __ATOMIC_RELEASE);
             if (obsolete) {
+                __atomic_sub_fetch(&num_surface_bytes, obsolete->pitch * obsolete->h, __ATOMIC_ACQ_REL);
                 SDL_FreeSurface(obsolete);
             }
             return true;
@@ -661,7 +672,7 @@ void tcache_dump() {
         for(int ix=0; ix < HASHTPRIME; ++ix) {
             tcache_entry* tce = tbl[ix];
             if (tce && tce != tce_deleted) {
-                printf("    %05d) delta=%4d hashv=%08x inuse=%016x %s tce=%p surface:%p texture=%p w=%4d h=%4d bytes=%8d %s\n",
+                printf("    %05d) delta=%4d hashv=%08x inuse=%016x %s tce=%p surface:%p texture=%p w=%4d h=%4d bytes=%8lu surface-bytes=%8lu %s\n",
                        ix, ix - last_ix,
                        tce->hashv,
                        tce->lru_count,
@@ -671,7 +682,8 @@ void tcache_dump() {
                        tce->texture,
                        tce->w,
                        tce->h,
-                       tce->num_bytes,
+                       (long unsigned)tce->num_bytes,
+                       (long unsigned)tce->num_surface_bytes,
                        tce->path);
                 ++count;
                 last_ix = ix;
@@ -712,8 +724,8 @@ void tcache_dump() {
         printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
         printf("Sizeof cache_entry = %ld\n", (long)sizeof(tcache_entry));
         printf("Sizeof table = %ld\n", (long)sizeof(tbl));
-        printf("Texture bytes = %u %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
-                num_texture_bytes, (float)num_texture_bytes/(1024*1024),
+        printf("Texture bytes = %lu %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
+                (long unsigned)num_texture_bytes, (float)num_texture_bytes/(1024*1024),
                 (long)locked_texture_bytes, (float)locked_texture_bytes/(1024*1024),
                 (long)unlocked_texture_bytes, (float)unlocked_texture_bytes/(1024*1024),
                 (long)ejected_texture_bytes, (float)ejected_texture_bytes/(1024*1024));
@@ -721,12 +733,12 @@ void tcache_dump() {
     printf("-----------------------------\n");
 }
 
-unsigned tcache_get_texture_bytes_count(void) {
+size_t tcache_get_texture_bytes_count(void) {
     return num_texture_bytes;
 }
 
-unsigned tcache_get_surface_bytes_count(void) {
-    return num_surface_bytes;
+size_t tcache_get_surface_bytes_count(void) {
+    return  __atomic_load_n(&num_surface_bytes, __ATOMIC_CONSUME);
 }
 
 texture_id_t tcache_get_empty_tid(void) {
@@ -750,8 +762,12 @@ bool tcache_lock_texture(texture_id_t texture_id) {
 bool tcache_unlock_texture(texture_id_t texture_id) {
     // locking the 0th entry, "uninitialised" is a client bug
     if (texture_id <= 0 || texture_id >= NUM_TBL_ENTRIES) {
-        error_printf("tcache_unlock_texture: invalid id %d\n", texture_id);
-        exit(EXIT_FAILURE);
+        if ( 0 == texture_id ) {
+            error_printf("tcache_unlock_texture: ignoring unlock empty texture %d\n", texture_id);
+        } else {
+            error_printf("tcache_unlock_texture: invalid id %d\n", texture_id);
+            exit(EXIT_FAILURE);
+        }
     }
     tcache_entry* tce = tbl[texture_id];
     if (external_tce(tce)) {

@@ -86,13 +86,6 @@ repeat_all				= repeat_2
  */
 #define SET_READONLY_CHAR_PTR(x, v) *(const char **)(&(x)) = (v)
 
-int strcmp_ex(const char* const x, const char* const y) {
-    if (x == y) return 0;
-    if (x == NULL) return -1;
-    if (y == NULL) return 1;
-    return strcmp(x, y);
-}
-
 typedef enum {
     BIT_INDEX_player_name,
     BIT_INDEX_player_connected,
@@ -221,7 +214,11 @@ typedef enum {
     playlist_modified = 0x030b9954c,
     playlist_id = 0x03584a535,
 
+    buttons = 0x0108f9988,
+    repeating_stream = 0x02607597b,
+
     VOLUME = 0x022fa5670,
+    CAN_CHANGE_VOLUME = 0x01a798b60,
     ARTIST = 0x013d3211e,
     TITLE = 0x027895b9d,
     PLAYLIST_CURRENT = 0x008374ad5,
@@ -272,6 +269,9 @@ typedef struct {
         int     id;
         int     waitingToPlay;
         int     isClassical;
+        int     mixer_volume;
+        int     digital_volume_control;
+        int     use_volume_control;
 
         const char* const   bitrate;
         const char* const   current_title;
@@ -312,7 +312,7 @@ typedef struct {
     FILE *fp;
 }lms_io, *lms_io_ptr;
 
-struct lyrion_player {
+struct lyrion_player_s_t {
     union {
         struct sockaddr sock_addr;
         struct sockaddr_in sin_addr;
@@ -326,6 +326,7 @@ struct lyrion_player {
     int volume;
     int64_t connection_failed_ts;
     int notified_failed_player_id;
+    int volume_step;
 };
 
 static inline void free_ex(void** tgt) {
@@ -502,7 +503,7 @@ static int __lms_req(lyrion_player_ptr player, const char* prefix, const char* s
             }
             *data_ptr = strdup(io_ptr->buffer + hdr_len);
         } else {
-            error_printf("failed to send data over socket\n");
+            error_printf("failed to send data over socket %s\n", strerror(errno));
         }
     } else {
         fprintf(stderr, "cmd buff is too small!\n%s\n", io_ptr->cmd_buff);
@@ -529,12 +530,12 @@ int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
                 socklen_t err_len = sizeof(err);
                 getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &err_len);
                 if (err != 0) {
-                    error_printf("connect failed %s\n", strerror(err));
+                    error_printf("connect failed %s sockfd=%d\n", strerror(err), sockfd);
                     errno = err;
                 }
                 connected = err;
             } else {
-                error_printf("connect timedout\n");
+                error_printf("connect timedout sockfd=%d\n", sockfd);
             }
         }
     }
@@ -545,11 +546,11 @@ int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
 }
 
 static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* suffix, const char *format, va_list args, char** data_ptr) {
-    lms_io io;
+    lms_io io = {.fp=NULL, .sockfd=-1};
     *data_ptr = NULL;
     int rv = -6;
 
-    if ((io.sockfd = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
+    if ((io.sockfd = socket(AF_INET, SOCK_STREAM, 0)) > -1) {
         struct timeval  tv = { .tv_sec=3, .tv_usec = 0};
         if (setsockopt(io.sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) ) {
             error_printf("failed to set socket receive timeout on %d %s\n", io.sockfd, strerror(errno));
@@ -566,8 +567,13 @@ static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* su
             if (io.fp) {
                 rv = __lms_req(player, prefix, suffix, format, args, data_ptr, &io);
                 fclose(io.fp);
+                io.fp = NULL;
             } else {
-                error_printf("Failed to create input stream %s\n", strerror(errno));
+                error_printf("Failed to create input stream for sockfd=%d %s\n", io.sockfd, strerror(errno));
+                int err = 0;
+                socklen_t err_len = sizeof(err);
+                getsockopt(io.sockfd, SOL_SOCKET, SO_ERROR, &err, &err_len);
+                error_printf("socket error sockfd=%d %s\n", io.sockfd, strerror(err));
                 rv =  -5;
             }
         } else {
@@ -580,7 +586,7 @@ static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* su
         }
         close(io.sockfd);
     } else {
-        error_printf("Socket creation error\n");
+        error_printf("Socket creation error: %s\n", strerror(errno));
         rv = -3;
     }
     return rv;
@@ -667,12 +673,14 @@ static void clear_player_status(player_status_ptr status_ptr) {
     status_ptr->isClassical = -1;
 }
 
+/*
 static void get_player_volume(lyrion_player_ptr player) {
     player->volume = -1;
     char *p = lms_query_player(player, "mixer volume");
     player->volume = atoi(p);
     FREE(p);
 }
+*/
 
 static bool update_player_status(lyrion_player_ptr player) {
 #define  SET_INTVALUE(nm) {\
@@ -840,6 +848,16 @@ static bool update_player_status(lyrion_player_ptr player) {
                         SET_STRVALUE(mode);
                         break;
 
+                    case mixer_volume:
+                        SET_INTVALUE(mixer_volume);
+                        break;
+                    case digital_volume_control:
+                        SET_INTVALUE(digital_volume_control);
+                        break;
+                    case use_volume_control:
+                        SET_INTVALUE(use_volume_control);
+                        break;
+
                     case player_name:
                     case player_connected:
                     case player_ip:
@@ -848,22 +866,23 @@ static bool update_player_status(lyrion_player_ptr player) {
                     case rate:
                     case sync_master:
                     case sync_slaves:
-                    case mixer_volume:
                     case playlist_mode:
                     case playlist_timestamp:
                     case seq_no:
-                    case digital_volume_control:
-                    case use_volume_control:
                     case remoteMeta:
                     case bpm:
 
                     case playlist_name:
                     case playlist_modified:
                     case playlist_id:
+
+                    case buttons:
+                    case repeating_stream:
                         break;
 
                     // pseudo tokens
                     case VOLUME:
+                    case CAN_CHANGE_VOLUME:
                     case ARTIST:
                     case TITLE:
                     case PLAYLIST_CURRENT:
@@ -1089,6 +1108,7 @@ void player_command(lyrion_player_ptr player, const char* command) {
 lyrion_player_ptr open_local_player(const char *lms_addr) {
     lyrion_player_ptr player = calloc(1, sizeof(*player));
     if (player) {
+        player->volume_step = 3;
         if (lms_addr) {
             player->lms = strdup(lms_addr);
         }
@@ -1101,28 +1121,6 @@ lyrion_player_ptr open_local_player(const char *lms_addr) {
             error_printf("open player to %s failed %d\n", lms_addr, status);
 //            return NULL;
         }
-    }
-    return player;
-}
-
-int poll_player(lyrion_player_ptr player, player_transient_state_ptr ptransient) {
-    int rv = 0;
-    if (player->lms_player_id) {
-        get_player_volume(player);
-        rv = update_player_status(player);
-        if (ptransient) {
-            ptransient->elapsed_secs = player->status.elapsed_time;
-            ptransient->volume = player->volume;
-        }
-    }
-    return rv;
-}
-
-lyrion_player_ptr close_local_player(lyrion_player_ptr player) {
-    if (player) {
-        close_player(player);
-        free(player);
-        player = NULL;
     }
     return player;
 }
@@ -1298,14 +1296,29 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case playlist_name:
         case playlist_modified:
         case playlist_id:
+        case buttons:
+        case repeating_stream:
             puts("????????????");
             break;
 
         // Meta keys
         case VOLUME:
-            if (player->volume > -1) {
+            if (player->status.mixer_volume > -1) {
                 return_value = PFV_INT;
-                pfv->integer = player->volume;
+                pfv->integer = 0;
+                if (player->status.use_volume_control || player->status.digital_volume_control) {
+                    pfv->integer = player->status.mixer_volume;
+                } else {
+                    pfv->integer = 100;
+                }
+            }break;
+        case CAN_CHANGE_VOLUME:
+            {
+                return_value = PFV_INT;
+                pfv->integer = 0;
+                if (player->status.use_volume_control || player->status.digital_volume_control) {
+                    pfv->integer = 1;
+                }
             }break;
         case ARTIST:
             if (player->status.meta_artist) {
@@ -1448,7 +1461,7 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case CAN_REW:
             return_value = PFV_INT;
             pfv->integer = 0;
-            if (player->status.playlist_tracks > 1 || player->status.can_seek) {
+            if (player->status.playlist_tracks > 1 || player->status.can_seek > 0) {
                 pfv->integer = 1;
             }
             break;
@@ -1510,6 +1523,31 @@ pfv_type get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const 
     return pft;
 }
 
+int poll_player(lyrion_player_ptr player, player_transient_state_ptr ptransient) {
+    int rv = 0;
+    if (player->lms_player_id) {
+//        get_player_volume(player);
+        rv = update_player_status(player);
+        if (ptransient) {
+            ptransient->elapsed_secs = player->status.elapsed_time;
+            player_value pv;
+            _get_player_value(player, &pv, "VOLUME");
+            ptransient->volume = pv.integer;
+        }
+    }
+    return rv;
+}
+
+lyrion_player_ptr close_local_player(lyrion_player_ptr player) {
+    if (player) {
+        close_player(player);
+        free(player);
+        player = NULL;
+    }
+    return player;
+}
+
+
 static int snprintf_time(char *buff, size_t bufflen, int seconds, bool suppress0) {
     int wr = 0;
     if (suppress0 && seconds < 1) {
@@ -1529,7 +1567,7 @@ static int snprintf_time(char *buff, size_t bufflen, int seconds, bool suppress0
 }
 
 void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const char *format) {
-    char* pre;
+    char* pre="";
     char* post;
     char* pprint = buff;
     int   wr;
@@ -1688,21 +1726,21 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
         }
     }
 END:
-    if (fmt) {
-        free(fmt);
-    }
+    SNPRINTF(pre);
+    FREE(fmt);
     unlock_player_status(player);
 }
 
 void player_volume_set(lyrion_player_ptr player, int level) {
-    level = level < 0 ? 0 : level;
-    level = level > 100 ? 100: level;
-    lms_command(player, "mixer volume %d", level);
+    if (player->status.use_volume_control || player->status.digital_volume_control) {
+        level = level < 0 ? 0 : level;
+        level = level > 100 ? 100: level;
+        lms_command(player, "mixer volume %d", level);
+    }
 }
 
-void player_volume_nudge(lyrion_player_ptr player, int delta) {
-    int volume = player->volume + delta;
-    player_volume_set(player, volume);
+void player_volume_step(lyrion_player_ptr player, bool up) {
+    player_volume_set(player, player->volume + (up ? player->volume_step : -player->volume_step));
 }
 
 void player_seek(lyrion_player_ptr player, int seek_time) {
@@ -1710,6 +1748,25 @@ void player_seek(lyrion_player_ptr player, int seek_time) {
         seek_time = seek_time < 0 ? 0 : seek_time;
         if (player->status.duration > 0 && seek_time < player->status.duration) {
             lms_command(player, "time %d", seek_time);
+        }
+    }
+}
+
+int player_set_volume_step(lyrion_player_ptr player, int step) {
+    int prev = -1;
+    if (player) {
+        prev = player->volume_step;
+        player->volume_step = step;
+    }
+    return prev;
+}
+
+void player_play_pause_toggle(lyrion_player_ptr player) {
+    if (player && player->status.mode) {
+        if (!strcmp(player->status.mode, "play")) {
+            player_command(player, "pause");
+        } else {
+            player_command(player, "play");
         }
     }
 }

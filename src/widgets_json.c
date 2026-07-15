@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <SDL2/SDL.h>
 #include "application.h"
-#include "widgets.h"
+#include "widgets_internal.h"
 #include "actions.h"
 #include "logging.h"
 #include "util.h"
@@ -21,10 +21,11 @@ static const char* widget_type_strings[] = {
     "vumeter",
     "slider",
     "text",
+    "vslider",
     ""
 };
 
-static widget_type tokenise_widget(const char* str) {
+static widget_type_t tokenise_widget(const char* str) {
     if (str == NULL) {
         return WIDGET_NONE;
     }
@@ -69,8 +70,9 @@ typedef enum {
     JT_RANGE_START,
     JT_RANGE_END,
     JT_INTERACTIVE,
+    JT_SLIDER_VALUE,
 
-// order of bar, pick, bar-start, bar-end should match slider_resource_ID enum
+// order of bar, pick, bar-start, bar-end should match slider_reosurce_ID_t enum
     JT_BAR,
     JT_PICK,
     JT_BAR_START,
@@ -79,10 +81,13 @@ typedef enum {
     JT_HEIGHT,
 
     JT_TEXT_FORMAT,
+    JT_TEXT_TIMEDATE_FORMAT,
     JT_TEXT_CONTENT,
     JT_TEXT_FONT,
     JT_TEXT_FONT_SIZE,
     JT_TEXT_COLOUR,
+    JT_TEXT_JUSTIFICATION,
+    JT_TEXT_Y_SCALING_THRESHOLD,
 
     JT_RED,
     JT_GREEN,
@@ -92,6 +97,9 @@ typedef enum {
     JT_PLAYER_VALUE,
     JT_PLAYER_RANGE_VALUE,
     JT_RUNTIME_VALUE,
+
+    JT_EQUAL_HORIZONTAL_SPACING,
+    JT_SYNC_ON_ACTION,
 
     JT_END,
 
@@ -130,6 +138,7 @@ static const char* json_token_strings[]= {
     "start",
     "end",
     "interactive",
+    "value",
 
     "bar",
     "pick",
@@ -139,10 +148,13 @@ static const char* json_token_strings[]= {
     "height",
 
     "format",
+    "timedate-format",
     "content",
     "font",
     "font_size",
     "colour",
+    "justification",
+    "y_scaling_threshold",
 
     "red",
     "green",
@@ -152,6 +164,10 @@ static const char* json_token_strings[]= {
     "player_value",
     "player_range_value",
     "runtime_value",
+
+    "equal_horizontal_spacing",
+
+    "sync_on_action",
 
     "",
 };
@@ -173,7 +189,7 @@ static const char* edge_strings[] = {
     "bottom"
 };
 
-static hotspot_edge tokenise_hotspot_edge(const char* str) {
+static hotspot_edge_t tokenise_hotspot_edge(const char* str) {
     if (str == NULL) {
         return EDGE_NONE;
     }
@@ -192,7 +208,7 @@ static const char* image_scaling_strings[] = {
     "stretch",
 };
 
-static image_scaling tokenise_image_scaling(const char* str) {
+static image_scaling_t tokenise_image_scaling(const char* str) {
     if (str == NULL) {
         return IMAGE_FIT;
     }
@@ -263,7 +279,6 @@ static bool get_object_boolean_value(json_value* value, json_token jt, bool defa
     return default_value;
 }
 
-/*
 static double get_object_double_value(json_value* value, json_token jt, double default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_double) {
@@ -271,9 +286,13 @@ static double get_object_double_value(json_value* value, json_token jt, double d
     }
     return default_value;
 }
-*/
 
-static void deserialise_container(json_value* value, SDL_Rect* container, view_context* ctx) {
+static float get_object_float_value(json_value* value, json_token jt, float default_value) {
+    return (float) get_object_double_value(value, jt, (double) default_value);
+}
+
+
+static void deserialise_container(json_value* value, SDL_Rect* container, view_context_t* ctx) {
     if (value == NULL) {
 //        error_printf("deserialise_container value==NULL\n");
         return;
@@ -327,7 +346,7 @@ static position tokenise_position(const char* str) {
     return P_NONE;
 }
 
-static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rect* rect, view_context* ctx) {
+static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rect* rect, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_position: value==NULL\n");
         return;
@@ -435,7 +454,7 @@ static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rec
     }
 }
 
-static void deserialise_location(json_value* value, view_context* ctx, SDL_Rect* container, widget* widget) {
+static void deserialise_location(json_value* value, view_context_t* ctx, SDL_Rect* container, widget_t* widget) {
     if (value == NULL) {
         error_printf("deserialise_location value==NULL\n");
         return;
@@ -459,158 +478,7 @@ static void deserialise_location(json_value* value, view_context* ctx, SDL_Rect*
     widget_rect(widget, &rect);
 }
 
-static void deserialise_one_widget(json_value* value, view_context* ctx) {
-    if (value == NULL) {
-        error_printf("deserialise_one_widget value==NULL\n");
-        return;
-    }
-    if (value->type != json_object) {
-        error_printf("deserialise_one_widget widget != object\n");
-        return;
-    }
-    if (value->u.object.length != 1) {
-        error_printf("deserialise_one_widget invalid object length\n");
-        exit(EXIT_FAILURE);
-    }
-    const char* widget_typename = value->u.object.values[0].name;
-    widget_type wdgt_type = tokenise_widget(value->u.object.values[0].name);
-    switch(wdgt_type) {
-        case WIDGET_NONE:
-            error_printf("deserialise_one_widget: widget none\n");
-            return;
-        case WIDGET_END:
-            error_printf("deserialise_one_widget: (END) unknown widget %s\n", widget_typename);
-            return;
-        case WIDGET_IMAGE:
-        case WIDGET_BUTTON:
-        case WIDGET_MULTISTATE_BUTTON:
-        case WIDGET_VUMETER:
-        case WIDGET_SLIDER:
-        case WIDGET_TEXT:
-            break;
-        default:
-            error_printf("deserialise_one_widget: (default) unknown widget %s\n", widget_typename);
-            return;
-    }
-    json_printf("%s\n", widget_typename);
-    value = value->u.object.values[0].value;
-    if (value->type != json_object) {
-        error_printf("deserialise_one_widget value != object\n");
-        return;
-    }
-    widget* widget = NULL;
-    switch(wdgt_type) {
-        case WIDGET_NONE:
-        case WIDGET_END:
-            break;
-        case WIDGET_IMAGE:
-            {
-                widget = widget_create_image(ctx);
-                widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
-                json_printf("     image    %s\n", widget->image_path);
-                widget_image_scaling(widget, tokenise_image_scaling(get_object_string_value(value, JT_IMAGE_SCALING, "fit")));
-            }break;
-        case WIDGET_BUTTON:
-            {
-                widget = widget_create_button(ctx);
-                widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
-                json_printf("     image    %s\n", widget->image_path);
-            }break;
-        case WIDGET_TEXT:
-            {
-                widget = widget_create_text(ctx);
-                widget_text_set_content(widget, get_object_string_value(value, JT_TEXT_CONTENT, NULL));
-                json_printf("     content    %s\n", widget->sub.text.content);
-                widget_text_set_format(widget, get_object_string_value(value, JT_TEXT_FORMAT, NULL));
-                json_printf("     format     %s\n", widget->sub.text.format);
-                int font_size = get_scaled_object_int_value(value, JT_TEXT_FONT_SIZE, 12);
-                widget_text_set_font(widget, get_object_string_value(value, JT_TEXT_FONT, ctx->app->default_font_path), font_size);
-                json_printf("     font       %p\n", widget->sub.text.font);
-                json_printf("     fontsize   %p\n", font_size);
-                json_value* jcolour = get_object_object_value(value, JT_TEXT_COLOUR);
-                if (jcolour) {
-                    SDL_Color sdlcolour = { 0, 0, 0, 255};
-                    sdlcolour.r =  get_object_int_value(jcolour, JT_RED, 0);
-                    sdlcolour.g =  get_object_int_value(jcolour, JT_GREEN, 0);
-                    sdlcolour.b =  get_object_int_value(jcolour, JT_BLUE, 0);
-                    sdlcolour.a =  get_object_int_value(jcolour, JT_ALPHA, 255);
-                    widget_text_set_colour(widget, sdlcolour);
-                }
-            }break;
-        case WIDGET_MULTISTATE_BUTTON:
-            {
-                json_value* jstates = get_object_value(value, JT_STATES);
-                if (jstates != NULL && jstates->type == json_array) {
-                    json_printf("     states\n");
-                    widget = widget_create_multistate_button(ctx, jstates->u.array.length);
-                    for(int x=0; x<jstates->u.array.length; ++x) {
-                        json_value* svalue = jstates->u.array.values[x];
-                        widget_multistate_button_addstate(widget, x, 
-                                get_object_string_value(svalue, JT_IMAGE, NULL),
-                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)));
-                        json_printf("              %d %s %s\n",
-                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
-                                get_object_string_value(svalue, JT_ACTION, NULL),
-                                get_object_string_value(svalue, JT_IMAGE, NULL));
-                    }
-                } else {
-                    error_printf("states is either missing or not an array %p", jstates);
-                }
-            }break;
-        case WIDGET_VUMETER:
-            {
-                widget = widget_create_vumeter(ctx);
-                // TODO remove this feature?
-                widget_vumeter_select_by_name(widget, get_object_string_value(value, JT_SELECT, NULL));
-            }break;
-        case WIDGET_SLIDER:
-            {
-                widget = widget_create_slider(ctx);
-                widget_slider_define_interactive(widget, get_object_boolean_value(value, JT_INTERACTIVE, true));
-                {
-                    json_value* jrange = get_object_object_value(value, JT_RANGE);
-                    if (jrange) {
-                        widget_slider_range(widget, 
-                                get_object_int_value(jrange, JT_RANGE_START, 0),
-                                get_object_int_value(jrange, JT_RANGE_END, 0)
-                                );
-                        json_printf("     range:%d %d\n",
-                                get_object_int_value(jrange, JT_RANGE_START, 0),
-                                get_object_int_value(jrange, JT_RANGE_END, 0)
-                                );
-                    }
-                }
-                json_printf("     resources:\n");
-                for(slider_resource_ID resid = 0; resid < SLIDER_RESOURCE_COUNT; ++resid) {
-                    json_value* jslider = get_object_object_value(value, JT_BAR+resid);
-                    if (jslider) {
-                        json_value* jimage = get_object_value(jslider, JT_IMAGE);
-                        if (jimage && jimage->type == json_array) {
-                            json_value* svalue = jimage->u.array.length >0? jimage->u.array.values[0]: NULL;
-                            char* path1 = svalue? svalue->u.string.ptr: NULL;
-                            svalue = jimage->u.array.length >1? jimage->u.array.values[1]: NULL;
-                            char* path2 = svalue? svalue->u.string.ptr: NULL;
-                            widget_slider_image_paths(widget, resid, path1, path2);
-                            json_printf("              %d img=[%s,%s]\n", resid, path1, path2);
-                        } else {
-                            widget_slider_image_paths(widget, resid, 
-                                    get_object_string_value(jslider, JT_IMAGE, NULL),
-                                    get_object_string_value(jslider, JT_IMAGE, NULL)
-                                    );
-                            json_printf("              %d img=%s\n", resid, get_object_string_value(jslider, JT_IMAGE, NULL));
-                        }
-                        if (get_object_value(jslider, JT_WIDTH)) {
-                            widget_slider_image_width(widget, resid, 
-                                    get_scaled_object_int_value(jslider, JT_WIDTH, 0));
-                            json_printf("              %d w=%d\n", resid, get_scaled_object_int_value(jslider, JT_WIDTH, 0));
-                        }
-                        widget_slider_image_height(widget, resid, 
-                            get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
-                        json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
-                    }
-                }
-            }break;
-    }
+static void deserialise_one_widget_generic(widget_t* widget, json_value* value, view_context_t* ctx) {
     if (widget) {
         widget_set_player_value_key(widget, get_object_string_value(value, JT_PLAYER_VALUE, NULL));
         if (get_object_string_value(value, JT_PLAYER_RANGE_VALUE, NULL)) {
@@ -634,12 +502,204 @@ static void deserialise_one_widget(json_value* value, view_context* ctx) {
                widget->hotspot,
                tokenise_hotspot_edge(get_object_string_value(value, JT_HOTSPOT_EDGE, NULL)),
                get_object_string_value(value, JT_HOTSPOT_EDGE, NULL));
-    } else {
+        widget_configure(widget);
+    }
+}
+
+static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
+    if (value == NULL) {
+        error_printf("deserialise_one_widget value==NULL\n");
+        return;
+    }
+    if (value->type != json_object) {
+        error_printf("deserialise_one_widget widget != object\n");
+        return;
+    }
+    if (value->u.object.length != 1) {
+        error_printf("deserialise_one_widget invalid object length\n");
+        exit(EXIT_FAILURE);
+    }
+    const char* widget_typename = value->u.object.values[0].name;
+    widget_type_t wdgt_type = tokenise_widget(value->u.object.values[0].name);
+    switch(wdgt_type) {
+        case WIDGET_NONE:
+            error_printf("deserialise_one_widget: widget none\n");
+            return;
+        case WIDGET_END:
+            error_printf("deserialise_one_widget: (END) unknown widget %s\n", widget_typename);
+            return;
+        case WIDGET_IMAGE:
+        case WIDGET_BUTTON:
+        case WIDGET_MULTISTATE_BUTTON:
+        case WIDGET_VUMETER:
+        case WIDGET_VSLIDER:
+        case WIDGET_SLIDER:
+        case WIDGET_TEXT:
+            break;
+        default:
+            error_printf("deserialise_one_widget: (default) unknown widget %s\n", widget_typename);
+            return;
+    }
+    json_printf("%s\n", widget_typename);
+    value = value->u.object.values[0].value;
+    if (value->type != json_object) {
+        error_printf("deserialise_one_widget value != object\n");
+        return;
+    }
+    widget_t* widget = NULL;
+    switch(wdgt_type) {
+        case WIDGET_NONE:
+        case WIDGET_END:
+            break;
+        case WIDGET_IMAGE:
+            {
+                widget = widget_create_image(ctx);
+                widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
+                json_printf("     image    %s\n", widget->image_path);
+                widget_image_scaling(widget, tokenise_image_scaling(get_object_string_value(value, JT_IMAGE_SCALING, "fit")));
+                deserialise_one_widget_generic(widget, value, ctx);
+            }break;
+        case WIDGET_BUTTON:
+            {
+                widget = widget_create_button(ctx);
+                widget_image_path(widget, get_object_string_value(value, JT_IMAGE, NULL));
+                json_printf("     image    %s\n", widget->image_path);
+                deserialise_one_widget_generic(widget, value, ctx);
+            }break;
+        case WIDGET_TEXT:
+            {
+                widget = widget_create_text(ctx);
+                widget_text_set_content(widget, get_object_string_value(value, JT_TEXT_CONTENT, NULL));
+                json_printf("     content    %s\n", widget->sub.text.content);
+                widget_text_set_format(widget, get_object_string_value(value, JT_TEXT_FORMAT, NULL));
+                json_printf("     format     %s\n", widget->sub.text.format);
+                widget_text_set_timedate_format(widget, get_object_string_value(value, JT_TEXT_TIMEDATE_FORMAT, NULL));
+                json_printf("     tdformat   %s\n", widget->sub.text.timedate_format);
+                int font_size = get_scaled_object_int_value(value, JT_TEXT_FONT_SIZE, 12);
+                widget_text_set_font(widget, get_object_string_value(value, JT_TEXT_FONT, ctx->app->default_font_path), font_size);
+                json_printf("     font       %p\n", widget->sub.text.font);
+                json_printf("     fontsize   %p\n", font_size);
+                widget_text_set_justification(widget, get_object_string_value(value, JT_TEXT_JUSTIFICATION, NULL));
+                widget_text_set_y_scaling_threshold(widget, get_object_float_value(value, JT_TEXT_Y_SCALING_THRESHOLD, DEFAULT_WIDGET_TEXT_Y_SCALING_THRESHOLD));
+                json_value* jcolour = get_object_object_value(value, JT_TEXT_COLOUR);
+                if (jcolour) {
+                    SDL_Color sdlcolour = { 0, 0, 0, 255};
+                    sdlcolour.r =  get_object_int_value(jcolour, JT_RED, 0);
+                    sdlcolour.g =  get_object_int_value(jcolour, JT_GREEN, 0);
+                    sdlcolour.b =  get_object_int_value(jcolour, JT_BLUE, 0);
+                    sdlcolour.a =  get_object_int_value(jcolour, JT_ALPHA, 255);
+                    widget_text_set_colour(widget, sdlcolour);
+                }
+                deserialise_one_widget_generic(widget, value, ctx);
+            }break;
+        case WIDGET_MULTISTATE_BUTTON:
+            {
+                json_value* jstates = get_object_value(value, JT_STATES);
+                if (jstates != NULL && jstates->type == json_array) {
+                    json_printf("     states\n");
+                    widget = widget_create_multistate_button(ctx, jstates->u.array.length);
+                    for(int x=0; x<jstates->u.array.length; ++x) {
+                        json_value* svalue = jstates->u.array.values[x];
+                        widget_multistate_button_addstate(widget, x, 
+                                get_object_string_value(svalue, JT_IMAGE, "__EMPTY__"),
+                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
+                                action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL))
+                                );
+                        json_printf("              %d %s, %d %s, %s\n",
+                                action_from_string(get_object_string_value(svalue, JT_ACTION, NULL)),
+                                get_object_string_value(svalue, JT_ACTION, NULL),
+                                action_from_string(get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL)),
+                                get_object_string_value(svalue, JT_SYNC_ON_ACTION, NULL),
+                                get_object_string_value(svalue, JT_IMAGE, "__EMPTY__"));
+                    }
+                } else {
+                    error_printf("states is either missing or not an array %p", jstates);
+                }
+                deserialise_one_widget_generic(widget, value, ctx);
+            }break;
+        case WIDGET_VUMETER:
+            {
+                widget = widget_create_vumeter(ctx);
+                // TODO remove this feature?
+                widget_vumeter_select_by_name(widget, get_object_string_value(value, JT_SELECT, NULL));
+                widget_vumeter_equal_horizontal_spacing(widget, get_object_boolean_value(value, JT_EQUAL_HORIZONTAL_SPACING, false));
+
+                deserialise_one_widget_generic(widget, value, ctx);
+            }break;
+        case WIDGET_SLIDER:
+        case WIDGET_VSLIDER:
+            {
+                widget = wdgt_type == WIDGET_SLIDER ? widget_create_slider(ctx) : widget_create_vslider(ctx);
+                widget_slider_define_interactive(widget, get_object_boolean_value(value, JT_INTERACTIVE, true));
+                {
+                    json_value* jrange = get_object_object_value(value, JT_RANGE);
+                    if (jrange) {
+                        widget_slider_range(widget, 
+                                get_object_int_value(jrange, JT_RANGE_START, 0),
+                                get_object_int_value(jrange, JT_RANGE_END, 0)
+                                );
+                        json_printf("     range:%d %d\n",
+                                get_object_int_value(jrange, JT_RANGE_START, 0),
+                                get_object_int_value(jrange, JT_RANGE_END, 0)
+                                );
+                    }
+                }
+                json_printf("     resources:\n");
+                for(slider_reosurce_ID_t resid = 0; resid < SLIDER_RESOURCE_COUNT; ++resid) {
+                    json_value* jslider = get_object_object_value(value, JT_BAR+resid);
+                    if (jslider) {
+                        json_value* jimage = get_object_value(jslider, JT_IMAGE);
+                        if (jimage && jimage->type == json_array) {
+                            json_value* svalue = jimage->u.array.length >0? jimage->u.array.values[0]: NULL;
+                            char* path1 = svalue? svalue->u.string.ptr: NULL;
+                            svalue = jimage->u.array.length >1? jimage->u.array.values[1]: NULL;
+                            char* path2 = svalue? svalue->u.string.ptr: NULL;
+                            widget_slider_image_paths(widget, resid, path1, path2);
+                            json_printf("              %d img=[%s,%s]\n", resid, path1, path2);
+                        } else {
+                            widget_slider_image_paths(widget, resid, 
+                                    get_object_string_value(jslider, JT_IMAGE, NULL),
+                                    get_object_string_value(jslider, JT_IMAGE, NULL)
+                                    );
+                            json_printf("              %d img=%s\n", resid, get_object_string_value(jslider, JT_IMAGE, NULL));
+                        }
+
+                        if (wdgt_type == WIDGET_SLIDER) {
+                            if (get_object_value(jslider, JT_WIDTH)) {
+                                widget_slider_image_width(widget, resid, 
+                                        get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                                json_printf("              %d w=%d\n", resid, get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                            }
+                            widget_slider_image_height(widget, resid, 
+                                get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                            json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                        } else {
+                            if (get_object_value(jslider, JT_HEIGHT)) {
+                                widget_slider_image_height(widget, resid, 
+                                        get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                                json_printf("              %d h=%d\n", resid, get_scaled_object_int_value(jslider, JT_HEIGHT, 0));
+                            }
+                            widget_slider_image_width(widget, resid, 
+                                get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                            json_printf("              %d w=%d\n", resid, get_scaled_object_int_value(jslider, JT_WIDTH, 0));
+                        }
+                    }
+                }
+                deserialise_one_widget_generic(widget, value, ctx);
+                {
+                    json_value* slider_v =get_object_value(value, JT_SLIDER_VALUE);
+                    if (slider_v && slider_v->type == json_integer) {
+                        widget_slider_update_value(widget, slider_v->u.integer, NULL);
+                    }
+                }
+            }break;
+    }
+    if (NULL == widget) {
         error_printf("deserialise_one_widget NULL widget for type %d\n", wdgt_type);
     }
 }
 
-void deserialise_widgets(json_value* value, view_context* ctx) {
+static void deserialise_widgets(json_value* value, view_context_t* ctx) {
     if (value == NULL) {
         error_printf("deserialise_widgets value==NULL\n");
         return;
@@ -658,7 +718,7 @@ void deserialise_widgets(json_value* value, view_context* ctx) {
     }
 }
 
-bool deserialise_screen(json_value* value, view_context* ctx, SDL_Rect* rect) {
+static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) {
     if (value == NULL) {
         error_printf("deserialise_screen value==NULL\n");
         return false;
@@ -680,7 +740,7 @@ bool deserialise_screen(json_value* value, view_context* ctx, SDL_Rect* rect) {
     return false;
 }
 
-int deserialise_json(const char* json_string, const int len, view_context* ctx) {
+static int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
     json_value* value = json_parse(json_string, len);
 
     if (value == NULL) {
@@ -709,7 +769,7 @@ int deserialise_json(const char* json_string, const int len, view_context* ctx) 
     return 0;
 }
 
-int deserialise_widgets_file(const char* filepath, view_context* ctx) {
+int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
     FILE *fp;
     struct stat filestatus;
     char* json_string;
@@ -746,5 +806,5 @@ int deserialise_widgets_file(const char* filepath, view_context* ctx) {
     if (rv != 0) {
         error_printf("deserialise_widgets_file: failed to parse json file %s\n", filepath);
     }
-    return 0;
+    return rv;
 }

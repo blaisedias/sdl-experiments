@@ -12,6 +12,7 @@
 extern void error_printf(char *format, ...);
 extern void dummy_printf(char *format, ...);
 
+extern void (*log_printf)(char *format, ...);
 extern void (*vol_printf)(char *format, ...);
 extern void (*perf_printf)(char *format, ...);
 extern void (*load_printf)(char *format, ...);
