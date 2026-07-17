@@ -1,7 +1,7 @@
 {
     "enums": [
         {
-            "name" : "layout_arrangement",
+            "name" : "channel_arrangement",
             "enum": [
                 { "string": "none", "symbol": "NO_ARRANGEMENT"},
                 { "string": "horizontal", "symbol": "HORIZONTAL_ARRANGEMENT"},
@@ -9,7 +9,7 @@
             ]
         },
         {
-            "name" : "component_render_op",
+            "name" : "composition_render_op",
             "enum": [
                 { "string": "static", "symbol": "STATIC"},
                 { "string": "single", "symbol": "SINGLE"},
@@ -18,12 +18,13 @@
             ]
         },
         {
-            "name" : "component_volume_type",
+            "name" : "composition_volume_type",
             "enum": [
                 { "string": "sampled", "symbol": "SAMPLED"},
                 { "string": "peak-hold+sampled", "symbol": "PEAK_HOLD_AND_SAMPLED"},
                 { "string": "decay", "symbol": "DECAY"},
-                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_AND_DECAY"}
+                { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_AND_DECAY"},
+                { "string": "none", "symbol": "NONE"}
             ]
         }
     ]

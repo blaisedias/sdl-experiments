@@ -215,7 +215,7 @@ $(BIN_DIR)/lyrion_player_strhash: $(SRC)/lyrion_player_strhash.c $(SRC)/lyrion_p
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
 
-$(BIN_DIR)/vumeter_json: $(SRC)/vumeter_json.c $(OBJS_DIR)/json.o $(OBJS_DIR)/logging.o $(OBJS_DIR)/util.o $(GENERATED)/vumeter_enum.c 
+$(BIN_DIR)/vumeter_json_load_test: $(SRC)/vumeter_json_load_test.c $(SRC)/vumeter_json.c $(OBJS_DIR)/json.o $(OBJS_DIR)/logging.o $(OBJS_DIR)/util.o $(GENERATED)/vumeter_enum.c 
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-Og -g -o $(@) $^ $(INCLUDES) $(LIBDIRS) $(LIBS)
 

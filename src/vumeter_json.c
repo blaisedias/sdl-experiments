@@ -21,42 +21,75 @@ static void printf_point(const SDL_Point* point) {
 }
 
 
-static void dump_vu(const vumeter_properties_t* vu) {
+void dump_vumeter(const vumeter_properties_t* vu) {
+    if (vu == NULL) {
+        return;
+    }
+    printf("resource path :%s\n", vu->resource_path);
 #ifdef DEBUG_VUMETER_JSON
     printf("kind:%s, vutype=%s, format=%s\n",
             vu->kind, vu->vutype, vu->format);
 #endif
     printf("format version:%d\n", vu->format_version);
-    printf("layout:\n    w=%d h=%d arrangement=%s\n",
+    printf("layout:\n    w=%d h=%d arrangement=%d (%s)\n",
             vu->layout.w,
             vu->layout.h,
-            string_from_layout_arrangement(vu->layout.arrangement)
+            vu->layout.arrangement,
+            string_from_channel_arrangement(vu->layout.arrangement)
             );
-    printf("    rects:\n");
+    printf("  rects:\n");
     for(int ix = 0; ix < sizeof(vu->layout.rects)/sizeof(vu->layout.rects[0]); ++ix) {
-        printf("        ");
+        printf("    ");
         printf_rect(vu->layout.rects+ix);
         printf("\n");
     }
-    printf("resources:\n    count=%d\n    names:\n", vu->resources.count);
-    for(int ix =0; ix < vu->resources.count; ++ix) {
-        printf("        %s\n", vu->resources.names[ix]);
+    printf("resources:\n    count=%d\n    filenames:\n", vu->resource_list.count);
+    for(int ix =0; ix < vu->resource_list.count; ++ix) {
+        printf("      %s\n", vu->resource_list.names[ix]);
     }
-    printf("placements:\n    count=%d\n    names:\n", vu->placements.count);
-    for(int ix =0; ix < vu->placements.count; ++ix) {
-        printf("        %03d) rect=", ix);
-        printf_rect(&vu->placements.elements[ix].rect);
+    printf("placements:\n    count=%d\n", vu->placement_list.count);
+    for(int ix =0; ix < vu->placement_list.count; ++ix) {
+        printf("    %03d) rect:  ", ix);
+        printf_rect(&vu->placement_list.elements[ix].rect);
         printf(", center=");
-        printf_point(&vu->placements.elements[ix].center);
+        printf_point(&vu->placement_list.elements[ix].center);
         printf(", flip=%d ",
-                vu->placements.elements[ix].flip);
+                vu->placement_list.elements[ix].flip);
         printf(", angle=%06.2f",
-                vu->placements.elements[ix].angle);
+                vu->placement_list.elements[ix].angle);
         printf(", texture_index=%d",
-                vu->placements.elements[ix].texture_index);
+                vu->placement_list.elements[ix].texture_index);
         printf("\n");
     }
+    printf("compositions:\n    count=%d\n", vu->composition_list.count);
+    for(int ix =0; ix < vu->composition_list.count; ++ix) {
+        vu_composition_t* composition =  &vu->composition_list.compositions[ix];
+        printf("    %d) composition: render_op=%d (%s) volume_type=%d (%s)\n",
+                ix,
+                composition->render_op, string_from_composition_render_op(composition->render_op),
+                composition->volume_type, string_from_composition_volume_type(composition->volume_type)
+                );
+        printf("         placements: ");
+        for(int ixp=0; ixp < composition->placement_count; ixp++) {
+            printf("%d, ", composition->ix_placements[ixp]);
+        }
+        puts("");
+    }
+    printf("vumeters:\n    count=%d\n", vu->vumeter_list.count);
+    for(int ix =0; ix < vu->vumeter_list.count; ++ix) {
+        vumeter_t* vumeter = &vu->vumeter_list.vumeters[ix];
+        printf("    %s:\n", vumeter->name);
+        for (int ich=0; ich < vumeter->component_count; ++ich) {
+            vu_component_t* component = &vumeter->components[ich];
+            printf("        ");
+            for (int icomp=0; icomp < component->composition_count; ++icomp) {
+                printf("%d, ", component->ix_compositions[icomp]);
+            }
+            puts("");
+        }
+    }
 }
+
 static json_value* get_object_value(json_value* jvalue, const char* jt) {
     if (jvalue == NULL) {
         error_printf("get_object_value: value==NULL\n");
@@ -155,12 +188,12 @@ static int deserialise_layout(json_value* jvalue, vumeter_properties_t* vu) {
         error_printf("deserialise_vumeter: invalid value of layout height %d\n", vu->layout.h);
         return -1;
     }
-    const char* str = get_object_string_value(jvalue, "arrangement", NULL);
-    if (str && !is_string_layout_arrangement(str)) {
+    const char* str = get_object_string_value(jvalue, "channel_arrangement", NULL);
+    if (str && !is_string_channel_arrangement(str)) {
         error_printf("invalid value for layout arrangement %s\n", str);
     }
-    vu->layout.arrangement = layout_arrangement_from_string(str, NO_ARRANGEMENT);
-    json_value* rects_value = get_object_array_value(jvalue, "rects");
+    vu->layout.arrangement = channel_arrangement_from_string(str, NO_ARRANGEMENT);
+    json_value* rects_value = get_object_array_value(jvalue, "rectangles");
     if (rects_value) {
         int n_rects = sizeof(vu->layout.rects)/sizeof(vu->layout.rects[0]);
         if (rects_value->u.array.length != n_rects) {
@@ -175,12 +208,12 @@ static int deserialise_layout(json_value* jvalue, vumeter_properties_t* vu) {
     return 0;
 }
 
-static int deserialise_resources(json_value* jresources, vumeter_properties_t* vu) {
+static int deserialiser_resource_list(json_value* jresources, vumeter_properties_t* vu) {
     if (NULL == jresources) {
-        error_printf("deserialise_resources: got null object for resources\n");
+        error_printf("deserialiser_resource_list: got null object for resources\n");
         return -1;
     }
-    vu->resources.count = jresources->u.array.length;
+    vu->resource_list.count = jresources->u.array.length;
     size_t bufflen = jresources->u.array.length;
     for(int ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
@@ -196,23 +229,22 @@ static int deserialise_resources(json_value* jresources, vumeter_properties_t* v
         }
     }
     bufflen += sizeof(char*) *  jresources->u.array.length;
-    char *buffer  = calloc(bufflen, sizeof(char));
-//    vu->resources.names = calloc(bufflen, sizeof(char));
-    vu->resources.names = (char **)buffer;
-    if (!vu->resources.names) {
+    char *buffer;
+    if (NULL == CALLOC(bufflen, buffer)) {
         error_printf("OOM: resources strings %ld\n", bufflen);
         return -1;
     }
-    char *p = (char*)(&vu->resources.names[vu->resources.count]);
+    vu->resource_list.names = (char **)buffer;
+    char *p = (char*)(&vu->resource_list.names[vu->resource_list.count]);
     for(int ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
         switch (jelem->type) {
             case json_null:
-                vu->resources.names[ix] = NULL;
+                vu->resource_list.names[ix] = NULL;
                 break;
             case json_string:
                 strcpy(p, jelem->u.string.ptr);
-                vu->resources.names[ix] = p;
+                vu->resource_list.names[ix] = p;
                 p += 1 + jelem->u.string.length;
                 break;
             default:
@@ -220,19 +252,27 @@ static int deserialise_resources(json_value* jresources, vumeter_properties_t* v
                 return -1;
         }
     }
-    vu->resources.textures = calloc(sizeof(vu->resources.textures[0]), vu->resources.count);
+//    vu->resource_list.textures = calloc(vu->resource_list.count, sizeof(vu->resource_list.textures[0]));
+    if (NULL == CALLOC(vu->resource_list.count, vu->resource_list.textures)) {
+        error_printf("OOM: calloc textures %d\n", vu->resource_list.count);
+        return -1;
+    }
     return 0;
 }
 
-static int deserialise_placements(json_value* jplacements, vumeter_properties_t* vu) {
+static int deserialise_placement_list(json_value* jplacements, vumeter_properties_t* vu) {
     if (NULL == jplacements) {
-        error_printf("deserialise_placements: got null object for placements\n");
+        error_printf("deserialise_placement_list: got null object for placements\n");
         return -1;
     }
-    vu->placements.count = jplacements->u.array.length;
-    vu->placements.elements = calloc(sizeof( vu->placements.elements[0]), vu->placements.count);
-    for(int ix=0; ix < vu->placements.count; ++ix) {
-        vu_placement_t* placement = &vu->placements.elements[ix];
+    vu->placement_list.count = jplacements->u.array.length;
+//    vu->placement_list.elements = calloc(vu->placement_list.count, sizeof( vu->placement_list.elements[0]));
+    if(NULL == CALLOC(vu->placement_list.count, vu->placement_list.elements)) {
+        error_printf("OOM placements %d\n", vu->placement_list.count);
+        return -1;
+    }
+    for(int ix=0; ix < vu->placement_list.count; ++ix) {
+        vu_placement_t* placement = &vu->placement_list.elements[ix];
         json_value* jelem = jplacements->u.array.values[ix];
 
         deserialise_rect(jelem, &placement->rect);
@@ -247,23 +287,151 @@ static int deserialise_placements(json_value* jplacements, vumeter_properties_t*
     return 0;
 }
 
-static int deserialise_levels(json_value* jlevels, vumeter_properties_t* vu) {
-    if (NULL == jlevels) {
-        error_printf("deserialise_levels: got null object for levels\n");
+static int deserialise_composition(json_value* jcomposition, vu_composition_t* composition) {
+    const char* str = get_object_string_value(jcomposition, "render_op", "static");
+    if (!is_string_composition_render_op(str)) {
+        error_printf("invalid value for render op %s\n", str);
         return -1;
     }
-    
+    composition->render_op = composition_render_op_from_string(str, STATIC);
+
+    str = get_object_string_value(jcomposition, "volume_type", "sampled");
+    if (!is_string_composition_volume_type(str)) {
+        error_printf("invalid value for volume type %s\n", str);
+        return -1;
+    }
+    composition->volume_type = composition_volume_type_from_string(str, STATIC);
+
+    json_value* jcp = get_object_array_value(jcomposition, "placements");
+    if (jcp == NULL) {
+        error_printf("got null object for compositions placements\n");
+        return -1;
+    }
+    composition->placement_count = jcp->u.array.length;
+//    composition->ix_placements = calloc(composition->placement_count, sizeof(composition->ix_placements[0]));
+    if(NULL == CALLOC(composition->placement_count,composition->ix_placements)) {
+        error_printf("OOM composition placements %d\n", composition->placement_count);
+        return -1;
+    }
+    for(int ix=0; ix < composition->placement_count; ++ix) {
+        if (jcp->u.array.values[ix]->type != json_integer) {
+            error_printf("composition placement index is not an integer\n");
+            return -1;
+        }
+        composition->ix_placements[ix] = jcp->u.array.values[ix]->u.integer;
+    }
     return 0;
 }
 
-static int __json_deserialise_vumeter(json_value* jvalue, vumeter_properties_t* vu) {
+static int deserialise_composition_list(json_value* jcompositions, vumeter_properties_t* vu) {
+    if (NULL == jcompositions) {
+        error_printf("deserialise_composition_list: got null object for compositions\n");
+        return -1;
+    }
+    vu->composition_list.count = jcompositions->u.array.length;
+//    vu->composition_list.compositions = calloc(vu->composition_list.count, sizeof( vu->composition_list.compositions[0]));
+    if (NULL == CALLOC(vu->composition_list.count, vu->composition_list.compositions)) {
+        error_printf("OOM composition list compositions %d\n", vu->composition_list.count);
+        return -1;
+    }
+    
+    for(int ix=0; ix < vu->composition_list.count; ++ix) {
+        vu_composition_t* composition = &vu->composition_list.compositions[ix];
+        if (0 != deserialise_composition(jcompositions->u.array.values[ix], composition)) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+static int deserialise_component(json_value* jcomponent,  vu_component_t* component) {
+    if (NULL == jcomponent) {
+        error_printf("deserialise_component: got null object for component\n");
+        return -1;
+    }
+    if (jcomponent->type != json_array) {
+        error_printf("deserialise_component: component is not an array\n");
+        return -1;
+    }
+
+//    component->ix_compositions = calloc(jcomponent->u.array.length, sizeof(component->ix_compositions[0]));
+    if (NULL == CALLOC(jcomponent->u.array.length, component->ix_compositions)) {
+        error_printf("deserialise_component: OOM %d\n", jcomponent->u.array.length);
+        return -1;
+    }
+
+    component->composition_count = jcomponent->u.array.length;
+    for(int ix = 0; ix < jcomponent->u.array.length; ++ix) {
+        json_value* jcomp = jcomponent->u.array.values[ix];
+        if (jcomp->type != json_integer) {
+            error_printf("deserialise_component: composition value is not an integer\n");
+            return -1;
+        }
+        component->ix_compositions[ix] = jcomp->u.integer;
+    }
+    return 0;
+}
+
+static int deserialise_vumeter(json_value* jvumeter, vumeter_t* vumeter) {
+    if (NULL == jvumeter) {
+        error_printf("deserialise_vumeter: got null object for vumeter\n");
+        return -1;
+    }
+    if (jvumeter->type != json_object) {
+        error_printf("deserialise_vumeter: vumeter is not an object\n");
+        return -1;
+    }
+    if (jvumeter->u.object.values->value->type != json_array) {
+        error_printf("deserialise_vumeter: vumeter object is not an array\n");
+        return -1;
+    }
+    vumeter->name = strdup(jvumeter->u.object.values->name);
+    json_value* jcomponents = jvumeter->u.object.values->value;
+    if (jcomponents->u.array.length != 1+NUM_VU_CHANNELS) {
+        error_printf("deserialise_vumeter: vumeter object array length is incorrect: %d, expected %d\n",
+                jcomponents->u.array.length, 1+NUM_VU_CHANNELS);
+        return -1;
+    }
+    vumeter->component_count = jcomponents->u.array.length;
+    for(int ix = 0; ix < jcomponents->u.array.length; ++ix) {
+        if (0 != deserialise_component(jcomponents->u.array.values[ix], &vumeter->components[ix])) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+static int deserialise_vumeter_list(json_value* jvumeters, vumeter_properties_t* vu) {
+    if (NULL == jvumeters) {
+        error_printf("deserialise_vumeter_list: got null object for vumeters\n");
+        return -1;
+    }
+    vu->vumeter_list.count = jvumeters->u.array.length;
+//    vu->vumeter_list.vumeters = calloc(vu->vumeter_list.count, sizeof( vu->vumeter_list.vumeters[0]));
+    if (NULL == CALLOC(vu->vumeter_list.count, vu->vumeter_list.vumeters)) {
+        error_printf("OOM vumeter list vumeters %d\n", vu->vumeter_list.count);
+        return -1;
+    }
+    
+    for(int ix=0; ix < vu->vumeter_list.count; ++ix) {
+        vumeter_t* vumeter = &vu->vumeter_list.vumeters[ix];
+        if (0 != deserialise_vumeter(jvumeters->u.array.values[ix], vumeter)) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+static int _json_deserialise(json_value* jvalue, vumeter_properties_t* vu) {
     const char* str;
     str = get_object_string_value(jvalue, "kind", NULL);
     if (strcmp_ex("vumeter", str)) {
         error_printf("deserialise_vumeter: unsupported kind %s\n", str); 
     }
 #ifdef DEBUG_VUMETER_JSON
-    vu->kind = str;
+    vu->kind = strdup(str);
 #endif
 
     str = get_object_string_value(jvalue, "vutype", NULL);
@@ -272,7 +440,7 @@ static int __json_deserialise_vumeter(json_value* jvalue, vumeter_properties_t* 
         return -1;
     }
 #ifdef DEBUG_VUMETER_JSON
-    vu->vutype = str;
+    vu->vutype = strdup(str);
 #endif
 
     str = get_object_string_value(jvalue, "format", NULL);
@@ -281,7 +449,7 @@ static int __json_deserialise_vumeter(json_value* jvalue, vumeter_properties_t* 
         return -1;
     }
 #ifdef DEBUG_VUMETER_JSON
-    vu->format = str;
+    vu->format = strdup(str);
 #endif
 
     vu->format_version = get_object_int_value(jvalue, "format_version", -1);
@@ -301,18 +469,21 @@ static int __json_deserialise_vumeter(json_value* jvalue, vumeter_properties_t* 
         return -1;
     }
 
-    if (deserialise_resources(get_object_array_value(jvalue, "resources"), vu)) {
+    if (deserialiser_resource_list(get_object_array_value(jvalue, "resources"), vu)) {
         return -1;
     }
 
-    if (deserialise_placements(get_object_array_value(jvalue, "placement"), vu)) {
+    if (deserialise_placement_list(get_object_array_value(jvalue, "placement"), vu)) {
         return -1;
     }
 
-    if (deserialise_levels(get_object_array_value(jvalue, "levels"), vu)) {
+    if (deserialise_composition_list(get_object_array_value(jvalue, "compositions"), vu)) {
         return -1;
     }
 
+    if (deserialise_vumeter_list(get_object_array_value(jvalue, "vumeters"), vu)) {
+        return -1;
+    }
 
     { // dummy
         SDL_Point pt;
@@ -321,75 +492,105 @@ static int __json_deserialise_vumeter(json_value* jvalue, vumeter_properties_t* 
         get_object_double_value(jvalue, "", 0);
         get_object_boolean_value(jvalue, "", 0);
     }
-    dump_vu(vu);
-
-    FREE(vu->resources.names);
-    FREE(vu->resources.textures);
-    FREE(vu->placements.elements);
-
     return 0;
 }
 
-int json_deserialise_vumeter(const char* json_string, size_t length) {
-    vumeter_properties_t vu_instance;
-    vumeter_properties_t* vu= &vu_instance;
-
-    memset(&vu_instance, 0, sizeof(vu_instance));
-    json_value* jvalue = json_parse(json_string, length);
-    if (NULL == jvalue) {
-        error_printf("deserialise_vumeter: failed to parse string\n");
-        return -1;
+void release_vumeter_memory(vumeter_properties_t* vu) {
+    if (NULL != vu) {
+#ifdef DEBUG_VUMETER_JSON
+        FREE(vu->kind);
+        FREE(vu->vutype);
+        FREE(vu->format);
+#endif
+        FREE(vu->resource_list.names);
+        FREE(vu->resource_list.textures);
+        FREE(vu->placement_list.elements);
+        for (int ix=0; ix < vu->composition_list.count; ++ix) {
+            FREE(vu->composition_list.compositions[ix].ix_placements);
+        }
+        FREE(vu->composition_list.compositions);
+        for (int ix=0; ix < vu->vumeter_list.count; ++ix) {
+            FREE(vu->vumeter_list.vumeters[ix].name);
+            for (int ich=0; ich < vu->vumeter_list.vumeters[ix].component_count; ++ich) {
+                FREE(vu->vumeter_list.vumeters[ix].components[ich].ix_compositions);
+            }
+        }
+        FREE(vu->vumeter_list.vumeters);
+        FREE(vu->resource_path);
+        free(vu);
     }
-    int rv = __json_deserialise_vumeter(jvalue, vu);
-    json_value_free(jvalue);
-    return rv;
-
 }
 
-int json_deserialise_vumeters_file(const char* filepath) {
+vumeter_properties_t* deserialise_vumeter_json_string(const char* json_string, size_t length) {
+    vumeter_properties_t* vu = NULL;
+    if (NULL != CALLOC(1, vu)) {
+        json_value* jvalue = json_parse(json_string, length);
+        if (NULL == jvalue) {
+            error_printf("deserialise_vumeter: failed to parse string\n");
+            release_vumeter_memory(vu);
+            return NULL;
+        }
+        int rv = _json_deserialise(jvalue, vu);
+        json_value_free(jvalue);
+        if (0 != rv) {
+            release_vumeter_memory(vu);
+            vu = NULL;
+        }
+    }
+    return vu;
+}
+
+vumeter_properties_t* json_deserialise_vumeters_file(const char* filepath) {
     FILE *fp;
     struct stat filestatus;
     char* json_string;
 
     if ( stat(filepath, &filestatus) != 0) {
         error_printf("deserialise_vumeters_file: file %s not found\n", filepath);
-        return EXIT_FAILURE;
+        return NULL;
     }
 
-    json_string =  calloc(filestatus.st_size, 1);
-    if (json_string == NULL) {
+    if (CALLOC(filestatus.st_size, json_string)  == NULL) {
         error_printf("deserialise_vumeters_file: OOM %d %s \n", filestatus.st_size, filepath);
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     fp = fopen(filepath, "rt");
     if (fp == NULL) {
         free(json_string);
         error_printf("deserialise_vumeters_file: failed to open file %s \n", filepath);
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     if (1 != fread(json_string, filestatus.st_size, 1, fp)) {
         fclose(fp);
         free(json_string);
         error_printf("deserialise_vumeters_file: failed to read file data %s \n", filepath);
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     fclose(fp);
-    int rv = json_deserialise_vumeter(json_string, filestatus.st_size);
+    vumeter_properties_t* vu = deserialise_vumeter_json_string(json_string, filestatus.st_size);
     free(json_string);
 
-    if (rv != 0) {
+    if (NULL == vu) {
         error_printf("deserialise_vumeters_file: failed to parse json file %s\n", filepath);
     }
-    return rv;
-}
-
-
-int main(int argc, char** argv) {
-    for(int ix=1; ix < argc; ++ix) {
-        json_deserialise_vumeters_file(argv[ix]);
+    vu->resource_path = strdup(filepath);
+    // remove filename from resource path
+    {
+        for (char *p = vu->resource_path + strlen(vu->resource_path) - 1;
+                p > vu->resource_path;
+                --p)
+        {
+            if (*p == '/') {
+                *p = '\0';
+                break;
+            }
+        }
     }
-    return 0;
+    return vu;
 }
+
+
+

@@ -10,6 +10,14 @@
 #include "texture_cache.h"
 #include "vumeter_enum.h"
 
+typedef struct {
+    int vol;
+    int peak_hold_vol;
+    int peak_hold_counter;
+    int decay_hold_counter;
+    float decay_vol;
+}runtime_volume_t, *runtime_volume_ptr;
+
 // For now the number of channels is fix at 2
 // a future change will remove this hard-coding
 #define     NUM_VU_CHANNELS   2
@@ -24,68 +32,57 @@ typedef struct {
 }vu_placement_t;
 
 typedef struct {
-    component_render_op_t        render_op;
-    component_volume_type_t      volume_type;
-    int           placement_count;
-    int           placements[50];
+    composition_render_op_t        render_op;
+    composition_volume_type_t      volume_type;
+    int     placement_count;
+    int*    ix_placements;
+}vu_composition_t;
+
+
+typedef struct {
+    int     composition_count;
+    int*    ix_compositions;
 }vu_component_t;
 
 typedef struct {
-    int           placement_count;
-    int           placements[100];
-}vu_background_t;
-
-typedef struct {
-    int vol;
-    int peak_hold_vol;
-    int peak_hold_counter;
-    int decay_hold_counter;
-    float decay_vol;
-}runtime_volume_t, *runtime_volume_ptr;
-
-typedef struct {
-    int               component_count;
-    vu_component_t*   components;
-}vu_channel_t;
-
-typedef struct {
-    char* name;
-    int              channel_count;
-    vu_background_t* background;
-    vu_background_t* backgrounds[NUM_VU_CHANNELS];
-    vu_channel_t*    channels[NUM_VU_CHANNELS];
+    char*           name;
+    int             component_count;
+    // fascia, left, right
+    vu_component_t    components[1+NUM_VU_CHANNELS];
 }vumeter_t;
 
 typedef struct vu_props {
     struct vu_props*    next;
-    char*         resource_path;
-    char*         name;
-    int           volume_levels;
+    char*   resource_path;
+    char*   name;
+    int     volume_levels;
+    float   rotation;
+    void*   handle;
+    int     format_version;
     struct {
         int           w;
         int           h;
-        // common + channels, common = 0, left=1, right=2
+        // fascia, left, right
         SDL_Rect      rects[3];
-        layout_arrangement_t  arrangement;
+        channel_arrangement_t  arrangement;
     }layout;
-    int           vumeter_count;
-    vumeter_t*    vumeters;
     struct {
         int             count;
         char**          names;
         texture_id_t*   textures;
-    }resources;
+    }resource_list;
     struct {
         int             count;
         vu_placement_t* elements;
-    }placements;
-    float rotation;
-    void * handle;
-    int   format_version;
+    }placement_list;
     struct {
         int                 count;
-        vu_component_t*     components;
-    }components;
+        vu_composition_t*   compositions;
+    }composition_list;
+    struct {
+        int         count;
+        vumeter_t*  vumeters;
+    }vumeter_list;
 #ifdef DEBUG_VUMETER_JSON
     const char* kind;
     const char* vutype;
