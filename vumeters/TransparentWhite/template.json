@@ -17,11 +17,11 @@
     "#dimensions": [
         "unscaled width and height of the vumeter",
         "for this vu meter:",
-        "width = left_margin + dial_width + spacing + dial_width + right_margin",
-        "      = 32          + 1024       + 32      + 1024       + 32          ",
-        "height=768"
+        "width  = left_margin + dial_width + spacing + dial_width + right_margin",
+        "       = 32          + 1024       + 32      + 1024       + 32          ",
+        "       = 2144",
+        "height = 600"
     ],
-    "dimensions" :{ "h": 600, "w": 2144 },
     "layout" : {
         "w": 2144,
         "h": 600,
@@ -37,7 +37,7 @@
                 "w": 1024,
                 "h": 600
         },
-        "arrangement": "horizontal"
+        "channel_arrangement": "horizontal"
     },
     "#files": [
         "The set of images required to render this VU-Meter"
@@ -55,30 +55,30 @@
     "#rotaries": [
         "rotaries is an associative array of rotary definitions",
         "a rotary defines image rotation parameters",
-        "for analog vu meters this image is typically the needle image",
         "Fields of a rotary are:",
+        "  resource: image identifier",
         "  enclosure: { w:width, h:height}",
         "  axle: { x:x-coordinate, y:y-coordinate} # with the enclosure",
-        "  image: { w:width, h:height}",
-        "  pivot: { x:x-coordinate, y:y-coordinate}",
-        "enclosure defines a rectangle relative to which rotation occurs,",
-        "and must be the dimensions of the VU meter dial",
+        "  bearing: { x:x-coordinate, y:y-coordinate, w:width, h:height}",
+        "enclosure defines a rectangle in which the rotation occurs,",
+        "and should have the same dimensions as layout left and/or right rectangle.",
+        "typically layout left and right have identical dimensions, if they do not",
+        "different rotaries are required for left and right",
         "axle defines the point relative to the enclosure around which rotation occurs",
-        " this point may lie within or external to the enclosure",
-        " image defines the dimensions of the image to be rotated",
-        "pivot defines the point relative to the image around which the image is rotated",
-        " this point maybe within the bounds of the image, or external to it",
-        "When rendered, the pivot is overlaid on to the enclosure such that the pivot is exactly on top of the axle",
+        "bearing defines ",
+        " - the dimensions at which the resource image is rendered",
+        " - the point around which the rendered resource image is rotated",
+        "the bearing is overlaid on to the enclosure such that the bearing location (x,y) is exactly on top of the axle",
         "For analog vu meters:",
         "   enclosure defines the dimensions of the dial",
         "   axle defines where the needle rotates around in the dial",
-        "   pivot defines where the image is affixed to the axle"
+        "   bearing defines where the needle is affixed to the axle"
     ],
     "rotaries": {
         "rot_needle": {
             "enclosure": {
-                "h": 600,
-                "w": 1024
+                "w": 1024,
+                "h": 600
             },
             "axle": {
                 "x": 512,
@@ -105,31 +105,12 @@
             {"prefix": "N", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 6.0, "angle_step": 3.5, "rotary": "rot_needle"}
         ]
     },
-    "#backgrounds" : [
-        "associative arrays keyed on background name",
-        " contents of each associative array are of associative arrays of channels",
-        " channels with names other the 'left' and 'right' or common, i.e. rendered always",
-        " channels are arrays of placements - there is no volume level associated with these placements"
-    ],
-    "backgrounds": {
-        "tsp_white": {
-            "left": {
-                "placements": [
-                    "BG"
-                ]
-            },
-            "right": {
-                "placements": [
-                    "BG"
-                ]
-            }
-        }
-    },
-    "#levels*":[
-        "associative arrays with keys 'left' and 'right'",
-        "The contents of each key must be objects which are associative arrays with 3 keys",
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
         "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
-        "   'static' => all placements are rendered regardless of volume_type",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
         "   'aggregate-off' => render all placements beyond the volume level",
@@ -145,45 +126,34 @@
         "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
         "         3) if peak is not set then volume levels are rendered to match sampled values",
         "'placements': an associative arrays of volume level to placements",
-        "Each object does not have to contain placement references for each volume level",
-        "However the combination of objects SHOULD contain placement references for each volume level"
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
     ],
-    "levels": {
-        "levels_1": {
-            "left": [
-                {
-                    "render_op": "single",
-                    "volume_type": "decay",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "N{index}"}
-                       ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "single",
-                    "volume_type": "decay",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "N{index}"}
-                       ]
-                    }
-                }
-            ]
+    "compositions": {
+        "composition0": {
+            "render_op": "static",
+            "placements": {
+                "0": "BG"
+            }
+        },
+        "composition1": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 48, "value": "N{index}"}
+                ]
+            }
         }
     },
-    "#vumeters": [
-        "associative arrays keyed on VU Meter name",
-        " contents of each associative array are 2 keys",
-        "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
-        "   background: which background in layout to use, if abseent then no backgorund is rendered"
-    ],
     "vumeters" :{
         "Transparent White": {
-            "background": "tsp_white",
-            "levels" : "levels_1"
+            "left":  [ "composition0", "composition1"],
+            "right": [ "composition0", "composition1"]
         }
     }
 }

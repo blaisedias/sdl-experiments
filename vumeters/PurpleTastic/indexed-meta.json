@@ -10,20 +10,16 @@
   "format": "indexed",
   "format_version": 0,
   "volume_levels": 49,
-  "dimensions": {
-    "h": 768,
-    "w": 2144
-  },
   "layout": {
     "w": 2144,
     "h": 768,
-    "arrangement": "horizontal",
-    "rects": [
+    "channel_arrangement": "horizontal",
+    "rectangles": [
       {
         "x": 0,
         "y": 0,
-        "w": 0,
-        "h": 0
+        "w": 2144,
+        "h": 768
       },
       {
         "x": 32,
@@ -39,7 +35,6 @@
       }
     ]
   },
-  "rotaries": [],
   "resources": [
     null,
     "background.png",
@@ -500,414 +495,199 @@
       "h": 55
     }
   ],
-  "backgrounds": [
+  "compositions": [
     {
-      "left": {
-        "placements": [
-          2,
-          1,
-          3
-        ]
-      },
-      "right": {
-        "placements": [
-          53,
-          1,
-          54
-        ]
-      }
+      "render_op": "static",
+      "volume_type": "none",
+      "placements": [
+        0
+      ]
     },
     {
-      "left": {
-        "placements": [
-          1,
-          3
-        ]
-      },
-      "right": {
-        "placements": [
-          1,
-          54
-        ]
-      }
-    }
-  ],
-  "levels": [
-    {
-      "left": [
-        {
-          "render_op": "single",
-          "volume_type": "decay",
-          "placements": [
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-            28,
-            29,
-            30,
-            31,
-            32,
-            33,
-            34,
-            35,
-            36,
-            37,
-            38,
-            39,
-            40,
-            41,
-            42,
-            43,
-            44,
-            45,
-            46,
-            47,
-            48,
-            49,
-            50,
-            51,
-            52
-          ]
-        },
-        {
-          "render_op": "aggregate",
-          "placements": [
-            55,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            56,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ]
-        }
+      "render_op": "static",
+      "placements": [
+        58,
+        57,
+        59
       ],
-      "right": [
-        {
-          "render_op": "single",
-          "volume_type": "decay",
-          "placements": [
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-            28,
-            29,
-            30,
-            31,
-            32,
-            33,
-            34,
-            35,
-            36,
-            37,
-            38,
-            39,
-            40,
-            41,
-            42,
-            43,
-            44,
-            45,
-            46,
-            47,
-            48,
-            49,
-            50,
-            51,
-            52
-          ]
-        },
-        {
-          "render_op": "aggregate",
-          "placements": [
-            55,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            56,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ]
-        }
+      "volume_type": "none"
+    },
+    {
+      "render_op": "static",
+      "placements": [
+        109,
+        57,
+        110
+      ],
+      "volume_type": "none"
+    },
+    {
+      "render_op": "static",
+      "placements": [
+        57,
+        59
+      ],
+      "volume_type": "none"
+    },
+    {
+      "render_op": "static",
+      "placements": [
+        57,
+        110
+      ],
+      "volume_type": "none"
+    },
+    {
+      "render_op": "single",
+      "volume_type": "decay",
+      "placements": [
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108
+      ]
+    },
+    {
+      "render_op": "aggregate",
+      "placements": [
+        111,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        112,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ]
     }
   ],
   "vumeters": [
     {
-      "background": 0,
-      "levels": 0
+      "PurpleTastic2": [
+        [
+          0
+        ],
+        [
+          1,
+          5,
+          6
+        ],
+        [
+          2,
+          5,
+          6
+        ]
+      ]
     },
     {
-      "background": 1,
-      "levels": 0
+      "PurpleTastic2Transparent": [
+        [
+          0
+        ],
+        [
+          3,
+          5,
+          6
+        ],
+        [
+          4,
+          5,
+          6
+        ]
+      ]
     }
   ],
-  "symbol_maps": {
-    "layout": {
-      "static": 0,
-      "left": 1,
-      "right": 2
-    },
-    "rotaries": {},
-    "resources": {
-      "LEFT_BG": 1,
-      "RIGHT_BG": 1,
-      "DIAL": 2,
-      "LEFT_LEGEND": 3,
-      "RIGHT_LEGEND": 4,
-      "ROUNDEL": 5,
-      "ROUNDEL_PEAK": 6,
-      "POS_00": 7,
-      "POS_01": 8,
-      "POS_02": 9,
-      "POS_03": 10,
-      "POS_04": 11,
-      "POS_05": 12,
-      "POS_06": 13,
-      "POS_07": 14,
-      "POS_08": 15,
-      "POS_09": 16,
-      "POS_10": 17,
-      "POS_11": 18,
-      "POS_12": 19,
-      "POS_13": 20,
-      "POS_14": 21,
-      "POS_15": 22,
-      "POS_16": 23,
-      "POS_17": 24,
-      "POS_18": 25,
-      "POS_19": 26,
-      "POS_20": 27,
-      "POS_21": 28,
-      "POS_22": 29,
-      "POS_23": 30,
-      "POS_24": 31,
-      "POS_25": 32,
-      "POS_26": 33,
-      "POS_27": 34,
-      "POS_28": 35,
-      "POS_29": 36,
-      "POS_30": 37,
-      "POS_31": 38,
-      "POS_32": 39,
-      "POS_33": 40,
-      "POS_34": 41,
-      "POS_35": 42,
-      "POS_36": 43,
-      "POS_37": 44,
-      "POS_38": 45,
-      "POS_39": 46,
-      "POS_40": 47,
-      "POS_41": 48,
-      "POS_42": 49,
-      "POS_43": 50,
-      "POS_44": 51,
-      "POS_45": 52,
-      "POS_46": 53,
-      "POS_47": 54,
-      "POS_48": 55
-    },
-    "placements": {
-      "DIAL": 1,
-      "LEFT_BG": 2,
-      "LEFT_LEGEND": 3,
-      "POS_00": 4,
-      "POS_01": 5,
-      "POS_02": 6,
-      "POS_03": 7,
-      "POS_04": 8,
-      "POS_05": 9,
-      "POS_06": 10,
-      "POS_07": 11,
-      "POS_08": 12,
-      "POS_09": 13,
-      "POS_10": 14,
-      "POS_11": 15,
-      "POS_12": 16,
-      "POS_13": 17,
-      "POS_14": 18,
-      "POS_15": 19,
-      "POS_16": 20,
-      "POS_17": 21,
-      "POS_18": 22,
-      "POS_19": 23,
-      "POS_20": 24,
-      "POS_21": 25,
-      "POS_22": 26,
-      "POS_23": 27,
-      "POS_24": 28,
-      "POS_25": 29,
-      "POS_26": 30,
-      "POS_27": 31,
-      "POS_28": 32,
-      "POS_29": 33,
-      "POS_30": 34,
-      "POS_31": 35,
-      "POS_32": 36,
-      "POS_33": 37,
-      "POS_34": 38,
-      "POS_35": 39,
-      "POS_36": 40,
-      "POS_37": 41,
-      "POS_38": 42,
-      "POS_39": 43,
-      "POS_40": 44,
-      "POS_41": 45,
-      "POS_42": 46,
-      "POS_43": 47,
-      "POS_44": 48,
-      "POS_45": 49,
-      "POS_46": 50,
-      "POS_47": 51,
-      "POS_48": 52,
-      "RIGHT_BG": 53,
-      "RIGHT_LEGEND": 54,
-      "ROUNDEL": 55,
-      "ROUNDEL_PEAK": 56
-    },
-    "backgrounds": {
-      "purpletastic": 0,
-      "dial": 1
-    },
-    "levels": {
-      "levels_1": 0
-    },
-    "vumeters": {
-      "PurpleTastic2": 0,
-      "PurpleTastic2Transparent": 1
-    }
-  },
+  "rotaries": [],
   "counts": {
     "resources": 56,
-    "placements": 57,
-    "backgrounds": 2,
-    "levels": 1,
+    "placements": 113,
+    "compositions": 7,
     "vumeters": 2
   }
 }

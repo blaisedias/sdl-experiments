@@ -17,14 +17,11 @@
   "#dimensions": [
     "unscaled width and height of the vumeter",
     "for this vu meter:",
-    "width = left_margin + dial_width + spacing + dial_width + right_margin",
-    "margins=32, spacing=32, dial_width=1024",
-    "height=768"
+    "margins = 32, spacing = 32, dial_width = 1024",
+    "width  = left_margin + dial_width + spacing + dial_width + right_margin",
+    "       = 2144",
+    "height = 768"
   ],
-  "dimensions": {
-    "h": 768,
-    "w": 2144
-  },
   "layout": {
     "w": 2144,
     "h": 768,
@@ -40,12 +37,12 @@
       "w": 1024,
       "h": 768
     },
-    "arrangement": "horizontal",
-    "static": {
+    "channel_arrangement": "horizontal",
+    "fascia": {
       "x": 0,
       "y": 0,
-      "w": 0,
-      "h": 0
+      "w": 2144,
+      "h": 768
     }
   },
   "#files": [
@@ -639,31 +636,12 @@
       "h": 56
     }
   },
-  "#backgrounds": [
-    "associative arrays keyed on background name",
-    " contents of each associative array are of associative arrays of channels",
-    " channels with names other the 'left' and 'right' or common, i.e. rendered always",
-    " channels are arrays of placements - there is no volume level associated with these placements"
-  ],
-  "backgrounds": {
-    "tubeD": {
-      "left": {
-        "placements": [
-          "BG"
-        ]
-      },
-      "right": {
-        "placements": [
-          "BG"
-        ]
-      }
-    }
-  },
-  "#levels*": [
-    "associative arrays with keys 'left' and 'right'",
-    "The contents of each key must be objects which are associative arrays with 3 keys",
+  "#compositions*": [
+    "associative array with keys",
+    "The contents of each key must be objects which are associative arrays with keys",
     "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
-    "   'static' => all placements are rendered regardless of volume_type",
+    "   'static' => all placements are rendered regardless of volume_type anf volume level",
+    "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
     "   'single' => only render the placement matching the volume level",
     "   'aggregate' => render all placements upto the volume level",
     "   'aggregate-off' => render all placements beyond the volume level",
@@ -679,151 +657,148 @@
     "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
     "         3) if peak is not set then volume levels are rendered to match sampled values",
     "'placements': an associative arrays of volume level to placements",
-    "Each object does not have to contain placement references for each volume level",
-    "However the combination of objects SHOULD contain placement references for each volume level"
+    "'render_op' and 'placements' are REQUIRED",
+    " volume_type is optional:",
+    "   - defaults to 'sampled'",
+    "   - is ignored when the value 'render_op' is 'static'",
+    "Notes:  Each non static object does not have to contain placement references for each volume level",
+    "           However the combination of objects SHOULD contain placement references for each volume level"
   ],
-  "levels": {
-    "levels_1": {
-      "left": [
-        {
-          "render_op": "single",
-          "volume_type": "decay",
-          "placements": {
-            "0": "POS_00",
-            "1": "POS_01",
-            "2": "POS_02",
-            "3": "POS_03",
-            "4": "POS_04",
-            "5": "POS_05",
-            "6": "POS_06",
-            "7": "POS_07",
-            "8": "POS_08",
-            "9": "POS_09",
-            "10": "POS_10",
-            "11": "POS_11",
-            "12": "POS_12",
-            "13": "POS_13",
-            "14": "POS_14",
-            "15": "POS_15",
-            "16": "POS_16",
-            "17": "POS_17",
-            "18": "POS_18",
-            "19": "POS_19",
-            "20": "POS_20",
-            "21": "POS_21",
-            "22": "POS_22",
-            "23": "POS_23",
-            "24": "POS_24",
-            "25": "POS_25",
-            "26": "POS_26",
-            "27": "POS_27",
-            "28": "POS_28",
-            "29": "POS_29",
-            "30": "POS_30",
-            "31": "POS_31",
-            "32": "POS_32",
-            "33": "POS_33",
-            "34": "POS_34",
-            "35": "POS_35",
-            "36": "POS_36",
-            "37": "POS_37",
-            "38": "POS_38",
-            "39": "POS_39",
-            "40": "POS_40",
-            "41": "POS_41",
-            "42": "POS_42",
-            "43": "POS_43",
-            "44": "POS_44",
-            "45": "POS_45",
-            "46": "POS_46",
-            "47": "POS_47",
-            "48": "POS_48"
-          }
-        },
-        {
-          "render_op": "aggregate",
-          "placements": {
-            "0": "ROUNDEL",
-            "36": "ROUNDEL_PEAK"
-          }
-        }
-      ],
-      "right": [
-        {
-          "render_op": "single",
-          "volume_type": "decay",
-          "placements": {
-            "0": "POS_00",
-            "1": "POS_01",
-            "2": "POS_02",
-            "3": "POS_03",
-            "4": "POS_04",
-            "5": "POS_05",
-            "6": "POS_06",
-            "7": "POS_07",
-            "8": "POS_08",
-            "9": "POS_09",
-            "10": "POS_10",
-            "11": "POS_11",
-            "12": "POS_12",
-            "13": "POS_13",
-            "14": "POS_14",
-            "15": "POS_15",
-            "16": "POS_16",
-            "17": "POS_17",
-            "18": "POS_18",
-            "19": "POS_19",
-            "20": "POS_20",
-            "21": "POS_21",
-            "22": "POS_22",
-            "23": "POS_23",
-            "24": "POS_24",
-            "25": "POS_25",
-            "26": "POS_26",
-            "27": "POS_27",
-            "28": "POS_28",
-            "29": "POS_29",
-            "30": "POS_30",
-            "31": "POS_31",
-            "32": "POS_32",
-            "33": "POS_33",
-            "34": "POS_34",
-            "35": "POS_35",
-            "36": "POS_36",
-            "37": "POS_37",
-            "38": "POS_38",
-            "39": "POS_39",
-            "40": "POS_40",
-            "41": "POS_41",
-            "42": "POS_42",
-            "43": "POS_43",
-            "44": "POS_44",
-            "45": "POS_45",
-            "46": "POS_46",
-            "47": "POS_47",
-            "48": "POS_48"
-          }
-        },
-        {
-          "render_op": "aggregate",
-          "placements": {
-            "0": "ROUNDEL",
-            "36": "ROUNDEL_PEAK"
-          }
-        }
+  "compositions": {
+    "N00": {
+      "render_op": "static",
+      "placements": [
+        "BG"
+      ]
+    },
+    "N01": {
+      "render_op": "single",
+      "volume_type": "decay",
+      "placements": [
+        "POS_00",
+        "POS_01",
+        "POS_02",
+        "POS_03",
+        "POS_04",
+        "POS_05",
+        "POS_06",
+        "POS_07",
+        "POS_08",
+        "POS_09",
+        "POS_10",
+        "POS_11",
+        "POS_12",
+        "POS_13",
+        "POS_14",
+        "POS_15",
+        "POS_16",
+        "POS_17",
+        "POS_18",
+        "POS_19",
+        "POS_20",
+        "POS_21",
+        "POS_22",
+        "POS_23",
+        "POS_24",
+        "POS_25",
+        "POS_26",
+        "POS_27",
+        "POS_28",
+        "POS_29",
+        "POS_30",
+        "POS_31",
+        "POS_32",
+        "POS_33",
+        "POS_34",
+        "POS_35",
+        "POS_36",
+        "POS_37",
+        "POS_38",
+        "POS_39",
+        "POS_40",
+        "POS_41",
+        "POS_42",
+        "POS_43",
+        "POS_44",
+        "POS_45",
+        "POS_46",
+        "POS_47",
+        "POS_48"
+      ]
+    },
+    "N02": {
+      "render_op": "aggregate",
+      "placements": [
+        "ROUNDEL",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "ROUNDEL_PEAK",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
       ]
     }
   },
   "#vumeters": [
-    "associative arrays keyed on VU Meter name",
-    " contents of each associative array are 2 keys",
-    "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
-    "   background: which background in layout to use, if abseent then no backgorund is rendered"
+    "associative array keyed on VU meter name",
+    " contents of each associative array are assocaitve arrays with keys:",
+    "   'channels': which channel definitions to use. REQUIRED",
+    "   'fascia': which fascia defintion to user. OPTIONAL"
   ],
   "vumeters": {
     "TubeD": {
-      "background": "tubeD",
-      "levels": "levels_1"
+      "left": [
+        "N00",
+        "N01",
+        "N02"
+      ],
+      "right": [
+        "N00",
+        "N01",
+        "N02"
+      ]
     }
   },
   "rotaries": {}

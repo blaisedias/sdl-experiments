@@ -14,10 +14,6 @@
         "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
     ],
     "volume_levels": 50,
-    "#dimensions": [
-        "natural width and height of the vumeter"
-    ],
-    "dimensions": {"h": 648, "w": 1935 },
     "layout" : {
         "w": 1935,
         "h": 648,
@@ -33,13 +29,13 @@
                 "w": 1915,
                 "h": 260
         },
-        "static": {
+        "fascia": {
                 "x": 10,
                 "y": 274,
                 "w": 1918,
                 "h": 100
         },
-        "arrangement": "vertical"
+        "channel_arrangement": "vertical"
     },
     "#files": [
         "The set of images required to render this VU-Meter",
@@ -84,12 +80,12 @@
         "white_right_legend": "white-right.png",
 
         "pastel_green_red_center": "pastel-green-red-center.png",
-        "pastel_green_left": "pastel-green-left.png",
-        "pastel_green_right": "pastel-green-right.png",
+        "pastel_green_left_legend": "pastel-green-left.png",
+        "pastel_green_right_legend": "pastel-green-right.png",
 
         "cyan_orange_center": "cyan-orange-center.png",
-        "cyan_left": "cyan-left.png",
-        "cyan_right": "cyan-right.png",
+        "cyan_left_legend": "cyan-left.png",
+        "cyan_right_legend": "cyan-right.png",
 
         "green_red_center": "green-red-center.png",
         "green_left_legend": "green-left.png",
@@ -146,179 +142,23 @@
         "white_right_legend"  : { "x":0, "y":0},
 
         "pastel_green_red_center" : { "x":0, "y":274},
-        "pastel_green_left"  : { "x":0, "y":0},
-        "pastel_green_right"  : { "x":0, "y":0},
+        "pastel_green_left_legend"  : { "x":0, "y":0},
+        "pastel_green_right_legend"  : { "x":0, "y":0},
 
         "cyan_orange_center" : { "x":0, "y":274},
-        "cyan_left"  : { "x":0, "y":0},
-        "cyan_right"  : { "x":0, "y":0},
+        "cyan_left_legend"  : { "x":0, "y":0},
+        "cyan_right_legend"  : { "x":0, "y":0},
 
         "green_red_center" : { "x":0, "y":274},
         "green_left_legend"  : { "x":0, "y":0},
         "green_right_legend"  : { "x":0, "y":0}
     },
-    "#backgrounds" : [
-        "associative arrays keyed on background name",
-        " contents of each associative array are associative arrays of channels",
-        " channels with names other the 'left' and 'right' or common, i.e. rendered always",
-        " each channels is an array of placements - there is no volume level associated with these placements"
-    ],
-    "backgrounds": {
-        "quad_color": {
-            "shared": {
-                "placements": [
-                    "quad_center"
-               ]
-            },
-            "left": {
-                "placements" : [
-                    "white_left_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "white_off{index}"},
-                            { "start": 19, "end": 36, "value": "cyan_off{index}"},
-                            { "start": 37, "end": 42, "value": "amber_off{index}"},
-                            { "start": 43, "end": 49, "value": "red_off{index}"}
-                        ]
-                    }
-                 ]
-            },
-            "right": {
-               "placements": [
-                   "white_right_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "white_off{index}"},
-                            { "start": 19, "end": 36, "value": "cyan_off{index}"},
-                            { "start": 37, "end": 42, "value": "amber_off{index}"},
-                            { "start": 43, "end": 49, "value": "red_off{index}"}
-                        ]
-                    }
-                ]
-            }
-        },
-        "white_orange": {
-            "shared": {
-                "placements": [
-                    "white_amber_center"
-                ]
-            },
-            "left": {
-                "placements" : [
-                    "white_left_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "white_off{index}"},
-                            { "start": 37, "end": 49, "value": "amber_off{index}"}
-                        ]
-                    }
-                ]
-            },
-            "right": {
-               "placements": [
-                   "white_right_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "white_off{index}"},
-                            { "start": 37, "end": 49, "value": "amber_off{index}"}
-                        ]
-                    }
-               ]
-            }
-        },
-        "cyan_orange": {
-            "shared": {
-                "placements": [
-                    "cyan_orange_center"
-                ]
-            },
-            "left": {
-                "placements" : [
-                    "cyan_left",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cyan_off{index}"},
-                            { "start": 37, "end": 49, "value": "amber_off{index}"}
-                        ]
-                    }
-                ]
-            },
-            "right": {
-               "placements": [
-                   "cyan_right",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cyan_off{index}"},
-                            { "start": 37, "end": 49, "value": "amber_off{index}"}
-                        ]
-                    }
-               ]
-            }
-        },
-        "green_red": {
-            "shared": {
-                "placements": [
-                    "green_red_center"
-                ]
-            },
-            "left": {
-                "placements" : [
-                    "green_left_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "green_off{index}"},
-                            { "start": 37, "end": 49, "value": "red_off{index}"}
-                        ]
-                    }
-                ]
-            },
-            "right": {
-               "placements": [
-                   "green_right_legend",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "green_off{index}"},
-                            { "start": 37, "end": 49, "value": "red_off{index}"}
-                        ]
-                    }
-               ]
-            }
-        },
-        "pastel_green_red": {
-            "shared": {
-                "placements": [
-                    "pastel_green_red_center"
-                ]
-            },
-            "left": {
-                "placements" : [
-                    "pastel_green_left",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
-                            { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
-                        ]
-                    }
-                ]
-            },
-            "right": {
-               "placements": [
-                   "pastel_green_right",
-                    {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
-                            { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
-                        ]
-                    }
-               ]
-            }
-        }
-    },
-    "#levels*":[
-        "associative arrays with keys 'left' and 'right'",
-        "The contents of each key must be objects which are associative arrays with 3 keys",
-        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
-        "   'static' => all placements are rendered regardless of volume_type",
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'static', 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
         "   'aggregate-off' => render all placements beyond the volume level",
@@ -333,172 +173,248 @@
         "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
         "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
         "         3) if peak is not set then volume levels are rendered to match sampled values",
-        "'placements': an associative arrays of volume level to placements",
-        "Each object does not have to contain placement references for each volume level",
-        "However the combination of objects SHOULD contain placement references for each volume level"
+        "'placements': an associative array of volume levels to placements",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
     ],
-    "levels": {
-        "levels_quad_colour": {
-            "left": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "white_on{index}"},
-                            { "start": 19, "end": 36, "value": "cyan_on{index}"},
-                            { "start": 37, "end": 42, "value": "amber_on{index}"},
-                            { "start": 43, "end": 49, "value": "red_on{index}"}
-                        ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 18, "value": "white_on{index}"},
-                            { "start": 19, "end": 36, "value": "cyan_on{index}"},
-                            { "start": 37, "end": 42, "value": "amber_on{index}"},
-                            { "start": 43, "end": 49, "value": "red_on{index}"}
-                        ]
-                   }
-                }
+    "compositions": {
+        "quad_color_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "white_left_legend"
+            }
+        },
+        "quad_color_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "white_right_legend"
+            }
+        },
+        "quad_color_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 18, "value": "white_off{index}"},
+                    { "start": 19, "end": 36, "value": "cyan_off{index}"},
+                    { "start": 37, "end": 42, "value": "amber_off{index}"},
+                    { "start": 43, "end": 49, "value": "red_off{index}"}
+                ]
+            }
+        },
+        "quad_color_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 18, "value": "white_on{index}"},
+                    { "start": 19, "end": 36, "value": "cyan_on{index}"},
+                    { "start": 37, "end": 42, "value": "amber_on{index}"},
+                    { "start": 43, "end": 49, "value": "red_on{index}"}
+                ]
+            }
+        },
+        "white_orange_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "white_left_legend"
+            }
+        },
+        "white_orange_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "white_right_legend"
+            }
+        },
+        "white_orange_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "white_off{index}"},
+                    { "start": 37, "end": 49, "value": "amber_off{index}"}
+                ]
+            }
+        },
+        "white_orange_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "white_on{index}"},
+                    { "start": 37, "end": 49, "value": "amber_on{index}"}
+                ]
+            }
+        },
+        "cyan_orange_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "cyan_left_legend"
+            }
+        },
+        "cyan_orange_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "cyan_right_legend"
+            }
+        },
+        "cyan_orange_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "cyan_off{index}"},
+                    { "start": 37, "end": 49, "value": "amber_off{index}"}
+                ]
+            }
+        },
+        "cyan_orange_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "cyan_on{index}"},
+                    { "start": 37, "end": 49, "value": "amber_on{index}"}
+                ]
+            }
+        },
+        "green_red_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "green_left_legend"
+            }
+        },
+        "green_red_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "green_right_legend"
+            }
+        },
+        "green_red_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "green_off{index}"},
+                    { "start": 37, "end": 49, "value": "red_off{index}"}
+                ]
+            }
+        },
+        "green_red_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "green_on{index}"},
+                    { "start": 37, "end": 49, "value": "red_on{index}"}
+                ]
+            }
+        },
+        "pastel_green_red_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "pastel_green_left_legend"
+            }
+        },
+        "pastel_green_red_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "pastel_green_right_legend"
+            }
+        },
+        "pastel_green_red_off": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
+                    { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
+                ]
+            }
+        },
+        "pastel_green_red_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
+                    { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
+                ]
+            }
+        }
+    },
+    "#fascias" : [
+        "associative array with keys",
+        "fascias are compositions restricted to render_op fixed to 'static'",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "    'render_op' : 'static'",
+        "    'placements': one of",
+        "           - an associative array of whole numbers to placements",
+        "           - array of placements",
+        " 'render_op' if specified must 'static', and is defaulted to 'static'"
+    ],
+    "fascias" : {
+        "quad_color_fascia": {
+            "placements": [
+                "quad_center"
             ]
         },
-        "levels_white_orange": {
-            "left": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "white_on{index}"},
-                            { "start": 37, "end": 49, "value": "amber_on{index}"}
-                        ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "white_on{index}"},
-                            { "start": 37, "end": 49, "value": "amber_on{index}"}
-                        ]
-                   }
-                }
+        "white_orange_fascia": {
+            "placements": [
+                "white_amber_center"
             ]
         },
-        "levels_cyan_orange": {
-            "left": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cyan_on{index}"},
-                            { "start": 37, "end": 49, "value": "amber_on{index}"}
-                        ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "cyan_on{index}"},
-                            { "start": 37, "end": 49, "value": "amber_on{index}"}
-                        ]
-                   }
-                }
+        "cyan_orange_fascia": {
+            "placements": [
+                "cyan_orange_center"
             ]
         },
-        "levels_green_red": {
-            "left": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "green_on{index}"},
-                            { "start": 37, "end": 49, "value": "red_on{index}"}
-                        ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "green_on{index}"},
-                            { "start": 37, "end": 49, "value": "red_on{index}"}
-                        ]
-                   }
-                }
+        "green_red_fascia": {
+            "placements": [
+                "green_red_center"
             ]
         },
-        "levels_pastel_green_red": {
-            "left": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
-                            { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
-                        ]
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "aggregate",
-                    "volume_type" : "peak-hold+sampled",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
-                            { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
-                        ]
-                   }
-                }
+        "pastel_green_red_fascia": {
+            "placements": [
+                "pastel_green_red_center"
             ]
         }
     },
     "#vumeters": [
         "Associate array of VU Meters defined in this file keyed on VU Meter name",
-        "In turn contents are associative arrays containing 2 keys",
-        "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
-        "   background: which background in layout to use, if absent then no background is rendered"
+        "In turn contents are associative arrays containing 3 keys",
+        " fascia: list of compositions to render in the layout fascia rectangle",
+        "       this can only include compositions with  render_op = 'static'",
+        " left: list of compositions to render in the layout left rectangle",
+        "       this includes compositions with all render_ops",
+        " right: list of compositions to render in the layout right rectangle",
+        "       this includes compositions with all render_ops",
+        ""
     ],
     "vumeters": {
-        "Chevrons": {
-            "background": "quad_color",
-            "levels":  "levels_quad_colour"
+        "Chevrons Quad Color": {
+            "fascia": ["quad_color_fascia"],
+            "left":  ["quad_color_L", "quad_color_off", "quad_color_on"],
+            "right":  ["quad_color_R", "quad_color_off", "quad_color_on"]
         },
-        "Chevrons WhiteOrange": {
-            "background": "white_orange",
-            "levels":  "levels_white_orange"
+        "Chevrons White Orange": {
+            "fascia": ["white_orange_fascia"],
+            "left":  ["white_orange_L", "white_orange_off", "white_orange_on"],
+            "right":  ["white_orange_R", "white_orange_off", "white_orange_on"]
         },
-        "Chevrons CyanOrange": {
-            "background": "cyan_orange",
-            "levels":  "levels_cyan_orange"
+        "Chevrons Cyan Orange": {
+            "fascia": ["cyan_orange_fascia"],
+            "left":  ["cyan_orange_L", "cyan_orange_off", "cyan_orange_on"],
+            "right":  ["cyan_orange_R", "cyan_orange_off", "cyan_orange_on"]
         },
-        "Chevrons GreenRed": {
-            "background": "green_red",
-            "levels":  "levels_green_red"
+        "Chevrons Green Red": {
+            "fascia": ["green_red_fascia"],
+            "left":  ["green_red_L", "green_red_off", "green_red_on"],
+            "right":  ["green_red_R", "green_red_off", "green_red_on"]
         },
-        "Chevrons PastelGreenRed": {
-            "background": "pastel_green_red",
-            "levels":  "levels_pastel_green_red"
+        "Chevrons Pastel Green Red": {
+            "fascia": ["pastel_green_red_fascia"],
+            "left":  ["pastel_green_red_L", "pastel_green_red_off", "pastel_green_red_on"],
+            "right":  ["pastel_green_red_R", "pastel_green_red_off", "pastel_green_red_on"]
         }
     }
 }

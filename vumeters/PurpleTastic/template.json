@@ -16,12 +16,11 @@
     "volume_levels": 49,
     "#dimensions": [
         "unscaled width and height of the vumeter",
-        "for this vu meter:",
-        "width = left_margin + dial_width + spacing + dial_width + right_margin",
-        "margins=50, spacing=50, dial_width=1024",
-        "height=768"
+        "margins = 32, dial_width=1024",
+        "width   = left_margin + dial_width + spacing + dial_width + right_margin",
+        "        = 2144",
+        "height  = 768"
     ],
-    "dimensions" :{ "h": 768, "w": 2144 },
     "layout" : {
         "w": 2144,
         "h": 768,
@@ -37,7 +36,7 @@
                 "w": 1024,
                 "h": 768
         },
-        "arrangement": "horizontal"
+        "channel_arrangement": "horizontal"
     },
     "#files": [
         "The set of images required to render this VU-Meter"
@@ -80,49 +79,12 @@
         "alias: { x-coordinate, y-coordinate} "
     ],
     "placement": {},
-    "#backgrounds" : [
-        "associative arrays keyed on background name",
-        " contents of each associative array are of associative arrays of channels",
-        " channels with names other the 'left' and 'right' or common, i.e. rendered always",
-        " channels are arrays of placements - there is no volume level associated with these placements"
-    ],
-    "backgrounds": {
-        "purpletastic": {
-            "left": {
-                "placements": [
-                    "LEFT_BG",
-                    "DIAL",
-                    "LEFT_LEGEND"
-                ]
-            },
-            "right": {
-                "placements": [
-                    "RIGHT_BG",
-                    "DIAL",
-                    "RIGHT_LEGEND"
-                ]
-            }
-        },
-        "dial": {
-            "left": {
-               "placements":  [
-                    "DIAL",
-                    "LEFT_LEGEND"
-               ]
-            },
-            "right": {
-                "placements" : [
-                    "DIAL",
-                    "RIGHT_LEGEND"
-                ]
-            }
-        }
-    },
-    "#levels*":[
-        "associative arrays with keys 'left' and 'right'",
-        "The contents of each key must be objects which are associative arrays with 3 keys",
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
         "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
-        "   'static' => all placements are rendered regardless of volume_type",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
         "   'single' => only render the placement matching the volume level",
         "   'aggregate' => render all placements upto the volume level",
         "   'aggregate-off' => render all placements beyond the volume level",
@@ -138,47 +100,59 @@
         "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
         "         3) if peak is not set then volume levels are rendered to match sampled values",
         "'placements': an associative arrays of volume level to placements",
-        "Each object does not have to contain placement references for each volume level",
-        "However the combination of objects SHOULD contain placement references for each volume level"
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
     ],
-    "levels": {
-        "levels_1": {
-            "left": [
-                {
-                    "render_op": "single",
-                    "volume_type": "decay",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "POS_{index}"}
-                       ]
-                    }
-                },
-                {
-                    "render_op": "aggregate",
-                    "placements": {
-                        "0": "ROUNDEL",
-                        "36": "ROUNDEL_PEAK"
-                    }
-                }
-            ],
-            "right": [
-                {
-                    "render_op": "single",
-                    "volume_type": "decay",
-                    "placements": {
-                        "$SEQUENCE": [
-                            { "start": 0,  "end": 48, "value": "POS_{index}"}
-                       ]
-                    }
-                },
-                {
-                    "render_op": "aggregate",
-                    "placements": {
-                    "0": "ROUNDEL",
-                    "36": "ROUNDEL_PEAK"
-                    }
-                }
+    "compositions": {
+        "LP00": {
+            "render_op": "static",
+            "placements": [
+                "LEFT_BG",
+                "DIAL",
+                "LEFT_LEGEND"
             ]
+        },
+        "RP00": {
+            "render_op": "static",
+            "placements": [
+                "RIGHT_BG",
+                "DIAL",
+                "RIGHT_LEGEND"
+            ]
+        },
+        "LT00": {
+            "render_op": "static",
+            "placements":  [
+                "DIAL",
+                "LEFT_LEGEND"
+            ]
+        },
+        "RT00": {
+            "render_op": "static",
+            "placements" : [
+                "DIAL",
+                "RIGHT_LEGEND"
+            ]
+        },
+        "N01": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 48, "value": "POS_{index}"}
+                ]
+            }
+        },
+        "N02": {
+            "render_op": "aggregate",
+            "placements": {
+                "0": "ROUNDEL",
+                "36": "ROUNDEL_PEAK"
+            }
         }
     },
     "#vumeters": [
@@ -189,12 +163,12 @@
     ],
     "vumeters" :{
         "PurpleTastic2": {
-            "background": "purpletastic",
-            "levels" : "levels_1"
+            "left":  [ "LP00", "N01", "N02" ],
+            "right": [ "RP00", "N01", "N02"]
         },
         "PurpleTastic2Transparent": {
-            "background": "dial",
-            "levels" : "levels_1"
+            "left":  [ "LT00", "N01", "N02" ],
+            "right": [ "RT00", "N01", "N02"]
         }
     }
 }
