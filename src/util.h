@@ -24,7 +24,10 @@ void print_sdl_key_scancode(SDL_Scancode scancode);
 
 //
 int strcmp_ex(const char* const x, const char* const y);
+
 void free_ex(void** tgt);
 #define FREE(x) free_ex((void **)(&x))
 
+void* calloc_ex(void** tgt, int nmemb, size_t memb_size);
+#define CALLOC(n,p) calloc_ex((void**)&p, n, sizeof(*p))
 #endif // __jl_util_h_

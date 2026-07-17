@@ -1051,3 +1051,15 @@ void free_ex(void** tgt) {
     }
     *tgt = NULL;
 }
+
+void* calloc_ex(void** tgt, int nmemb, size_t memb_size) {
+    if (tgt) {
+        *tgt  = calloc(nmemb, memb_size);
+        if (*tgt == NULL) {
+            error_printf("OOM: %d * %d = %ld\n", nmemb, (int)memb_size, (long)(nmemb*memb_size));
+        }
+        return *tgt;
+    }
+    return NULL;
+}
+
