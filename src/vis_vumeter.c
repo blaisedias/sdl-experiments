@@ -114,6 +114,12 @@ int _visualizer_vumeter_div256_squared(int* levels) {
 	return 1;
 }
 
+
+static inline bool tenpc_delta(long long a, long long b) {
+	long long d = llabs(a - b);
+	return d > a /10;
+}
+
 int _visualizer_vumeter_cp(int* levels) {
 static int16_t buff[VUMETER_DEFAULT_SAMPLE_WINDOW*2];
 static long long prev_summed[2] = { 0, 0};
@@ -172,7 +178,7 @@ static bool vc_displayed = false;
 		vol_calib_printf("S:%lld %lld\n", prev_summed[0], prev_summed[1]);
 	}
 */
-	if ((prev_summed[0]/10) != (summed_accumulator[0]/10) || (prev_summed[1]/10) != (summed_accumulator[1]/10)) {
+	if (tenpc_delta(prev_summed[0],summed_accumulator[0]) || tenpc_delta(prev_summed[1], summed_accumulator[1])) {
 		same_count = 0;
 		vc_displayed = false;
 		prev_summed[0] = summed_accumulator[0];
