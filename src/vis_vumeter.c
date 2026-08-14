@@ -49,6 +49,17 @@ static long long prev_acc[2] = { 0, 0};
 	}
 }
 
+// 16
+#define MASK_OFF_LSB_4 ((~0)^0xf)
+// 32
+#define MASK_OFF_LSB_5 ((~0)^0x1f)
+// 64
+#define MASK_OFF_LSB_6 ((~0)^0x3f)
+// 128
+#define MASK_OFF_LSB_7 ((~0)^0x7f)
+// 256
+#define MASK_OFF_LSB_8 ((~0)^0xff)
+
 int _visualizer_vumeter_div256_squared(int* levels) {
 	long long sample_accumulator[2];
 	int16_t *ptr;
@@ -107,6 +118,7 @@ int _visualizer_vumeter_cp(int* levels) {
 static int16_t buff[VUMETER_DEFAULT_SAMPLE_WINDOW*2];
 static long long prev_summed[2] = { 0, 0};
 static int same_count =0;
+static bool vc_displayed = false;
 
 	long long div256Sq_accumulator[2] = {0,0};
 	long long summed_accumulator[2] = {0,0};
@@ -162,11 +174,13 @@ static int same_count =0;
 */
 	if ((prev_summed[0]/10) != (summed_accumulator[0]/10) || (prev_summed[1]/10) != (summed_accumulator[1]/10)) {
 		same_count = 0;
+		vc_displayed = false;
 		prev_summed[0] = summed_accumulator[0];
 		prev_summed[1] = summed_accumulator[1];
 	} else {
 		++same_count;
-		if (same_count == 60) {
+		if (same_count >= 60 && !vc_displayed) {
+			vc_displayed = true;
 			vol_calib_printf("Summed:%lld %lld Div256Sq:%lld %lld\n",
 					prev_summed[0], prev_summed[1],
 					div256Sq_accumulator[0]/num_samples, div256Sq_accumulator[1]/num_samples);
