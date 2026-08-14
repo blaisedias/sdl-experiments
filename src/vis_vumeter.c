@@ -181,7 +181,7 @@ static volatile bool once = true;
 int visualizer_vumeter(int* levels) {
 	if (once) {
 		printf("sizeof(long long)=%ld, sizeof(s16_t)=%ld, sizeof(int64_t)=%ld\n",
-				sizeof(long long), sizeof(s16_t), sizeof(int64_t));
+				(long)sizeof(long long), (long)sizeof(s16_t), (long)sizeof(int64_t));
 		once = false;
 	}
 	return _visualizer_vumeter_cp(levels);
