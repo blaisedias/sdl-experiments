@@ -36,6 +36,7 @@ static const char* help_text=""
 " - printfdefbug enable printing of debug\n"
 " - printfinput  enable printing of input data\n"
 " - printfvol    enable printing of volume levels\n"
+" - printfvolcalib    enable printing of volume raw values\n"
 " - printfload   enable printing of media load times\n"
 " - printfscale  enable printing of scaling parameters and data\n"
 " - printfperf   enable printing of performance metrics\n"
@@ -168,6 +169,8 @@ int main(int argc, char** argv) {
             enable_printf(INPUT_PRINTF);
         } else if (0 == strcmp(argv[i], "printfvol")) {
             enable_printf(VOL_PRINTF);
+        } else if (0 == strcmp(argv[i], "printfvolcalib")) {
+            enable_printf(VOL_CALIB_PRINTF);
         } else if (0 == strcmp(argv[i], "printfload")) {
             enable_printf(LOAD_PRINTF);
         } else if (0 == strcmp(argv[i], "printfscale")) {
@@ -883,6 +886,7 @@ printf("starting player_poll_loop\n"); fflush(stdout);
             player_sprintf(player, buffer, sizeof(buffer), "{playlist_cur_index}{TITLE}{ARTIST}{ALBUM_OR_REMOTE_TITLE}");
             uint64_t new_sig = compute_player_hash(buffer);
             player_sprintf(player, buffer, sizeof(buffer), "Title:{TITLE} Artist:{ARTIST} Album:{ALBUM_OR_REMOTE_TITLE}");
+            log_printf("%s\n",buffer);
 //            fprintf(stderr, "\n<< 0x%lx==0x%lx %s >>\n",(unsigned long)sig, (unsigned long)new_sig, buffer);
             if (sig && new_sig != sig) {
                 // TODO only change visualiser if user setting is set

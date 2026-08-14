@@ -55,6 +55,7 @@ void dummy_printf(char *format, ...) {
 
 void (*log_printf)(char *format, ...) = logfprintf;
 void (*vol_printf)(char *format, ...) = dummy_printf;
+void (*vol_calib_printf)(char *format, ...) = dummy_printf;
 void (*perf_printf)(char *format, ...) = dummy_printf;
 void (*load_printf)(char *format, ...) = dummy_printf;
 void (*scale_printf)(char *format, ...) = dummy_printf;
@@ -76,6 +77,9 @@ void enable_printf(vu_printf_typ v) {
             break;
         case VOL_PRINTF:
             vol_printf = logfprintf_no_timestamp;
+            break;
+        case VOL_CALIB_PRINTF:
+            vol_calib_printf = logfprintf;
             break;
         case PERF_PRINTF:
             perf_printf = error_printf;
@@ -120,6 +124,9 @@ void disable_printf(vu_printf_typ v) {
             break;
         case VOL_PRINTF:
             vol_printf = dummy_printf;
+            break;
+        case VOL_CALIB_PRINTF:
+            vol_calib_printf = dummy_printf;
             break;
         case PERF_PRINTF:
             perf_printf = dummy_printf;

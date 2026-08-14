@@ -26,6 +26,7 @@ extern void (*profile_texture_printf)(char *format, ...);
 extern void (*json_printf)(char *format, ...);
 extern void (*action_printf)(char *format, ...);
 extern void (*app_printf)(char *format, ...);
+extern void (*vol_calib_printf)(char *format, ...);
 
 typedef enum {
     DEBUG_PRINTF,
@@ -41,6 +42,7 @@ typedef enum {
     ACTION_PRINTF,
     TEXTURE_CACHE_EJECT_PRINTF,
     APP_PRINTF,
+    VOL_CALIB_PRINTF,
 }vu_printf_typ;
 
 void enable_printf(vu_printf_typ v);
