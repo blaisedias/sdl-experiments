@@ -234,14 +234,14 @@ static json_value* get_object_array_value(json_value* jvalue, const char* jt) {
 }
 
 
-static int get_object_int_value(json_value* jvalue, const char* jt, int default_value) {
+static bool read_object_int_value(json_value* jvalue, const char* jt, int* destination, int default_value) {
     jvalue = get_object_value(jvalue, jt);
-    if (jvalue && jvalue->type == json_integer) {
-        return jvalue->u.integer;
+    if (jvalue && jvalue->type != json_integer) {
+        return false;
     }
-    return default_value;
+    *destination = jvalue ? jvalue->u.integer : default_value;
+    return true;
 }
-
 
 static const char* get_object_string_value(json_value* jvalue, const char* jt, const char* default_value) {
     jvalue = get_object_value(jvalue, jt);
@@ -251,36 +251,45 @@ static const char* get_object_string_value(json_value* jvalue, const char* jt, c
     return default_value;
 }
 
-static bool get_object_boolean_value(json_value* jvalue, const char* jt, bool default_value) {
+static bool read_object_boolean_value(json_value* jvalue, const char* jt, bool* destination, bool default_value) {
     jvalue = get_object_value(jvalue, jt);
     if (jvalue && jvalue->type == json_boolean) {
-            return (bool)jvalue->u.boolean;
+        return false;
     }
+    *destination = jvalue ? (bool)jvalue->u.boolean : default_value;
     return default_value;
 }
 
-static double get_object_double_value(json_value* jvalue, const char* jt, double default_value) {
+static bool read_object_double_value(json_value* jvalue, const char* jt, double* destination, double default_value) {
     jvalue = get_object_value(jvalue, jt);
-    if (jvalue && jvalue->type == json_double) {
-            return jvalue->u.dbl;
+    if (jvalue && jvalue->type != json_double) {
+        return false;
     }
-    return default_value;
+    *destination = jvalue ? jvalue->u.dbl : default_value;
+    return true;
 }
 
-static float get_object_float_value(json_value* jvalue, const char* jt, float default_value) {
-    return (float) get_object_double_value(jvalue, jt, (double) default_value);
+static bool read_object_float_value(json_value* jvalue, const char* jt, float* destination, float default_value) {
+    double dbl = (double) default_value;
+    if (!read_object_double_value(jvalue, jt, &dbl, (double) default_value)) {
+        return false;
+    }
+    *destination = (float)dbl;
+    return true;
 }
 
-static void deserialise_rect(json_value* jvalue, SDL_Rect* rect) {
-    rect->x = get_object_int_value(jvalue, "x", 0);
-    rect->y = get_object_int_value(jvalue, "y", 0);
-    rect->w = get_object_int_value(jvalue, "w", 0);
-    rect->h = get_object_int_value(jvalue, "h", 0);
+static bool deserialise_rect(json_value* jvalue, SDL_Rect* rect) {
+    if (!read_object_int_value(jvalue, "x", &rect->x, 0)) { return false; }
+    if (!read_object_int_value(jvalue, "y", &rect->y, 0)) { return false; }
+    if (!read_object_int_value(jvalue, "w", &rect->w, 0)) { return false; }
+    if (!read_object_int_value(jvalue, "h", &rect->h, 0)) { return false; }
+    return true;
 }
 
-static void deserialise_point(json_value* jvalue, SDL_Point* pt) {
-    pt->x = get_object_int_value(jvalue, "x", 0);
-    pt->y = get_object_int_value(jvalue, "y", 0);
+static bool deserialise_point(json_value* jvalue, SDL_Point* pt) {
+    if (!read_object_int_value(jvalue, "x", &pt->x, 0)) { return false; }
+    if (!read_object_int_value(jvalue, "y", &pt->y, 0)) { return false; }
+    return true;
 }
 
 static int deserialise_layout(json_value* jvalue, vu_meters_specs_t* vu_specs) {
@@ -288,29 +297,32 @@ static int deserialise_layout(json_value* jvalue, vu_meters_specs_t* vu_specs) {
         error_printf("deserialise_layout: got null object for layout\n");
         return -1;
     }
-    vu_specs->layout.w = get_object_int_value(jvalue, "w", 0);
+    vu_specs->layout.w = vu_specs->layout.h = 0;
+    read_object_int_value(jvalue, "w", &vu_specs->layout.w, 0);
     if ( 0 >= vu_specs->layout.w ) {
-        error_printf("deserialise_vumeter: invalid value of layout width %d\n", vu_specs->layout.w);
+        error_printf("deserialise_layout: invalid value for layout width %d\n", vu_specs->layout.w);
         return -1;
     }
-    vu_specs->layout.h = get_object_int_value(jvalue, "h", 0);
+    read_object_int_value(jvalue, "h", &vu_specs->layout.h, 0);
     if ( 0 >= vu_specs->layout.h) {
-        error_printf("deserialise_vumeter: invalid value of layout height %d\n", vu_specs->layout.h);
+        error_printf("deserialise_layout: invalid value for layout height %d\n", vu_specs->layout.h);
         return -1;
     }
     const char* str = get_object_string_value(jvalue, "channel_arrangement", NULL);
     if (str && !is_string_channel_arrangement(str)) {
-        error_printf("invalid value for layout arrangement %s\n", str);
+        error_printf("deserialise_layout: invalid value for layout arrangement %s\n", str);
     }
     vu_specs->layout.arrangement = channel_arrangement_from_string(str, NO_ARRANGEMENT);
     json_value* viewport_value = get_object_array_value(jvalue, "rectangles");
     if (viewport_value) {
         int n_viewport = sizeof(vu_specs->layout.viewports)/sizeof(vu_specs->layout.viewports[0]);
         if (viewport_value->u.array.length != n_viewport) {
-            error_printf("number of layout viewports != %d\n", n_viewport);
+            error_printf("deserialise_layout: number of layout viewports != %d\n", n_viewport);
         }
         for(int ix=0; ix < MIN(viewport_value->u.array.length, n_viewport); ++ix) {
-            deserialise_rect(viewport_value->u.array.values[ix], vu_specs->layout.viewports + ix);
+            if (!deserialise_rect(viewport_value->u.array.values[ix], vu_specs->layout.viewports + ix)) {
+                error_printf("deserialise_layout: failed to read viewport %d\n", ix);
+            }
         }
     } else {
         return -1;
@@ -318,9 +330,9 @@ static int deserialise_layout(json_value* jvalue, vu_meters_specs_t* vu_specs) {
     return 0;
 }
 
-static int deserialiser_resource_list(json_value* jresources, vu_meters_specs_t* vu_specs) {
+static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* vu_specs) {
     if (NULL == jresources) {
-        error_printf("deserialiser_resource_list: got null object for resources\n");
+        error_printf("deserialise_resource_list: got null object for resources\n");
         return -1;
     }
     vu_specs->resource_list.count = jresources->u.array.length;
@@ -387,14 +399,30 @@ static int deserialise_placement_list(json_value* jplacements, vu_meters_specs_t
         vu_placement_t* placement = &vu_specs->placement_list.elements[ix];
         json_value* jelem = jplacements->u.array.values[ix];
 
-        deserialise_rect(jelem, &placement->rect);
+        if (!deserialise_rect(jelem, &placement->rect)) {
+            error_printf("deserialise_placement_list: failed to deserialise placement rectangle %d\n", ix);
+            return -1;
+        }
         json_value* jcenter = get_object_object_value(jelem, "center");
         if (jcenter) {
-            deserialise_point(jcenter, &placement->center);
+            if (!deserialise_point(jcenter, &placement->center)) {
+                error_printf("deserialise_placement_list: failed to deserialise center point\n");
+            }
         }
-        placement->flip = get_object_int_value(jelem, "flip", 0);
-        placement->angle = get_object_float_value(jelem, "angle", 0);
-        placement->texture_index = get_object_int_value(jelem, "resource", 0);
+        int int_flip;
+        if (!read_object_int_value(jelem, "flip", &int_flip, 0)) {
+            error_printf("deserialise_placement_list: failed to deserialise placement flip %d\n", ix);
+            return -1;
+        }
+        placement->flip = int_flip;
+        if (!read_object_float_value(jelem, "angle", &placement->angle, 0)) {
+            error_printf("deserialise_placement_list: failed to deserialise placement angle %d\n", ix);
+            return -1;
+        }
+        if (!read_object_int_value(jelem, "resource", &placement->texture_index, 0)) {
+            error_printf("deserialise_placement_list: failed to deserialise placement resource %d\n", ix);
+            return -1;
+        }
     }
     return 0;
 }
@@ -564,14 +592,20 @@ static int _json_deserialise(json_value* jvalue, vu_meters_specs_t* vu_specs) {
     vu_specs->format = strdup(str);
 #endif
 
-    vu_specs->format_version = get_object_int_value(jvalue, "format_version", -1);
+    if(!read_object_int_value(jvalue, "format_version", &vu_specs->format_version, -1)) {
+        error_printf("deserialise_vumeter: failed to deserialise format version\n");
+        return -2;
+    }
     // FIXME: 
     if (vu_specs->format_version != 0) {
         error_printf("deserialise_vumeter: format version %d\n", vu_specs->format_version);
         return -2;
     }
 
-    vu_specs->volume_levels = get_object_int_value(jvalue, "volume_levels", 0);
+    if (!read_object_int_value(jvalue, "volume_levels", &vu_specs->volume_levels, 0)) {
+        error_printf("deserialise_vumeter: failed to deserialise volume levels\n");
+        return -2;
+    }
     if (vu_specs->volume_levels <= 0) {
         error_printf("deserialise_vumeter: invalid volume levels %d\n", vu_specs->volume_levels);
         return -2;
@@ -581,7 +615,7 @@ static int _json_deserialise(json_value* jvalue, vu_meters_specs_t* vu_specs) {
         return -1;
     }
 
-    if (deserialiser_resource_list(get_object_array_value(jvalue, "resources"), vu_specs)) {
+    if (deserialise_resource_list(get_object_array_value(jvalue, "resources"), vu_specs)) {
         return -1;
     }
 
@@ -598,11 +632,8 @@ static int _json_deserialise(json_value* jvalue, vu_meters_specs_t* vu_specs) {
     }
 
     { // dummy
-        SDL_Point pt;
-        deserialise_point(jvalue, &pt);
-        get_object_float_value(jvalue, "", 0);
-        get_object_double_value(jvalue, "", 0);
-        get_object_boolean_value(jvalue, "", 0);
+        bool bdummy;
+        read_object_boolean_value(jvalue, "", &bdummy, 0);
     }
     return 0;
 }
@@ -712,7 +743,7 @@ static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json
 vu_meters_t* deserialise_vumeters_json_string(const char* json_string, size_t length, const char* identifier) {
     vu_meters_t* vu = NULL;
     if (!_deserialise_vumeter_json_string(&vu, json_string, length, identifier)) {
-        release_deserialised_vumeters(vu);
+        vu = release_deserialised_vumeters(vu);
     }
     return vu;
 }
