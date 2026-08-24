@@ -17,6 +17,8 @@ extern void copyRect(const SDL_Rect *src, SDL_Rect *dst);
 extern void copyPoint(const SDL_Point *src, SDL_Point *dst);
 void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst);
 void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst);
+void offset_rect(const SDL_Point* offset, const SDL_Rect* src, SDL_Rect* dst);
+void offset_point(const SDL_Point* offset,const SDL_Point* src, SDL_Point* dst);
 void center_rect(const SDL_Rect* outer, const SDL_Rect* inner, SDL_Rect* dst);
 void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef);
 void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef);
@@ -30,4 +32,6 @@ void free_ex(void** tgt);
 
 void* calloc_ex(void** tgt, int nmemb, size_t memb_size);
 #define CALLOC(n,p) calloc_ex((void**)&p, n, sizeof(*p))
+
+#define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
 #endif // __jl_util_h_

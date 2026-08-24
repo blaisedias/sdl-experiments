@@ -16,7 +16,7 @@
 #include "lyrion_player.h"
 #include "widgets.h"
 #include "widgets_json.h"
-#include "vumeter_util.h"
+#include "vumeter.h"
 #include "nowplaying.h"
 
 lyrion_player_ptr get_player();
@@ -49,15 +49,12 @@ static const char* help_text=""
 " - printfapp enable printing of application processing\n"
 " - debug_redraw_backdrop enable printing when backdrop is redrawn\n"
 "\n"  
-" - list list the set of VU Meters and exit\n"
 " - dl <path-to-object-file> : dynamically load VU meter in object file\n"
 "\n"  
 " - wxh <width>[x]<height> : window width and height, only works if window manager is available\n"
 " - fullscreen\n"
 "\n"
 " - json path to json file\n"
-"\n"
-" - vu <vumeter_name> first VU meter to display\n"
 "\n"
 " - showrects       : show widget draw rectangles when pointer is over them\n"
 " - showinputrects  : show widget input rectangles when pointer is over them\n"
@@ -228,28 +225,14 @@ int main(int argc, char** argv) {
             monitor_tcache = true;
         } else if (0 == strcmp(argv[i], "profile_level")) {
             if (argc > i+1) {
-                VUMeter_set_profile_level(atoi(argv[i+1]));
+                vumeter_set_profile_level(atoi(argv[i+1]));
                 i += 1;
             }
-/*            
-         } else if (0 == strcmp(argv[i], "vu")) {
-            if (argc > i+1) {
-                i += 1;
-                app_ctx.first_vu_meter = argv[i];
-            }
-*/            
-        } else if (0 == strcmp(argv[i], "list") ){
-            const vumeter_properties_t *p = VUMeter_get_props_list();
-            while(p != NULL) {
-                for(int iv=0; iv < p->vumeter_count;  ++iv) {
-                    printf("%s\n", p->vumeters[iv].name);
-                }
-                p = p->next;
-            }
-            exit(EXIT_SUCCESS);
         } else if (0 == strcmp(argv[i], "dl")) {
             if (argc > i+1) {
-                VUMeter_loadlib(argv[i+1]);
+                if (!vumeter_load_from_json_file(argv[i+1])) {
+                    error_printf("Failed to load VU meters from %s\n", argv[i+1]);
+                }
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "json")) {
@@ -259,12 +242,12 @@ int main(int argc, char** argv) {
             }
         } else if (0 == strcmp(argv[i], "peakhold")) {
             if (argc > i+1) {
-                VUMeter_set_peak_hold(atoi(argv[i+1]));
+                vumeter_set_peak_hold(atoi(argv[i+1]));
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "decayhold")) {
             if (argc > i+1) {
-                VUMeter_set_decay_hold(atoi(argv[i+1]));
+                vumeter_set_decay_hold(atoi(argv[i+1]));
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "help")
@@ -404,11 +387,6 @@ printf("starting controller\n"); fflush(stdout);
         exit(EXIT_FAILURE);
     }
     main_view = vw;
-
-    if (VUMeter_get_props_list() == NULL) {
-        error_printf("No VU Meters found\n");
-//        app_stop(app_ctx);
-    }
 
     if (json_files && strlen(json_files)) {
         char *tmp = strdup(json_files);

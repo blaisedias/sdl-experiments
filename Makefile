@@ -41,7 +41,6 @@ SRC = ./src
 GENERATED = ./generated
 JSON-PARSER-SRC = ./json-parser
 CITYHASH-SRC = ./cityhash-c
-VUMETERS-SRC = ./vumeters
 INCLUDES-JSON-PARSER = -I $(JSON-PARSER-SRC)
 INCLUDES-CITYHASH = -I $(CITYHASH-SRC)
 INCLUDES-GENERATED = -I $(GENERATED)
@@ -64,14 +63,8 @@ CC = gcc
 CF_PIC = $(CF) -fpic
 CF_SHARED = $(CF) -fpic -shared
 
-SHARED_OBJS = $(LIB_DIR)/Chevrons.so $(LIB_DIR)/PurpleTastic.so $(LIB_DIR)/TubeD.so $(LIB_DIR)/SpeakerGreen.so $(LIB_DIR)/SpeakerGray.so $(LIB_DIR)/TransparentWhite.so
 
-#all: $(BIN_DIR)/sqvumeter $(SHARED_OBJS) \
-#	$(BIN_DIR)/test_tcache \
-#	$(BIN_DIR)/test_widgets_json \
-#	$(BIN_DIR)/test_touch \
-
-all: $(BIN_DIR)/jl2 $(SHARED_OBJS)
+all: $(BIN_DIR)/jl2
 
 TSP_OBJS =  \
 		  $(OBJS_DIR)/application.o \
@@ -90,7 +83,8 @@ TSP_OBJS =  \
 		  $(OBJS_DIR)/json.o \
 		  $(OBJS_DIR)/widgets_json.o \
 		  $(OBJS_DIR)/visualizer.o \
-		  $(OBJS_DIR)/vumeter_util.o \
+		  $(OBJS_DIR)/vumeter.o \
+		  $(OBJS_DIR)/vumeter_json.o \
 		  $(OBJS_DIR)/vis_vumeter.o \
 		  $(OBJS_DIR)/slider_widget.o \
 		  $(OBJS_DIR)/vumeter_widget.o \
@@ -117,21 +111,23 @@ generated: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h
 
 #{
 Makefile.deps: \
-		$(SRC)/*.c $(JSON-PARSER-SRC)/*.c $(CITYHASH-SRC)/*.c $(VUMETERS-SRC)/*.c \
+		$(SRC)/*.c $(JSON-PARSER-SRC)/*.c $(CITYHASH-SRC)/*.c \
 		$(SRC)/*.h $(JSON-PARSER-SRC)/*.h $(CITYHASH-SRC)/*.h \
 		./scripts/mkdeps.py $(GLOBAL_DEPS) generated 
-	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(VUMETERS-SRC)' '$(GENERATED)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
+	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(GENERATED)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
 
 include Makefile.deps
 #}
 # Alternative makefile way of doing above.
 #
 #https://www.gnu.org/software/make/manual/make.html#Automatic-Prerequisites
+#sources = $(SRC)/
+#
 #%.d: %.c
-#        @set -e; rm -f $@; \
-#         $(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
-#         sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-#         rm -f $@.$$$$
+#	@set -e; rm -f $@; \
+#	$(CC) -M $(CF) $< > $@.$$$$; \
+#	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+#	rm -f $@.$$$$
 #
 #include $(sources:.c=.d)
 #
@@ -160,10 +156,6 @@ $(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
 #$(BIN_DIR)/sqvumeter : $(SQVUMETER_OBJS) | $(BIN_DIR)
 #	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
 
-# dynamic libraries
-$(OBJS_DIR)/%.o: $(VUMETERS-SRC)/%.c | $(OBJS_DIR)
-	$(CC) $(CF_PIC) -c -o $(@) $< $(INCLUDES)
-
 $(LIB_DIR)/%.so: $(OBJS_DIR)/%.o | $(LIB_DIR)
 	$(CC) $(CF_SHARED) $(INCLUDES) $< -o $@
 
@@ -189,7 +181,8 @@ TEST_WIDGETS_JSON_OBJS =  \
 	$(OBJS_DIR)/vumeter_widget.o \
 	$(OBJS_DIR)/actions.o \
 	$(OBJS_DIR)/util.o \
-	$(OBJS_DIR)/vumeter_util.o \
+	$(OBJS_DIR)/vumeter.o \
+	$(OBJS_DIR)/vumeter_json.o \
 	$(OBJS_DIR)/visualizer.o \
 	$(OBJS_DIR)/vis_vumeter.o \
 	$(OBJS_DIR)/city.o $(OBJS_DIR)/texture_cache.o \
@@ -215,7 +208,20 @@ $(BIN_DIR)/lyrion_player_strhash: $(SRC)/lyrion_player_strhash.c $(SRC)/lyrion_p
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
 
-$(BIN_DIR)/vumeter_json_load_test: $(SRC)/vumeter_json_load_test.c $(SRC)/vumeter_json.c $(OBJS_DIR)/json.o $(OBJS_DIR)/logging.o $(OBJS_DIR)/util.o $(GENERATED)/vumeter_enum.c 
+VUMETER_TEST_OBJS = \
+	$(OBJS_DIR)/vumeter_json.o \
+	$(OBJS_DIR)/json.o \
+	$(OBJS_DIR)/vumeter.o \
+	$(OBJS_DIR)/logging.o \
+	$(OBJS_DIR)/util.o \
+	$(OBJS_DIR)/texture_cache.o  $(OBJS_DIR)/city.o \
+	$(OBJS_DIR)/timing.o \
+	$(OBJS_DIR)/visualizer.o \
+	$(OBJS_DIR)/vis_vumeter.o \
+	$(OBJS_DIR)/platform_linux.o \
+
+
+$(BIN_DIR)/vumeter_json_load_test: $(SRC)/vumeter_json_load_test.c $(GENERATED)/vumeter_enum.c $(VUMETER_TEST_OBJS) 
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-Og -g -o $(@) $^ $(INCLUDES) $(LIBDIRS) $(LIBS)
 

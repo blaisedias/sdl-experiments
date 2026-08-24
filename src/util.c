@@ -187,7 +187,7 @@ void setup_orientation(float orientation, int w, int h, SDL_Rect *screen) {
 //    }
 }
 
-// src and dst can be the same rect, so order of rebasing is important
+// src and dst can be the same rect
 void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst) {
     dst->x = origin->x + src->x;
     dst->y = origin->y + src->y;
@@ -198,6 +198,19 @@ void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst) {
 void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst) {
     dst->x = origin->x + src->x;
     dst->y = origin->y + src->y;
+}
+
+// src and dst can be the same rect
+void offset_rect(const SDL_Point* offset, const SDL_Rect* src, SDL_Rect* dst) {
+    dst->x = offset->x + src->x;
+    dst->y = offset->y + src->y;
+    dst->w = src->w;
+    dst->h = src->h;
+}
+
+void offset_point(const SDL_Rect* offset, const SDL_Point* src, SDL_Point* dst) {
+    dst->x = offset->x + src->x;
+    dst->y = offset->y + src->y;
 }
 
 void translate_axle(const SDL_Rect* enclosure, const SDL_Point* axle, SDL_Rect* rect) {
@@ -1058,6 +1071,11 @@ void* calloc_ex(void** tgt, int nmemb, size_t memb_size) {
         if (*tgt == NULL) {
             error_printf("OOM: %d * %d = %ld\n", nmemb, (int)memb_size, (long)(nmemb*memb_size));
         }
+#if 0
+        {
+            printf("calloc: %d * %d = %ld\n", nmemb, (int)memb_size, (long)(nmemb*memb_size));
+        }
+#endif
         return *tgt;
     }
     return NULL;
