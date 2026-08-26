@@ -216,6 +216,7 @@ typedef enum {
 
     buttons = 0x0108f9988,
     repeating_stream = 0x02607597b,
+    rescan = 0x017f39550,
 
     VOLUME = 0x022fa5670,
     CAN_CHANGE_VOLUME = 0x01a798b60,
@@ -878,6 +879,7 @@ static bool update_player_status(lyrion_player_ptr player) {
 
                     case buttons:
                     case repeating_stream:
+                    case rescan:
                         break;
 
                     // pseudo tokens
@@ -1298,6 +1300,7 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case playlist_id:
         case buttons:
         case repeating_stream:
+        case rescan:
             puts("????????????");
             break;
 
