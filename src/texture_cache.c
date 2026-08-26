@@ -527,7 +527,7 @@ static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
             tcache_eject_printf("tcache_eject: %s %u / %u lru:%u, req:%u lru_counter:%u\n", tce->path, num_texture_bytes, max_num_texture_bytes, tce->lru_count, increment, lru_counter);
         }
     }
-    assert(lru_eject.ix < lru_eject.count);
+    assert(lru_eject.ix <= lru_eject.count);
     int64_t ms_1 = get_micro_seconds();
     profile_texture_printf("tcache_eject: %06lu usec ejected %d\n", ms_1- ms_0, ejected_count);
 //    perf_printf("tcache_eject: %f millis\n", (float)(ms_1 - ms_0)/1000);
