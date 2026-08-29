@@ -262,10 +262,18 @@ static bool read_object_boolean_value(json_value* jvalue, const char* jt, bool* 
 
 static bool read_object_double_value(json_value* jvalue, const char* jt, double* destination, double default_value) {
     jvalue = get_object_value(jvalue, jt);
-    if (jvalue && jvalue->type != json_double) {
+    if (jvalue && jvalue->type != json_double && jvalue->type != json_integer) {
         return false;
     }
-    *destination = jvalue ? jvalue->u.dbl : default_value;
+    if (jvalue) {
+        if (jvalue->type == json_double) {
+            *destination = jvalue->u.dbl;
+        } else {
+            *destination = jvalue->u.integer;
+        }
+    } else {
+        *destination = default_value;
+    }
     return true;
 }
 
