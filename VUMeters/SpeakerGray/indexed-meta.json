@@ -59,8 +59,7 @@
   },
   "resources": [
     null,
-    "L-frame2000.png",
-    "R-frame2000.png",
+    "frame2000.png",
     "L-lsp1620.png",
     "R-lsp1620.png"
   ],
@@ -77,343 +76,343 @@
       "w": 1292,
       "x": 354,
       "y": 354,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1298,
       "w": 1298,
       "x": 351,
       "y": 351,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1304,
       "w": 1304,
       "x": 348,
       "y": 348,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1310,
       "w": 1310,
       "x": 345,
       "y": 345,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1316,
       "w": 1316,
       "x": 342,
       "y": 342,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1322,
       "w": 1322,
       "x": 339,
       "y": 339,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1328,
       "w": 1328,
       "x": 336,
       "y": 336,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1334,
       "w": 1334,
       "x": 333,
       "y": 333,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1340,
       "w": 1340,
       "x": 330,
       "y": 330,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1346,
       "w": 1346,
       "x": 327,
       "y": 327,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1352,
       "w": 1352,
       "x": 324,
       "y": 324,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1358,
       "w": 1358,
       "x": 321,
       "y": 321,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1364,
       "w": 1364,
       "x": 318,
       "y": 318,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1370,
       "w": 1370,
       "x": 315,
       "y": 315,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1376,
       "w": 1376,
       "x": 312,
       "y": 312,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1382,
       "w": 1382,
       "x": 309,
       "y": 309,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1388,
       "w": 1388,
       "x": 306,
       "y": 306,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1394,
       "w": 1394,
       "x": 303,
       "y": 303,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1400,
       "w": 1400,
       "x": 300,
       "y": 300,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1406,
       "w": 1406,
       "x": 297,
       "y": 297,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1412,
       "w": 1412,
       "x": 294,
       "y": 294,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1418,
       "w": 1418,
       "x": 291,
       "y": 291,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1424,
       "w": 1424,
       "x": 288,
       "y": 288,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1430,
       "w": 1430,
       "x": 285,
       "y": 285,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1436,
       "w": 1436,
       "x": 282,
       "y": 282,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1442,
       "w": 1442,
       "x": 279,
       "y": 279,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1448,
       "w": 1448,
       "x": 276,
       "y": 276,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1454,
       "w": 1454,
       "x": 273,
       "y": 273,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1460,
       "w": 1460,
       "x": 270,
       "y": 270,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1466,
       "w": 1466,
       "x": 267,
       "y": 267,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1472,
       "w": 1472,
       "x": 264,
       "y": 264,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1478,
       "w": 1478,
       "x": 261,
       "y": 261,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1484,
       "w": 1484,
       "x": 258,
       "y": 258,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1490,
       "w": 1490,
       "x": 255,
       "y": 255,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1496,
       "w": 1496,
       "x": 252,
       "y": 252,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1502,
       "w": 1502,
       "x": 249,
       "y": 249,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1508,
       "w": 1508,
       "x": 246,
       "y": 246,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1514,
       "w": 1514,
       "x": 243,
       "y": 243,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1520,
       "w": 1520,
       "x": 240,
       "y": 240,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1526,
       "w": 1526,
       "x": 237,
       "y": 237,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1532,
       "w": 1532,
       "x": 234,
       "y": 234,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1538,
       "w": 1538,
       "x": 231,
       "y": 231,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1544,
       "w": 1544,
       "x": 228,
       "y": 228,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1550,
       "w": 1550,
       "x": 225,
       "y": 225,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1556,
       "w": 1556,
       "x": 222,
       "y": 222,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1562,
       "w": 1562,
       "x": 219,
       "y": 219,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1568,
       "w": 1568,
       "x": 216,
       "y": 216,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1574,
       "w": 1574,
       "x": 213,
       "y": 213,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 1580,
       "w": 1580,
       "x": 210,
       "y": 210,
-      "resource": 3
+      "resource": 2
     },
     {
       "h": 2000,
@@ -427,350 +426,351 @@
       "w": 1292,
       "x": 354,
       "y": 354,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1298,
       "w": 1298,
       "x": 351,
       "y": 351,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1304,
       "w": 1304,
       "x": 348,
       "y": 348,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1310,
       "w": 1310,
       "x": 345,
       "y": 345,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1316,
       "w": 1316,
       "x": 342,
       "y": 342,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1322,
       "w": 1322,
       "x": 339,
       "y": 339,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1328,
       "w": 1328,
       "x": 336,
       "y": 336,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1334,
       "w": 1334,
       "x": 333,
       "y": 333,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1340,
       "w": 1340,
       "x": 330,
       "y": 330,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1346,
       "w": 1346,
       "x": 327,
       "y": 327,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1352,
       "w": 1352,
       "x": 324,
       "y": 324,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1358,
       "w": 1358,
       "x": 321,
       "y": 321,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1364,
       "w": 1364,
       "x": 318,
       "y": 318,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1370,
       "w": 1370,
       "x": 315,
       "y": 315,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1376,
       "w": 1376,
       "x": 312,
       "y": 312,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1382,
       "w": 1382,
       "x": 309,
       "y": 309,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1388,
       "w": 1388,
       "x": 306,
       "y": 306,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1394,
       "w": 1394,
       "x": 303,
       "y": 303,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1400,
       "w": 1400,
       "x": 300,
       "y": 300,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1406,
       "w": 1406,
       "x": 297,
       "y": 297,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1412,
       "w": 1412,
       "x": 294,
       "y": 294,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1418,
       "w": 1418,
       "x": 291,
       "y": 291,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1424,
       "w": 1424,
       "x": 288,
       "y": 288,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1430,
       "w": 1430,
       "x": 285,
       "y": 285,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1436,
       "w": 1436,
       "x": 282,
       "y": 282,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1442,
       "w": 1442,
       "x": 279,
       "y": 279,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1448,
       "w": 1448,
       "x": 276,
       "y": 276,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1454,
       "w": 1454,
       "x": 273,
       "y": 273,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1460,
       "w": 1460,
       "x": 270,
       "y": 270,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1466,
       "w": 1466,
       "x": 267,
       "y": 267,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1472,
       "w": 1472,
       "x": 264,
       "y": 264,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1478,
       "w": 1478,
       "x": 261,
       "y": 261,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1484,
       "w": 1484,
       "x": 258,
       "y": 258,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1490,
       "w": 1490,
       "x": 255,
       "y": 255,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1496,
       "w": 1496,
       "x": 252,
       "y": 252,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1502,
       "w": 1502,
       "x": 249,
       "y": 249,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1508,
       "w": 1508,
       "x": 246,
       "y": 246,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1514,
       "w": 1514,
       "x": 243,
       "y": 243,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1520,
       "w": 1520,
       "x": 240,
       "y": 240,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1526,
       "w": 1526,
       "x": 237,
       "y": 237,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1532,
       "w": 1532,
       "x": 234,
       "y": 234,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1538,
       "w": 1538,
       "x": 231,
       "y": 231,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1544,
       "w": 1544,
       "x": 228,
       "y": 228,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1550,
       "w": 1550,
       "x": 225,
       "y": 225,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1556,
       "w": 1556,
       "x": 222,
       "y": 222,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1562,
       "w": 1562,
       "x": 219,
       "y": 219,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1568,
       "w": 1568,
       "x": 216,
       "y": 216,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1574,
       "w": 1574,
       "x": 213,
       "y": 213,
-      "resource": 4
+      "resource": 3
     },
     {
       "h": 1580,
       "w": 1580,
       "x": 210,
       "y": 210,
-      "resource": 4
+      "resource": 3
     },
     {
+      "flip": 1,
       "h": 2000,
       "w": 2000,
       "x": 0,
       "y": 0,
-      "resource": 2
+      "resource": 1
     }
   ],
   "compositions": [
@@ -925,7 +925,7 @@
   ],
   "rotaries": [],
   "counts": {
-    "resources": 5,
+    "resources": 4,
     "placements": 101,
     "compositions": 5,
     "vumeters": 1

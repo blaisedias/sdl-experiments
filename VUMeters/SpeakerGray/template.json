@@ -66,8 +66,7 @@
         "The set of images required to render this VU-Meter"
     ],
     "files": [
-        "L-frame2000.png",
-        "R-frame2000.png",
+        "frame2000.png",
         "L-lsp1620.png",
         "R-lsp1620.png"
     ],
@@ -75,7 +74,7 @@
         "associative array of image resources"
     ],
     "resources": {
-        "LEFT_BG": "L-frame2000.png", "RIGHT_BG": "R-frame2000.png",
+        "LEFT_BG": "frame2000.png", "RIGHT_BG": "frame2000.png",
         "$SEQUENCE" : [
             { "key_prefix": "L", "start": 0,  "end": 48,  "value": "L-lsp1620.png"},
             { "key_prefix": "R", "start": 0,  "end": 48,  "value": "R-lsp1620.png"}
