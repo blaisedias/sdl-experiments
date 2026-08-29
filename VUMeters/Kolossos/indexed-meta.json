@@ -1,0 +1,771 @@
+{
+  "Authors": [
+    {
+      "Name": "Arie Kool"
+    },
+    {
+      "Github": "https://github.com/blaisedias/"
+    }
+  ],
+  "Source": {
+    "Description": "Community squeezebox controller 3rd party VU image.",
+    "Version": "0.1.0",
+    "Original-site": "https://github.com/ralph-irving/jivelite.git",
+    "Copying-policy": "Public Domain",
+    "Extension_by": "piCorePlayer team: https://www.picoreplayer.org",
+    "Further-Modifications": "cropping, transparent surround, and needle modification by blaisedias https://github.com/blaisedias"
+  },
+  "License": "Public Domain",
+  "kind": "vumeter",
+  "vutype": "compose2",
+  "format": "indexed",
+  "format_version": 0,
+  "volume_levels": 49,
+  "layout": {
+    "w": 1936,
+    "h": 698,
+    "channel_arrangement": "horizontal",
+    "rectangles": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 1936,
+        "h": 698
+      },
+      {
+        "x": 32,
+        "y": 0,
+        "w": 920,
+        "h": 698
+      },
+      {
+        "x": 984,
+        "y": 0,
+        "w": 920,
+        "h": 698
+      }
+    ]
+  },
+  "resources": [
+    null,
+    "Kolossos-Oval-R0.55-upscaled.png",
+    "Kolossos-Oval-Needle-2-upscaled-touchedup.png"
+  ],
+  "rotaries": [
+    {
+      "enclosure": {
+        "w": 920,
+        "h": 698
+      },
+      "axle": {
+        "x": 454,
+        "y": 668
+      },
+      "bearing": {
+        "x": 18,
+        "y": 668,
+        "w": 36,
+        "h": 698
+      },
+      "resource": "needle"
+    }
+  ],
+  "placement": [
+    {
+      "x": 0,
+      "y": 0,
+      "resource": 0,
+      "w": 0,
+      "h": 0
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "resource": 1,
+      "w": 920,
+      "h": 698
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -42.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -40.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -38.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -36.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -35.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -33.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -31.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -29.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -28.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -26.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -24.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -22.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -21.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -19.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -17.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -15.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -14.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -12.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -10.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -8.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -7.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -5.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -3.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": -1.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 0.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 1.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 3.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 5.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 7.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 8.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 10.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 12.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 14.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 15.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 17.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 19.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 21.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 22.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 24.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 26.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 28.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 29.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 31.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 33.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 35.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 36.75,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 38.5,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 40.25,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    },
+    {
+      "x": 436,
+      "y": 0,
+      "w": 36,
+      "h": 698,
+      "resource": 2,
+      "angle": 42.0,
+      "center": {
+        "x": 18,
+        "y": 668
+      }
+    }
+  ],
+  "compositions": [
+    {
+      "render_op": "static",
+      "volume_type": "none",
+      "placements": [
+        0
+      ]
+    },
+    {
+      "render_op": "static",
+      "placements": [
+        1
+      ],
+      "volume_type": "none"
+    },
+    {
+      "render_op": "single",
+      "volume_type": "decay",
+      "placements": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ]
+    }
+  ],
+  "vumeters": [
+    {
+      "Kolossos Oval": [
+        [
+          0
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    }
+  ],
+  "counts": {
+    "resources": 3,
+    "placements": 51,
+    "compositions": 3,
+    "vumeters": 1
+  }
+}

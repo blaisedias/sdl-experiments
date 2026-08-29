@@ -1,0 +1,170 @@
+{
+    "Authors":  [
+        {
+            "Name": "Arie Kool"
+        },
+        {
+            "Github": "https://github.com/blaisedias/"
+        }
+    ],
+    "Source": {
+        "Description":	"Community squeezebox controller 3rd party VU image.",
+        "Version": "0.1.0",
+        "Original-site": "https://github.com/ralph-irving/jivelite.git",
+        "Copying-policy": "Public Domain",
+        "Extension_by":	"piCorePlayer team: https://www.picoreplayer.org",
+        "Further-Modifications": "cropping, transparent surround, and needle modification by blaisedias https://github.com/blaisedias"
+    },
+    "License": "Public Domain",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 49,
+    "#dimensions": [
+        "unscaled width and height of the vumeter",
+        "for this vu meter:",
+        "width  = left_margin + dial_width + spacing + dial_width + right_margin",
+        "       = 32          + 920       + 32      + 920       + 32          ",
+        "       = 1936",
+        "height = 698"
+    ],
+    "layout" : {
+        "w": 1936,
+        "h": 698,
+        "left": {
+                "x": 32,
+                "y": 0,
+                "w": 920,
+                "h": 698
+        },
+        "right": {
+                "x": 984,
+                "y": 0,
+                "w": 920,
+                "h": 698
+        },
+        "channel_arrangement": "horizontal"
+    },
+    "#files": [
+        "The set of images required to render this VU-Meter"
+    ],
+    "files": [
+        "Kolossos-Oval-R0.55-upscaled.png", "Kolossos-Oval-Needle-2-upscaled-touchedup.png"
+    ],
+    "#resources" :[
+        "associative array of image resources"
+    ],
+    "resources": {
+        "BG": "Kolossos-Oval-R0.55-upscaled.png",
+        "needle": "Kolossos-Oval-Needle-2-upscaled-touchedup.png"
+    },
+    "#rotaries": [
+        "rotaries is an associative array of rotary definitions",
+        "a rotary defines image rotation parameters",
+        "Fields of a rotary are:",
+        "  resource: image identifier",
+        "  enclosure: { w:width, h:height}",
+        "  axle: { x:x-coordinate, y:y-coordinate} # with the enclosure",
+        "  bearing: { x:x-coordinate, y:y-coordinate, w:width, h:height}",
+        "enclosure defines a rectangle in which the rotation occurs,",
+        "and should have the same dimensions as layout left and/or right rectangle.",
+        "typically layout left and right have identical dimensions, if they do not",
+        "different rotaries are required for left and right",
+        "axle defines the point relative to the enclosure around which rotation occurs",
+        "bearing defines ",
+        " - the dimensions at which the resource image is rendered",
+        " - the point around which the rendered resource image is rotated",
+        "the bearing is overlaid on to the enclosure such that the bearing location (x,y) is exactly on top of the axle",
+        "For analog vu meters:",
+        "   enclosure defines the dimensions of the dial",
+        "   axle defines where the needle rotates around in the dial",
+        "   bearing defines where the needle is affixed to the axle"
+    ],
+    "rotaries": {
+        "rot_needle": {
+            "enclosure": {
+                "w": 920,
+                "h": 698
+            },
+            "axle": {
+                "x": 454,
+                "y": 668
+            },
+            "bearing": {
+                "x": 18,
+                "y": 668,
+                "w": 36,
+                "h": 698
+            },
+            "resource": "needle"
+        }
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {
+        "BG": { "x": 0, "y": 0 },
+        "$ROTATION_SEQUENCE" : [
+            {"prefix": "N", "x":0, "y": 0, "start":0, "end": 48, "start_angle": -42.0, "angle_step": 1.75, "rotary": "rot_needle"}
+        ]
+    },
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays of volume level to placements",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
+    ],
+    "compositions": {
+        "composition0": {
+            "render_op": "static",
+            "placements": {
+                "0": "BG"
+            }
+        },
+        "composition1": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 48, "value": "N{index}"}
+                ]
+            }
+        }
+    },
+    "vumeters" :{
+        "Kolossos Oval": {
+            "left":  [ "composition0", "composition1"],
+            "right": [ "composition0", "composition1"]
+        }
+    }
+}

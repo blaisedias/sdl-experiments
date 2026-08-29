@@ -1,0 +1,229 @@
+{
+    "Authors":  [
+        {
+            "Github": "https://github.com/blaisedias/"
+        }
+    ],
+    "License": "CC-BY-SA-4.0",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 49,
+    "#dimensions": [
+        "unscaled width and height of the vumeter",
+        "margins = 32, dial_width=1024",
+        "width   = left_margin + dial_width + spacing + dial_width + right_margin",
+        "        = 2144",
+        "height  = 768"
+    ],
+    "layout" : {
+        "w": 2144,
+        "h": 768,
+        "left": {
+                "x": 32,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "right": {
+                "x": 1088,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "channel_arrangement": "horizontal"
+    },
+    "#files": [
+        "The set of images required to render this VU-Meter"
+    ],
+    "files": [
+        "background.png", "trimmed-dial.png",
+        "left-legend.png", "right-legend.png",
+        "roundel-r.png", "roundel-r_high.png",
+        "needle-r.png", "needle-r_high.png"
+    ],
+    "#resources" :[
+        "associative array of image resources"
+    ],
+    "resources": {
+        "LEFT_BG": "background.png", "RIGHT_BG": "background.png", "DIAL": "trimmed-dial.png",
+        "LEFT_LEGEND": "left-legend.png", "RIGHT_LEGEND": "right-legend.png",
+        "ROUNDEL": "roundel-r.png", "ROUNDEL_HIGH": "roundel-r_high.png",
+        "needle": "needle-r.png", "needle_high": "needle-r_high.png"
+    },
+    "rotaries": {
+        "rot_needle": {
+            "enclosure": {
+                "w": 1024,
+                "h": 768
+            },
+            "axle": {
+                "x": 512,
+                "y": 615
+            },
+            "bearing": {
+                "x": 424,
+                "y": 16,
+                "w": 424,
+                "h": 31
+            },
+            "resource": "needle"
+        },
+        "rot_needle_high": {
+            "enclosure": {
+                "w": 1024,
+                "h": 768
+            },
+            "axle": {
+                "x": 512,
+                "y": 615
+            },
+            "bearing": {
+                "x": 424,
+                "y": 16,
+                "w": 424,
+                "h": 31
+            },
+            "resource": "needle_high"
+        }
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {
+        "DIAL": {
+            "x": 56,
+            "y": 122
+        },
+        "LEFT_BG": {
+            "x": 0,
+            "y": 0
+        },
+        "LEFT_LEGEND": {
+            "x": 479,
+            "y": 277
+        },
+        "RIGHT_BG": {
+            "flip": 1,
+            "x": 0,
+            "y": 0
+        },
+        "RIGHT_LEGEND": {
+            "x": 460,
+            "y": 278
+        },
+        "ROUNDEL": {
+            "x": 485,
+            "y": 587
+        },
+        "ROUNDEL_HIGH": {
+            "x": 485,
+            "y": 587
+        },
+        "$ROTATION_SEQUENCE" : [
+            {"prefix": "N", "x":0, "y": 0, "start":0, "end": 35,  "start_angle": 24.0,   "angle_step": 2.75, "rotary": "rot_needle"},
+            {"prefix": "N", "x":0, "y": 0, "start":36, "end": 48, "start_angle": 123, "angle_step": 2.75, "rotary": "rot_needle_high"}
+        ]
+    },
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays of volume level to placements",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
+    ],
+    "compositions": {
+        "LP00": {
+            "render_op": "static",
+            "placements": [
+                "LEFT_BG",
+                "DIAL",
+                "LEFT_LEGEND"
+            ]
+        },
+        "RP00": {
+            "render_op": "static",
+            "placements": [
+                "RIGHT_BG",
+                "DIAL",
+                "RIGHT_LEGEND"
+            ]
+        },
+        "LT00": {
+            "render_op": "static",
+            "placements":  [
+                "DIAL",
+                "LEFT_LEGEND"
+            ]
+        },
+        "RT00": {
+            "render_op": "static",
+            "placements" : [
+                "DIAL",
+                "RIGHT_LEGEND"
+            ]
+        },
+        "N01": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 48, "value": "N{index}"}
+                ]
+            }
+        },
+        "R01": {
+            "render_op": "aggregate",
+            "volume_type": "decay",
+            "placements": {
+                "0": "ROUNDEL",
+                "36": "ROUNDEL_HIGH"
+            }
+        }
+    },
+    "#vumeters": [
+        "associative arrays keyed on VU Meter name",
+        " contents of each associative array are 2 keys",
+        "   levels: which set of levels in layout to use for the VU Meter. REQUIRED",
+        "   background: which background in layout to use, if abseent then no backgorund is rendered"
+    ],
+    "vumeters" :{
+        "PurpleTastic2": {
+            "left":  [ "LP00", "R01", "N01" ],
+            "right": [ "RP00", "R01", "N01"]
+        },
+        "PurpleTastic2Transparent": {
+            "left":  [ "LT00", "R01", "N01"],
+            "right": [ "RT00", "R01", "N01"]
+        }
+    }
+}

@@ -1,0 +1,420 @@
+{
+    "Authors":  [
+        {
+            "Github": "https://github.com/blaisedias/"
+        }
+    ],
+    "License": "CC-BY-SA-4.0",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 50,
+    "layout" : {
+        "w": 1935,
+        "h": 648,
+        "left": {
+                "x": 0,
+                "y": 0,
+                "w": 1915,
+                "h": 260
+        },
+        "right": {
+                "x": 0,
+                "y": 388,
+                "w": 1915,
+                "h": 260
+        },
+        "fascia": {
+                "x": 10,
+                "y": 274,
+                "w": 1918,
+                "h": 100
+        },
+        "channel_arrangement": "vertical"
+    },
+    "#files": [
+        "The set of images required to render this VU-Meter",
+        "derived from resources"
+    ],
+    "files": [
+        "white-orange-center.png",
+        "cyan-bar-off.png",
+        "cyan-bar-on.png",
+        "green-bar-off.png",
+        "green-bar-on.png",
+        "white-left.png",
+        "left-trail.png",
+        "orange-bar-off.png",
+        "orange-bar-on.png",
+        "red-bar-off.png",
+        "red-bar-on.png",
+        "white-right.png",
+        "right-trail.png",
+        "white-bar-off.png",
+        "white-bar-on.png",
+        "cyan-orange-center.png",
+        "cyan-left.png",
+        "cyan-right.png",
+        "green-red-center.png",
+        "green-left.png",
+        "green-right.png",
+        "pastel-green-red-center.png",
+        "pastel-green-bar-off.png",
+        "pastel-green-bar-on.png",
+        "pastel-red-bar-off.png",
+        "pastel-red-bar-on.png"
+    ],
+    "#resources" :[
+        "associative array of image resources, which serve as symbolic links",
+        "to image file names"
+    ],
+    "resources": {
+        "white_amber_center": "white-orange-center.png",
+        "quad_center": "quad-center.png",
+        "white_left_legend": "white-left.png",
+        "white_right_legend": "white-right.png",
+
+        "pastel_green_red_center": "pastel-green-red-center.png",
+        "pastel_green_left_legend": "pastel-green-left.png",
+        "pastel_green_right_legend": "pastel-green-right.png",
+
+        "cyan_orange_center": "cyan-orange-center.png",
+        "cyan_left_legend": "cyan-left.png",
+        "cyan_right_legend": "cyan-right.png",
+
+        "green_red_center": "green-red-center.png",
+        "green_left_legend": "green-left.png",
+        "green_right_legend": "green-right.png",
+
+        "white_on": "white-bar-on.png",
+        "cyan_on": "cyan-bar-on.png",
+        "green_on": "green-bar-on.png",
+        "amber_on": "orange-bar-on.png",
+        "red_on": "red-bar-on.png",
+        "pastel_green_on": "pastel-green-bar-on.png",
+        "pastel_red_on": "pastel-red-bar-on.png",
+
+        "white_off": "white-bar-off.png",
+        "cyan_off": "cyan-bar-off.png",
+        "green_off": "green-bar-off.png",
+        "amber_off": "orange-bar-off.png",
+        "red_off": "red-bar-off.png",
+        "pastel_green_off": "pastel-green-bar-off.png",
+        "pastel_red_off": "pastel-red-bar-off.png"
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {
+        "$SEQUENCE" : [
+            { "prefix": "white_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "white_on" },
+            { "prefix": "white_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "white_off" },
+
+            { "prefix": "cyan_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "cyan_on" },
+            { "prefix": "cyan_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "cyan_off" },
+
+            { "prefix": "green_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "green_on" },
+            { "prefix": "green_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "green_off" },
+
+            { "prefix": "amber_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "amber_on" },
+            { "prefix": "amber_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "amber_off" },
+
+            { "prefix": "red_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "red_on" },
+            { "prefix": "red_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "red_off" },
+
+            { "prefix": "pastel_green_on", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "pastel_green_on" },
+            { "prefix": "pastel_green_off", "x":108, "y":0, "xstep": 36, "start":1, "end":36, "resource": "pastel_green_off" },
+
+            { "prefix": "pastel_red_on", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "pastel_red_on" },
+            { "prefix": "pastel_red_off", "x":108, "y":0, "xstep": 36, "start":37, "end":49, "resource": "pastel_red_off" }
+        ],
+        "quad_center" : { "x":0, "y":7},
+        "white_amber_center" : { "x":0, "y":7},
+        "white_left_legend"  : { "x":0, "y":0},
+        "white_right_legend"  : { "x":0, "y":0},
+
+        "pastel_green_red_center" : { "x":0, "y":7},
+        "pastel_green_left_legend"  : { "x":0, "y":0},
+        "pastel_green_right_legend"  : { "x":0, "y":0},
+
+        "cyan_orange_center" : { "x":0, "y":7},
+        "cyan_left_legend"  : { "x":0, "y":0},
+        "cyan_right_legend"  : { "x":0, "y":0},
+
+        "green_red_center" : { "x":0, "y":7},
+        "green_left_legend"  : { "x":0, "y":0},
+        "green_right_legend"  : { "x":0, "y":0}
+    },
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'static', 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative array of volume levels to placements",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
+    ],
+    "compositions": {
+        "quad_color_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "white_left_legend"
+            }
+        },
+        "quad_color_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "white_right_legend"
+            }
+        },
+        "quad_color_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 18, "value": "white_off{index}"},
+                    { "start": 19, "end": 36, "value": "cyan_off{index}"},
+                    { "start": 37, "end": 42, "value": "amber_off{index}"},
+                    { "start": 43, "end": 49, "value": "red_off{index}"}
+                ]
+            }
+        },
+        "quad_color_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 18, "value": "white_on{index}"},
+                    { "start": 19, "end": 36, "value": "cyan_on{index}"},
+                    { "start": 37, "end": 42, "value": "amber_on{index}"},
+                    { "start": 43, "end": 49, "value": "red_on{index}"}
+                ]
+            }
+        },
+        "white_orange_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "white_left_legend"
+            }
+        },
+        "white_orange_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "white_right_legend"
+            }
+        },
+        "white_orange_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "white_off{index}"},
+                    { "start": 37, "end": 49, "value": "amber_off{index}"}
+                ]
+            }
+        },
+        "white_orange_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "white_on{index}"},
+                    { "start": 37, "end": 49, "value": "amber_on{index}"}
+                ]
+            }
+        },
+        "cyan_orange_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "cyan_left_legend"
+            }
+        },
+        "cyan_orange_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "cyan_right_legend"
+            }
+        },
+        "cyan_orange_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "cyan_off{index}"},
+                    { "start": 37, "end": 49, "value": "amber_off{index}"}
+                ]
+            }
+        },
+        "cyan_orange_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "cyan_on{index}"},
+                    { "start": 37, "end": 49, "value": "amber_on{index}"}
+                ]
+            }
+        },
+        "green_red_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "green_left_legend"
+            }
+        },
+        "green_red_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "green_right_legend"
+            }
+        },
+        "green_red_off": {
+            "render_op": "static",
+            "placements" : {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "green_off{index}"},
+                    { "start": 37, "end": 49, "value": "red_off{index}"}
+                ]
+            }
+        },
+        "green_red_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "green_on{index}"},
+                    { "start": 37, "end": 49, "value": "red_on{index}"}
+                ]
+            }
+        },
+        "pastel_green_red_L": {
+            "render_op": "static",
+            "placements" : {
+                "0": "pastel_green_left_legend"
+            }
+        },
+        "pastel_green_red_R": {
+            "render_op": "static",
+            "placements": {
+                "0": "pastel_green_right_legend"
+            }
+        },
+        "pastel_green_red_off": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "pastel_green_off{index}"},
+                    { "start": 37, "end": 49, "value": "pastel_red_off{index}"}
+                ]
+            }
+        },
+        "pastel_green_red_on": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "pastel_green_on{index}"},
+                    { "start": 37, "end": 49, "value": "pastel_red_on{index}"}
+                ]
+            }
+        }
+    },
+    "#fascias" : [
+        "associative array with keys",
+        "fascias are compositions restricted to render_op fixed to 'static'",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "    'render_op' : 'static'",
+        "    'placements': one of",
+        "           - an associative array of whole numbers to placements",
+        "           - array of placements",
+        " 'render_op' if specified must 'static', and is defaulted to 'static'"
+    ],
+    "fascias" : {
+        "quad_color_fascia": {
+            "placements": [
+                "quad_center"
+            ]
+        },
+        "white_orange_fascia": {
+            "placements": [
+                "white_amber_center"
+            ]
+        },
+        "cyan_orange_fascia": {
+            "placements": [
+                "cyan_orange_center"
+            ]
+        },
+        "green_red_fascia": {
+            "placements": [
+                "green_red_center"
+            ]
+        },
+        "pastel_green_red_fascia": {
+            "placements": [
+                "pastel_green_red_center"
+            ]
+        }
+    },
+    "#vumeters": [
+        "Associate array of VU Meters defined in this file keyed on VU Meter name",
+        "In turn contents are associative arrays containing 3 keys",
+        " fascia: list of compositions to render in the layout fascia rectangle",
+        "       this can only include compositions with  render_op = 'static'",
+        " left: list of compositions to render in the layout left rectangle",
+        "       this includes compositions with all render_ops",
+        " right: list of compositions to render in the layout right rectangle",
+        "       this includes compositions with all render_ops",
+        ""
+    ],
+    "vumeters": {
+        "Chevrons Quad Color": {
+            "fascia": ["quad_color_fascia"],
+            "left":  ["quad_color_L", "quad_color_off", "quad_color_on"],
+            "right":  ["quad_color_R", "quad_color_off", "quad_color_on"]
+        },
+        "Chevrons White Orange": {
+            "fascia": ["white_orange_fascia"],
+            "left":  ["white_orange_L", "white_orange_off", "white_orange_on"],
+            "right":  ["white_orange_R", "white_orange_off", "white_orange_on"]
+        },
+        "Chevrons Cyan Orange": {
+            "fascia": ["cyan_orange_fascia"],
+            "left":  ["cyan_orange_L", "cyan_orange_off", "cyan_orange_on"],
+            "right":  ["cyan_orange_R", "cyan_orange_off", "cyan_orange_on"]
+        },
+        "Chevrons Green Red": {
+            "fascia": ["green_red_fascia"],
+            "left":  ["green_red_L", "green_red_off", "green_red_on"],
+            "right":  ["green_red_R", "green_red_off", "green_red_on"]
+        },
+        "Chevrons Pastel Green Red": {
+            "fascia": ["pastel_green_red_fascia"],
+            "left":  ["pastel_green_red_L", "pastel_green_red_off", "pastel_green_red_on"],
+            "right":  ["pastel_green_red_R", "pastel_green_red_off", "pastel_green_red_on"]
+        }
+    }
+}

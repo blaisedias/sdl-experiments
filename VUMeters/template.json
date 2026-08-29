@@ -1,0 +1,247 @@
+{
+    "#Authors": [
+        "list of authors"
+    ],
+    "Authors":  [
+        {
+            "Github": "........."
+        }
+    ],
+    "#License": [
+        "license then applies to the VU meter artifacts"
+    ],
+    "License": "CC-BY-SA-4.0",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "format": "<[associative,indexed]>",
+    "#format_version": [
+        "format version number, whole number"
+    ],
+    "format_version": <n>,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": <N>,
+    "#dimensions": [
+        "natural width and height of the vumeter"
+    ],
+    "layout" : {
+        "w": <W>,
+        "h": <H>,
+        "left": {
+            "x": <X>, "y": <Y>, "w": <W>, "h": <H>
+        },
+        "right": {
+            "x": <X+OFFSET>, "y": <Y>, "w": <W>, "h": <H>
+        },
+        "static": {
+            "x": <X+OFFSET>, "y": <Y>, "w": <W>, "h": <H>
+        },
+        "#channel_arrangement": [ 
+            "Hint regarding relative arrangement between channels"
+        ],
+        "channel_arrangement": "<[horizontal|vertical]>"
+    },
+    "#resources" :[
+        "associative array of image resources, the keys serve resource identifier links",
+        "and the contents are names of the image file and dimensions",
+        "Format:",
+        " resource_identifier: { imagefile: <name_of image file> , w:<image width> h:<image height>}"
+    ],
+    "resources": {
+         "$SEQUENCE" : [
+             "OPTIONAL",
+             "Array used to generate sequences of image resource entries",
+             "Format:",
+             "key_prefix: kp, start: <integer>, end: <integer>, value: <name{index}.<suffix>>",
+             "{index} is replace by values in the range start to end (inclusive)",
+             "example:", 
+             " {key_prefix: KP, start: 0, end: 1, value: img{index}.png} ",
+             " generates:",
+             " { KP0: img0.png},",
+             " { KP1: img1.png}" 
+         ]
+    },
+    "#rotaries": [
+        "rotaries is an associative array of rotary definitions",
+        "a rotary defines image rotation parameters",
+        "Fields of a rotary are:",
+        "  resource: image identifier",
+        "  enclosure: { w:width, h:height}",
+        "  axle: { x:x-coordinate, y:y-coordinate} # with the enclosure",
+        "  bearing: { x:x-coordinate, y:y-coordinate, w:width, h:height}",
+        "enclosure defines a rectangle in which the rotation occurs,",
+        "and should have the same dimensions as layout left and/or right rectangle.",
+        "typically layout left and right have identical dimensions, if they do not",
+        "different rotaries are required for left and right",
+        "axle defines the point relative to the enclosure around which rotation occurs",
+        "bearing defines ",
+        " - the dimensions at which the resource image is rendered",
+        " - the point around which the rendered resource image is rotated",
+        "the bearing is overlaid on to the enclosure such that the bearing location (x,y) is exactly on top of the axle",
+        "For analog vu meters:",
+        "   enclosure defines the dimensions of the dial",
+        "   axle defines where the needle rotates around in the dial",
+        "   bearing defines where the needle is affixed to the axle"
+    ],
+    "rotaries": {
+        "rot_1": {
+            "enclosure": {
+                "w": <W>,
+                "h": <H>
+            },
+            "axle": {
+                "x": <AX>,
+                "y": <AY>
+            },
+            "bearing": {
+                "x": <BX>,
+                "y": <BY>,
+                "w": <BW>,
+                "h": <BH>
+            },
+            "resource": "needle"
+        },
+        ....
+    },
+    "#placement": [
+        "placement is an associative array of placements, the keys serve as placement_ids",
+        "each placement specifies where the associated image resource will be rendered",
+        "Format: ",
+        "{ x: x-coordinate, y: y-coordinate, resource: resource_identifier} ",
+        "Multiple placements may refer to a single resource"
+    ],
+    "placement": {
+        "#$SEQUENCE" : [
+             "OPTIONAL",
+             "Array used to generate sequences of placements",
+             "Format:",
+             "prefix: p, x:<integer>, y: <integer>, start: <integer>, end: <integer>, resource: <resource identifier>",
+             "{index} is replace by values in the range start to end (inclusive)",
+             "example:", 
+             " {prefix: PLACEMENT_LEFT_, start: 0, end: 1, x:10, y:10, xstep:10, value: img.png} ",
+             " generates:",
+             " PLACEMENT_LEFT_0: { x:10, y:10, resource:img.png},",
+             " PLACEMENT_LEFT_1: { x:20, y:10, img.png}"
+        ]
+    },
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'static', 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type and volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "'placements': an associative array of volume levels to placements",
+        "",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is OPTIONAL and is ",
+        "   - defaulted to 'sampled'",
+        "   - ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level",
+        ""
+    ],
+    "compositions": {
+        "L01": {
+            "render_op": "XX",
+            "volume_type": "YY",
+            "placements" : {
+                "0": "PLACEMENT_LEFT_0",
+                ....
+                "49": "PLACEMENT_LEFT_49"
+            }
+        },
+        "L02":  {
+            "render_op": "XX",
+            "volume_type": "YY",
+            "placements" : {
+                "0": "PLACEMENT_LEFT2_0",
+                ....
+                "49": "PLACEMENT_LEFT2_49"
+            }
+        },
+        ....
+        "R01": {
+            "render_op": "XX",
+            "volume_type": "YY",
+            "placements" : {
+                "0": "PLACEMENT_RIGHT_0",
+                ....
+                "49": "PLACEMENT_RIGHT_49"
+            }
+        },
+        "R02": {
+            "render_op": "XX",
+            "volume_type": "YY",
+            "placements" : {
+                "0": "PLACEMENT_RIGHT_0",
+                ....
+                "49": "PLACEMENT_RIGHT_49"
+            }
+        }
+        ....
+    },
+    "#fascias" : [
+        "associative array with keys",
+        "fascias are compositions restricted to render_op set to 'static'",
+        "The contents of each key must be objects which are associative arrays with required keys",
+        "    'placements': one of",
+        "           - an associative array of whole numbers to placements",
+        "           - array of placements",
+        "    'render_op' : 'static'",
+        "''placements' are REQUIRED",
+        " render_op is OPTIONAL and ",
+        "       - is defaulted to 'static'",
+        "       - must be 'static' if specified",
+        " Since render_op is 'static', volume_type if specified is ignored",
+        ""
+    ],
+    "fascias": {
+        "fascia_1": {
+            "placements": {
+                "0": "PLACMENT_F_0_0",
+                "1": "PLACMENT_F_0_1",
+                ....
+                "N": "PLACEMENT_F_0_N"
+            }
+        },
+        ....
+    },
+    "#vumeters": [
+        "Associate array of VU Meters defined in this file keyed on VU Meter name",
+        "In turn contents are associative arrays containing 3 keys",
+        " fascia: list of compositions to render in the layout fascia rectangle",
+        "       this can only include compositions with  render_op = 'static'",
+        " left: list of compositions to render in the layout left rectangle",
+        "       this includes compositions with all render_ops",
+        " right: list of compositions to render in the layout right rectangle",
+        "       this includes compositions with all render_ops",
+        ""
+    ],
+    "vumeters": {
+        "vumeter1 ": {
+            "fascia": [ "fascia_1"],
+            "left": [ "L01", "L02", ...],
+            "right": [ "L01", "L02", ...]
+        },
+        "vumeter2": {
+            "left": [ "L01", "L02", ...],
+            "right": [ "L01", "L02", ...]
+        },
+        .....
+    }
+}

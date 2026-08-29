@@ -1,0 +1,144 @@
+{
+    "Authors":  [
+        {
+            "Github": "https://github.com/blaisedias/"
+        }
+    ],
+    "License": "CC-BY-SA-4.0",
+    "kind": "vumeter",
+    "vutype": "compose2",
+    "format": "associative",
+    "format_version": 0,
+    "#volume_levels": [
+        "equivalent to number of frames,",
+        "0 counts as a volume level, so when volume_levels=50 the max volume level is 49"
+    ],
+    "volume_levels": 49,
+    "#dimensions": [
+        "unscaled width and height of the vumeter",
+        "for this vu meter:",
+        "margins = 32, spacing = 32, dial_width = 1024",
+        "width  = left_margin + dial_width + spacing + dial_width + right_margin",
+        "       = 2144",
+        "height = 768"
+    ],
+    "layout" : {
+        "w": 2144,
+        "h": 768,
+        "left": {
+                "x": 32,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "right": {
+                "x": 1088,
+                "y": 0,
+                "w": 1024,
+                "h": 768
+        },
+        "channel_arrangement": "horizontal"
+    },
+    "#files": [
+        "The set of images required to render this VU-Meter"
+    ],
+    "files": [
+        "background.png",
+        "roundel.png", "roundel_peak.png",
+        "needles00.png", "needles01.png", "needles02.png", "needles03.png", "needles04.png",
+        "needles05.png", "needles06.png", "needles07.png", "needles08.png", "needles09.png",
+        "needles10.png", "needles11.png", "needles12.png", "needles13.png", "needles14.png",
+        "needles15.png", "needles16.png", "needles17.png", "needles18.png", "needles19.png",
+        "needles20.png", "needles21.png", "needles22.png", "needles23.png", "needles24.png",
+        "needles25.png", "needles26.png", "needles27.png", "needles28.png", "needles29.png",
+        "needles30.png", "needles31.png", "needles32.png", "needles33.png", "needles34.png",
+        "needles35.png", "needles36.png", "needles37.png", "needles38.png", "needles39.png",
+        "needles40.png", "needles41.png", "needles42.png", "needles43.png", "needles44.png",
+        "needles45.png", "needles46.png", "needles47.png", "needles48.png"
+    ],
+    "#resources" :[
+        "associative array of image resources"
+    ],
+    "resources": {
+        "BG": "background.png",
+        "ROUNDEL": "roundel.png", "ROUNDEL_PEAK": "roundel_peak.png",
+        "#$SEQUENCE " : "needles00.png ... needles10.png....needles49.png",
+        "$SEQUENCE" : [
+            { "key_prefix": "POS_", "start": 0, "end": 48, "value": "needles{index}.png"}
+        ]
+    },
+    "#placement": [
+        "placement is an associative array of image aliases to coordinates",
+        "each placement specifies where an image associated with an alias will be rendered",
+        "Format: ",
+        "alias: { x-coordinate, y-coordinate} "
+    ],
+    "placement": {},
+    "#compositions*":[
+        "associative array with keys",
+        "The contents of each key must be objects which are associative arrays with keys",
+        "'render_op' : one of 'single', 'aggregate', 'aggregate-off'",
+        "   'static' => all placements are rendered regardless of volume_type anf volume level",
+        "               rendering is fixed (static) as opposed to dynamic (changes with audio volume level)",
+        "   'single' => only render the placement matching the volume level",
+        "   'aggregate' => render all placements upto the volume level",
+        "   'aggregate-off' => render all placements beyond the volume level",
+        "'volume_type' : one of ",
+        "       'sampled': volume levels are rendered to match sampled values",
+        "       'peak-hold+sampled'  : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                 lower volume levels are rendered to match sampled values",
+        "       'decay' : (default) volume levels follows peak volume level decaying at configured rate, if lower",
+        "       'peak-hold+decay' : peak volume level is held for a brief time and rendered in non-aggregated manner,",
+        "                      lower volume levels follows peak volume level decaying at configured rate",
+        "       Notes: ",
+        "         1) decay is for use with VU Meters simulating analog VU Meters with needles",
+        "         2) hold is for use with digital VU Meters, where multiple volume levels can be rendered in a frame",
+        "         3) if peak is not set then volume levels are rendered to match sampled values",
+        "'placements': an associative arrays of volume level to placements",
+        "'render_op' and 'placements' are REQUIRED",
+        " volume_type is optional:",
+        "   - defaults to 'sampled'",
+        "   - is ignored when the value 'render_op' is 'static'",
+        "Notes:  Each non static object does not have to contain placement references for each volume level",
+        "           However the combination of objects SHOULD contain placement references for each volume level"
+    ],
+    "compositions": {
+        "N00": {
+            "render_op": "static",
+            "placements": {
+                "0": "BG"
+            }
+        },
+        "N01": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 48, "value": "POS_{index}"}
+                ]
+            }
+        },
+        "N02": {
+            "render_op": "single",
+            "volume_type": "decay",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 0,  "end": 35, "value": "ROUNDEL"},
+                    { "start": 36,  "end": 48, "value": "ROUNDEL_PEAK"}
+                ]
+            }
+        }
+    },
+    "#vumeters": [
+        "associative array keyed on VU meter name",
+        " contents of each associative array are assocaitve arrays with keys:",
+        "   'channels': which channel definitions to use. REQUIRED",
+        "   'fascia': which fascia defintion to user. OPTIONAL"
+    ],
+    "vumeters" :{
+        "TubeD": {
+            "left":  [ "N00", "N01", "N02" ],
+            "right": [ "N00", "N01", "N02"]
+        }
+    }
+}
