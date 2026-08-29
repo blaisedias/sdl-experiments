@@ -2,6 +2,7 @@
 #include "vumeter.h"
 #include "util.h"
 
+bool debug_rects=false;
 static vumeter_instance_t vumeters[100];
 
 static void printf_rect(const SDL_Rect* rect) {
