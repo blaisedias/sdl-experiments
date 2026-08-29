@@ -53,5 +53,6 @@ if [ -f "/usr/local/etc/pcp/pcpversion.cfg" ]; then
 fi
 export TCACHE_SIZE="texture_cache_size 50000000"
 
+DLVUMETERS="dl VUMeters/Chevrons/indexed-meta.json dl VUMeters/PurpleTastic/indexed-meta.json dl VUMeters/SpeakerGray/indexed-meta.json dl VUMeters/SpeakerGreen/indexed-meta.json dl VUMeters/TransparentWhite/indexed-meta.json dl VUMeters/TubeD/indexed-meta.json dl VUMeters/Kolossos/indexed-meta.json"
 set -x
-./bin/jl2 dl ./lib/TubeD.so  dl ./lib/Chevrons.so dl ./lib/PurpleTastic.so dl ./lib/SpeakerGreen.so dl ./lib/SpeakerGray.so dl ./lib/TransparentWhite.so $* $TCACHE_SIZE
+./bin/jl2 $TCACHE_SIZE $DLVUMETERS $*
