@@ -435,8 +435,6 @@ printf("starting controller\n"); fflush(stdout);
     if (next_vu_time) {
         next_vu_time += get_milli_seconds();
     }
-//    size_t num_texture_bytes = 0;
-//    size_t num_surface_bytes = 0;
     unsigned iters = 0;
     while(app_running(app_ctx)) {
         ++iters;
@@ -467,17 +465,31 @@ printf("starting controller\n"); fflush(stdout);
         }
         size_t nt = tcache_get_texture_bytes_count();
         size_t ns = tcache_get_surface_bytes_count();
-//        if (nt != num_texture_bytes || ns != num_surface_bytes)
+#if     0
+        static size_t num_texture_bytes;
+        static size_t num_surface_bytes;
+        if (nt != num_texture_bytes || ns != num_surface_bytes) {
+            printf("+++ t=%09lu %.02f s=%09lu %.02f (delta t=%ld s=%ld)\n",
+                    nt, (float)nt/(1024*1024),
+                    ns, (float)ns/(1024*1024),
+                    (long)nt-(long)num_texture_bytes, (long)ns-(long)num_surface_bytes);
+            num_texture_bytes = nt;
+            num_surface_bytes = ns;
+        }
+#endif
         if (monitor_tcache && 0 == (iters%50)) {
-//            printf("+++ t=%09lu %.02f s=%09lu %.02f (delta t=%ld s=%ld)\n",
-//                    nt, (float)nt/(1024*1024),
-//                    ns, (float)ns/(1024*1024),
-//                    (long)nt-(long)num_texture_bytes, (long)ns-(long)num_surface_bytes);
-            log_printf("textures:%.02f MiB surfaces:=%.02f MiB\n",
-                    (float)nt/(1024*1024),
-                    (float)ns/(1024*1024));
-//            num_texture_bytes = nt;
-//            num_surface_bytes = ns;
+            static size_t prev_nt_val, prev_ns_val;
+            float f_nt = (float)nt/(1024*1024);
+            float f_ns = (float)ns/(1024*1024);
+            size_t nt_val = f_nt*100;
+            size_t ns_val = f_ns*100;
+            if (prev_nt_val != nt_val || prev_ns_val != ns_val) {
+                log_printf("textures:%.02f MiB surfaces:=%.02f MiB\n",
+                        (float)nt/(1024*1024),
+                        (float)ns/(1024*1024));
+                prev_nt_val = nt_val;
+                prev_ns_val = ns_val;
+            }
         }
     }
     SDL_SemWait(controller_sem);
@@ -532,6 +544,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
     static  SDL_Scancode prev_keydown;
     static int64_t keydown_start_time = 0;
     int key_press_duration = 0;
+    const Uint8 *key_states = SDL_GetKeyboardState(NULL);
     switch (eventp->type) {
             case USEREVENT_NEXT_VISU:
             case USEREVENT_NEXT_VU:
@@ -607,7 +620,14 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     print_tcache_stats();
                     break;
                 case SDL_SCANCODE_PRINTSCREEN:
-                    tcache_dump();
+                    if (key_states[SDL_SCANCODE_LCTRL]) {
+                        tcache_concise_dump();
+                    }
+                    else if (key_states[SDL_SCANCODE_RCTRL]) {
+                        tcache_dump_LRU();
+                    } else {
+                        tcache_dump();
+                    }
                     break;
                 case SDL_SCANCODE_LEFT:
                 case SDL_SCANCODE_KP_4:
