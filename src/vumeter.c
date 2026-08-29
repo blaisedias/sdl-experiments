@@ -18,7 +18,7 @@ void vumeter_set_profile_level(int l) {
 // ==== debug and profiling  }
 
 // ==== setup {
-void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in) {
+void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in, bool equal_horizontal_spacing) {
     const vu_meters_specs_t* spec = vumeter->vss->spec;
     // Create a rectangle of same dimensions as the bounds but located at the origin 0,0
     // use this rectangle to scale and position the viewports
@@ -48,7 +48,7 @@ void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in) {
 
     vumeter->decay_unit = (float)spec->volume_levels/60;
 
-    if (spec->layout.arrangement == HORIZONTAL_ARRANGEMENT && vumeter->vss->state->equal_horizontal_spacing) {
+    if (spec->layout.arrangement == HORIZONTAL_ARRANGEMENT && equal_horizontal_spacing) {
         //FIXME: works with stereo channels
 #define FUZZ_DOWN(v) 2*((v)/2)
         SDL_Rect* lrect = vumeter->viewports + 1;

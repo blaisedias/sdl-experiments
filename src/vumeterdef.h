@@ -98,7 +98,6 @@ typedef struct {
         int     count;
         bool*   elements;
     }vu_meter_disabled;
-    bool equal_horizontal_spacing;
 }vu_meters_state_t;
 
 typedef struct vu_meters {

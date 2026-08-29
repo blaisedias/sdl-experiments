@@ -40,7 +40,7 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
     debug_printf("          rect = {%4d,%4d,%4d,%4d}\n", wdgt->rect.x, wdgt->rect.y, wdgt->rect.w, wdgt->rect.h);
     for(int ix = 0; ix < vw->num_meters; ++ix) {
         vumeter_instance_t* vumtr = vw->meters + ix;
-        vumeter_setup(vumtr, &wdgt->rect);
+        vumeter_setup(vumtr, &wdgt->rect, vw->equal_horizontal_spacing);
     }
     if (vw->num_meters) {
         if (!vu_meters_load_media(wdgt->view->app->renderer, vw->meters[vumeter_index(vw)].vss)) {

@@ -4,7 +4,7 @@
 #include "vumeterdef.h"
 #include "types.h"
 
-void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in);
+void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in, bool equal_horizontal_spacing);
 
 bool vu_meters_load_media(SDL_Renderer* renderer, vu_meters_t* vu);
 void vu_meters_unload_media(vu_meters_t* vu);
