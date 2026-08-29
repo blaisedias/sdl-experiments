@@ -5,3 +5,5 @@ bin/
 *.xcf
 *.svg
 unchecked-meta.json
+crossref-indexed-meta.json
+meta.json
