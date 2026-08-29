@@ -33,7 +33,7 @@
                         "h": 328
                     }
                 },
-                "image": "./images/gdj-musical.png",
+                "image": "./images/sd/gdj-musical.png",
                 "#comment": "image_scaling is one of [fit, center, stretch]",
                 "image_scaling": "fit",
                 "focus_enable": false
