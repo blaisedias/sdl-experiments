@@ -47,5 +47,7 @@ bool tcache_delete_texture(const char* token);
 
 // Diagnostics
 void tcache_dump();
+void tcache_concise_dump();
+void tcache_dump_LRU();
 
 #endif // __jl_texture_h_

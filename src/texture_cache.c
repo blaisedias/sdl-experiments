@@ -18,6 +18,7 @@
 #include "timing.h"
 #include <assert.h>
 
+#define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
 typedef struct tcache_entry tcache_entry;
 
 struct tcache_entry {
@@ -57,8 +58,11 @@ static inline bool unoccupied_tce(tcache_entry* tce) {
 }
 
 // lru counter is 32 bits, and is incremented for every frame.
-// Only 31 bits are effective for comparisoin, MS bit is "set" if locked
+// Only 31 bits are effective for comparison, MS bit is "set" if locked
 // rollover @60 Hz -> 67 years,  @120 Hz -> 33 years
+// 2^31 = 2147483648 
+// 1 Day = 60*60*24 = 86400, 1 Year = 86400*366 = 31622400
+// 2147483648/31622400 = 67 
 // so should be sufficient.
 static uint32_t lru_counter = 1;
 unsigned char delete_requested = 0;
@@ -661,56 +665,34 @@ texture_id_t tcache_load_media(const char* path, SDL_Renderer* renderer, bool* p
     return texture_id;
 }
 
-void tcache_dump() {
-    static tcache_entry* stbl[HASHTPRIME];
-    {
-        int count = 0;
-        int last_ix = 0;
-        int ix_s = 0;
-        printf("texture cache dump:\n");
-        printf("-----------------------------\n");
+void tcache_concise_dump() {
+    int count = 0;
+    int64_t locked_texture_bytes=0;
+    int64_t unlocked_texture_bytes=0;
+    int64_t ejected_texture_bytes=0;
+    printf("texture cache dump:\n");
+    printf("-----------------------------\n");
+    bool locked_vals[2] = {true, false};
+    const char* locked_caption[] = {"LOCKED", "UNLOCKED"};
+    for (int ixlock = 0; ixlock < ARRAYLEN(locked_vals); ++ixlock) {
+        printf("%s\n", locked_caption[ixlock]);
         for(int ix=0; ix < HASHTPRIME; ++ix) {
             tcache_entry* tce = tbl[ix];
-            if (tce && tce != tce_deleted) {
-                printf("    %05d) delta=%4d hashv=%08x inuse=%016x %s tce=%p surface:%p texture=%p w=%4d h=%4d bytes=%8lu surface-bytes=%8lu %s\n",
-                       ix, ix - last_ix,
-                       tce->hashv,
-                       tce->lru_count,
-                       tce->locked ? "locked  ": "unlocked",
-                       tce,
-                       tce->surface,
-                       tce->texture,
+            if (tce && tce != tce_deleted && tce->locked == locked_vals[ixlock]) {
+                size_t num_bytes = tce->num_surface_bytes;
+                char   src_num_bytes = 'S';
+                if (tce->num_bytes) {
+                    num_bytes = tce->num_bytes;
+                    src_num_bytes = 'T';
+                }
+                printf("    %05d) w=%4d h=%4d %c=%7.4f MiB %s\n",
+                       ix, 
                        tce->w,
                        tce->h,
-                       (long unsigned)tce->num_bytes,
-                       (long unsigned)tce->num_surface_bytes,
+                       src_num_bytes,
+                       (float)num_bytes/(1024*1024),
                        tce->path);
                 ++count;
-                last_ix = ix;
-                stbl[ix_s] = tce;
-                ++ix_s;
-            }
-        }
-/*        
-        printf("Number of hashtable entries=%d\n", HASHTPRIME);
-        printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
-        printf("Memory used for table entries = %ld\n", count * sizeof(tcache_entry));
-        printf("Sizeof cache_entry = %ld\n", sizeof(tcache_entry));
-        printf("Sizeof table = %ld\n", sizeof(tbl));
-*/
-//        qsort(stbl, count, sizeof(stbl[0]), tcache_compare);
-        quick_sort_tcache(stbl, count);
-        printf("LRU: ------------------------\n");
-        int64_t locked_texture_bytes=0;
-        int64_t unlocked_texture_bytes=0;
-        int64_t ejected_texture_bytes=0;
-        for(int ix=0; ix < count; ++ix) {
-            tcache_entry* tce = stbl[ix];
-                printf("    %5d) hashv=%08x inuse=%016x %p %s\n", ix,
-                       tce->hashv,
-                       tce->lru_count,
-                       tce,
-                       tce->path);
                 if (tce->ejected) {
                     ejected_texture_bytes += tce->num_bytes;
                 } else if (tce->locked) {
@@ -718,20 +700,69 @@ void tcache_dump() {
                 } else {
                     unlocked_texture_bytes += tce->num_bytes;
                 }
+            }
         }
-        printf("Number of hashtable entries=%d\n", HASHTPRIME);
-        printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
-        printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
-        printf("Sizeof cache_entry = %ld\n", (long)sizeof(tcache_entry));
-        printf("Sizeof table = %ld\n", (long)sizeof(tbl));
-        printf("Texture bytes = %lu %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
-                (long unsigned)num_texture_bytes, (float)num_texture_bytes/(1024*1024),
-                (long)locked_texture_bytes, (float)locked_texture_bytes/(1024*1024),
-                (long)unlocked_texture_bytes, (float)unlocked_texture_bytes/(1024*1024),
-                (long)ejected_texture_bytes, (float)ejected_texture_bytes/(1024*1024));
+    }
+    printf("Number of hashtable entries=%d\n", HASHTPRIME);
+    printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
+    printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
+    printf("Texture bytes = %lu %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
+            (long unsigned)num_texture_bytes, (float)num_texture_bytes/(1024*1024),
+            (long)locked_texture_bytes, (float)locked_texture_bytes/(1024*1024),
+            (long)unlocked_texture_bytes, (float)unlocked_texture_bytes/(1024*1024),
+            (long)ejected_texture_bytes, (float)ejected_texture_bytes/(1024*1024));
+    printf("-----------------------------\n");
+}
+
+
+void tcache_dump_LRU() {
+    static tcache_entry* stbl[HASHTPRIME];
+    int count = lru_sort_tce(stbl);
+    printf("LRU: ------------------------\n");
+    for(int ix=0; ix < count; ++ix) {
+        tcache_entry* tce = stbl[ix];
+        printf("    %5d) lru_count=%016x %7.4f %s\n", ix,
+               tce->lru_count,
+               (float)tce->num_bytes/(1024*1024),
+               tce->path);
     }
     printf("-----------------------------\n");
 }
+
+void tcache_dump() {
+    int count = 0;
+    int last_ix = 0;
+    printf("texture cache dump:\n");
+    printf("-----------------------------\n");
+    for(int ix=0; ix < HASHTPRIME; ++ix) {
+        tcache_entry* tce = tbl[ix];
+        if (tce && tce != tce_deleted) {
+            printf("    %05d) delta=%4d hashv=%08x lru_count=%016x %s tce:%p surface:%p,%8lu bytes texture:%p,%8lu bytes w=%4d h=%4d %s\n",
+                   ix, ix - last_ix,
+                   tce->hashv,
+                   tce->lru_count,
+                   tce->locked ? "locked  ": "unlocked",
+                   tce,
+                   tce->surface,
+                   (long unsigned)tce->num_surface_bytes,
+                   tce->texture,
+                   (long unsigned)tce->num_bytes,
+                   tce->w,
+                   tce->h,
+                   tce->path);
+            ++count;
+            last_ix = ix;
+        }
+    }
+    tcache_dump_LRU();
+    printf("Number of hashtable entries=%d\n", HASHTPRIME);
+    printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
+    printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
+    printf("Sizeof cache_entry = %ld\n", (long)sizeof(tcache_entry));
+    printf("Sizeof table = %ld\n", (long)sizeof(tbl));
+    printf("-----------------------------\n");
+}
+
 
 size_t tcache_get_texture_bytes_count(void) {
     return num_texture_bytes;
