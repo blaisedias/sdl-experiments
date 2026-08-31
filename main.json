@@ -27,15 +27,33 @@
             "text": {
                 "location": {
                     "position": {
-                        "x": 0,
-                        "w": -1,
-                        "y": 100,
-                        "h": -100
+                        "x": 20,
+                        "w": -20,
+                        "y": 50,
+                        "h": -200
                     }
                 },
-                "content": "NN MMM hh:mm:ss 20XX",
-                "timedate-format": "{weekday} {day} {month} {hour}:{minutes}:{seconds} {year}",
-                "font": "fonts/Montserrat/static/Montserrat-Regular.ttf",
+                "timedate-format": "{hour}:{minutes}:{seconds}",
+                "font": "fonts/Courier_Prime/CourierPrime-Bold.ttf",
+                "font_size": 200,
+                "colour": {
+                    "red" : 255,
+                    "green" : 255
+                }
+            }
+        },
+        {
+            "text": {
+                "location": {
+                    "position": {
+                        "x": 20,
+                        "w": -20,
+                        "y": -180,
+                        "h": 150
+                    }
+                },
+                "timedate-format": "{weekday}, {day} {month}, {year}",
+                "font": "fonts/Courier_Prime/CourierPrime-Bold.ttf",
                 "font_size": 60,
                 "colour": {
                     "red" : 255,
