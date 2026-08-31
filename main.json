@@ -8,27 +8,11 @@
     },
     "widgets": [
         {
-            "image": {
-                "location": {
-                    "position": {
-                        "x": 0,
-                        "y": 0,
-                        "w": 0,
-                        "h": 0
-                    }
-                },
-                "image": "./images/wallpapers/HD_IceCold2.png",
-                "#comment": "image_scaling is one of [fit, center, stretch]",
-                "image_scaling": "center",
-                "focus_enable": false
-            }
-        },
-        {
             "text": {
                 "location": {
                     "position": {
-                        "x": 20,
-                        "w": -20,
+                        "x": 40,
+                        "w": -40,
                         "y": 50,
                         "h": -200
                     }
@@ -37,8 +21,9 @@
                 "font": "fonts/Courier_Prime/CourierPrime-Bold.ttf",
                 "font_size": 200,
                 "colour": {
-                    "red" : 255,
-                    "green" : 255
+                    "red" : 128,
+                    "green" : 128,
+                    "blue" : 128
                 }
             }
         },
@@ -46,18 +31,20 @@
             "text": {
                 "location": {
                     "position": {
-                        "x": 20,
-                        "w": -20,
+                        "x": 40,
+                        "w": -40,
                         "y": -180,
                         "h": 150
                     }
                 },
-                "timedate-format": "{weekday}, {day} {month}, {year}",
+                "timedate-format": "{weekday}, {day} {month}",
+                "#timedate-format": "{weekday}, {day} {month}, {year}",
                 "font": "fonts/Courier_Prime/CourierPrime-Bold.ttf",
                 "font_size": 60,
                 "colour": {
-                    "red" : 255,
-                    "green" : 255
+                    "red" : 128,
+                    "green" : 128,
+                    "blue" : 128
                 }
             }
         },
