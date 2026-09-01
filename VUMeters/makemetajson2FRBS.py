@@ -198,6 +198,8 @@ def main():
                     'angle': angle,
                     'center': {'x': bearing['x'], 'y': bearing['y']}
                 }
+                if 'flip' in seq:
+                    d[k]['flip'] = seq['flip']
                 angle += angle_step
         del start, stop, angle, angle_step, axle, bearing, rotary
         del d['$ROTATION_SEQUENCE']
