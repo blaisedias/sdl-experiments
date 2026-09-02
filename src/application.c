@@ -277,7 +277,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
         } else {
             error_printf("Failed to retrieve renderer information\n");
         }
-        printf("display:%dx%d Orientation:%f,  max seconds:%u cycle secs %u\n",
+        printf("display:%dx%d Orientation:%f,  max seconds:%u cycle secs %f\n",
            app_ctx->screen_width,
            app_ctx->screen_height,
            app_ctx->orientation,

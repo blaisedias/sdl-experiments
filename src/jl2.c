@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "cycle")) {
             if (argc > i+1) {
-                app_ctx.cycle_secs = atoi(argv[i+1]);
+                app_ctx.cycle_secs = atof(argv[i+1]);
                 i += 1;
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "wxh")) {
@@ -559,7 +559,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             widget_list_react(pv->list, USEREVENT_NEXT_VISU ? NEXT_VISU: NEXT_VU, NULL);
                         }
                     }
-#if 1
+#if 0
                     print_tcache_stats();
 #endif
                 }break;

@@ -40,7 +40,7 @@ struct app_context_s_t {
     int             screen_height;
 
     int             max_secs;
-    int             cycle_secs;
+    float           cycle_secs;
     int             vsync;
     int             refresh_rate;
     int             frame_time_millis;
