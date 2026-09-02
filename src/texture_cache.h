@@ -16,7 +16,8 @@ void tcache_flush_textures(SDL_Renderer* renderer);
 SDL_Texture* tcache_get_texture(const char* token, texture_id_t* texture_id, SDL_Renderer* renderer);
 SDL_Texture* tcache_quick_get_texture(texture_id_t texture_id, SDL_Renderer* renderer);
 bool tcache_quick_get_texture_ejected(texture_id_t texture_id);
-void tcache_render_prep(SDL_Renderer* renderer);
+void tcache_render_frame_start(SDL_Renderer* renderer);
+void tcache_render_frame_done(SDL_Renderer* renderer);
 
 // Test only function
 bool tcache_test_lru_eject();

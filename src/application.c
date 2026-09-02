@@ -354,7 +354,7 @@ void app_render_loop(app_context_ptr app_ctx_in) {
                 evt_q_put(&event);
             }
         }
-        tcache_render_prep(app_ctx->renderer);
+        tcache_render_frame_start(app_ctx->renderer);
 
         if (app_ctx->cb_query_render_backdrop(app_ctx)) {
             if (app_ctx->debug_redraw_backdrop) {
@@ -381,7 +381,8 @@ void app_render_loop(app_context_ptr app_ctx_in) {
                     app_ctx->target_texture,
                     NULL, &dst_rect, app_ctx->orientation, NULL, SDL_FLIP_NONE);
         }
-        
+        tcache_render_frame_done(app_ctx->renderer);
+
         SDL_RenderPresent(app_ctx->renderer);
         int64_t ms_6 = get_micro_seconds();
         if (ms_00) {

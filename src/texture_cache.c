@@ -18,11 +18,13 @@
 #include "timing.h"
 #include <assert.h>
 
+#define TEXTURE_CACHE_FAILFAST 1
+
 #define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
 typedef struct tcache_entry tcache_entry;
 
 struct tcache_entry {
-    uint32_t            lru_count;
+    int64_t             lru_count;
     const char*         path;
     uint32_t            hashv;
     const SDL_Texture*  texture;
@@ -57,14 +59,12 @@ static inline bool unoccupied_tce(tcache_entry* tce) {
     return tce == NULL || tce == tce_deleted;
 }
 
-// lru counter is 32 bits, and is incremented for every frame.
-// Only 31 bits are effective for comparison, MS bit is "set" if locked
-// rollover @60 Hz -> 67 years,  @120 Hz -> 33 years
-// 2^31 = 2147483648 
-// 1 Day = 60*60*24 = 86400, 1 Year = 86400*366 = 31622400
-// 2147483648/31622400 = 67 
-// so should be sufficient.
-static uint32_t lru_counter = 1;
+static inline void update_lru(tcache_entry* tce) {
+    if (tce) {
+        __atomic_store_n(&tce->lru_count, get_micro_seconds(), __ATOMIC_RELEASE);
+    }
+}
+
 unsigned char delete_requested = 0;
 size_t num_texture_bytes = 0;
 size_t max_num_texture_bytes = 0;
@@ -87,6 +87,8 @@ size_t num_surface_bytes = 0;
 static tcache_entry* tbl[NUM_TBL_ENTRIES];
 
 static SDL_threadID renderer_tid;
+
+static unsigned render_cycle = 1;
 
 static SDL_threadID delete_lock = 0;
 
@@ -137,7 +139,12 @@ void tcache_set_renderer_tid(const SDL_threadID tid) {
 
 // check for operations only permitted in the renderer thread context 
 static inline bool check_permitted() {
+#if TEXTURE_CACHE_FAILFAST
+    assert(SDL_GetThreadID(NULL) == renderer_tid);
+    return true;
+#else
     return SDL_GetThreadID(NULL) == renderer_tid;
+#endif
 }
 
 // only for used by quick sort
@@ -196,15 +203,6 @@ static uint32_t hashfn(const char* token) {
     return CityHash32(token, strlen(token));
 }
 
-//static inline void recently_used(tcache_entry* tce) {
-//    if (tce) {
-//        __atomic_store_n(&tce->lru_count, lru_counter, __ATOMIC_RELEASE);
-////        tcache_printf("recently_used: tce=%p %ld %s\n", tce, tce->lru_count, tce->path);
-//    } else {
-//        error_printf("recently_used: tce=%p\n", tce);
-//    }
-//}
-
 static void release_texture(tcache_entry* tce) {
     assert(external_tce(tce));
     if (external_tce(tce) && tce->texture) {
@@ -236,8 +234,6 @@ static void update_texture(tcache_entry* tce, const SDL_Texture* texture) {
             tce->texture = texture;
             SDL_SetTextureScaleMode((SDL_Texture*)texture, SDL_ScaleModeBest);
         }
-        // TODO: do this before creating the texture
-        tcache_cap_num_bytes(0);
     }
 }
 
@@ -373,10 +369,11 @@ SDL_Texture* tcache_quick_get_texture(texture_id_t texture_id, SDL_Renderer* ren
     tcache_entry* tce = tbl[texture_id];
     if (!unoccupied_tce(tce)) {
 //        tcache_printf("tcache_quick_get_texture: %d %u %s\n", texture_id, tce->hashv, tce->path);
-        __atomic_store_n(&tce->lru_count, lru_counter, __ATOMIC_RELEASE);
+        update_lru(tce);
 
         if (tce->surface != NULL) {
             int64_t ms_ct_0 =get_micro_seconds();
+            tcache_cap_num_bytes(tce->num_surface_bytes);
             SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tce->surface);
             int64_t ms_ct_1 =get_micro_seconds();
 //            perf_printf("texture_resolve: create_texture: %07.2f millis\n", (float)(ms_ct_1 - ms_ct_0)/1000);
@@ -392,7 +389,10 @@ SDL_Texture* tcache_quick_get_texture(texture_id_t texture_id, SDL_Renderer* ren
             profile_texture_printf("texture_resolve: create_texture: %06lu usec %u/%u\n", ms_ct_1 - ms_ct_0, num_texture_bytes, max_num_texture_bytes);
         }
         if (tce->texture == NULL) {
-            error_printf("tcache_quick_get_texture: NULL texture: %d %s\n", texture_id, tce->path);
+            error_printf("tcache_quick_get_texture: NULL texture: %d %s cycle:%lu\n", texture_id, tce->path, render_cycle);
+#if TEXTURE_CACHE_FAILFAST
+            exit(EXIT_FAILURE);
+#endif
         }
         // stored as a const - callers require a pointer which is not const
         return (SDL_Texture *)tce->texture;
@@ -506,6 +506,8 @@ static struct {
     tcache_entry* tbl[HASHTPRIME];
     int count;
     int ix;
+    unsigned render_cycle;
+    int64_t  eject_time;
 } lru_eject;
 
 // Eject least recently used textures to reduce texture bytes to the configured limit
@@ -515,20 +517,14 @@ static struct {
 // and the renderer thread merely performs the release.
 static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
     int64_t ms_0 = get_micro_seconds();
-//    static tcache_entry* eject_tbl[HASHTPRIME];
     int ejected_count = 0;
-//    int64_t ms_ct_0 = get_micro_seconds();
-//    int count = lru_sort_tce(eject_tbl);
-//    int64_t ms_ct_1 = get_micro_seconds();
-//    profile_texture_printf("tcache_eject: lru_sort_tcache: %06lu\n", ms_ct_1 - ms_ct_0);
-//    for(int ix=0; ix < count && check(increment, ejected_count); ++ix) {
     for(; lru_eject.ix < lru_eject.count && check(increment, ejected_count); ++lru_eject.ix) {
         tcache_entry* tce = lru_eject.tbl[lru_eject.ix];
         if (!tce->locked && tce->texture) {
             release_texture(tce);
             tce->ejected = true;
             ++ejected_count;
-            tcache_eject_printf("tcache_eject: %s %u / %u lru:%u, req:%u lru_counter:%u\n", tce->path, num_texture_bytes, max_num_texture_bytes, tce->lru_count, increment, lru_counter);
+            tcache_eject_printf("tcache_eject: %s %u / %u lru:%u, req:%u\n", tce->path, num_texture_bytes, max_num_texture_bytes, tce->lru_count, increment);
         }
     }
     assert(lru_eject.ix <= lru_eject.count);
@@ -541,7 +537,50 @@ static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
 // Eject least recently used textures to reduce texture bytes to the configured limit
 static void tcache_cap_num_bytes(unsigned increment) {
     if( max_num_texture_bytes && (num_texture_bytes + increment) > max_num_texture_bytes ) {
+        int64_t ms_0 = get_micro_seconds();
+        if (lru_eject.render_cycle != render_cycle) {
+            lru_eject.count = lru_sort_tce(lru_eject.tbl);
+            lru_eject.ix = 0;
+        } else {
+//            quick_sort_tcache(lru_eject.tbl, lru_eject.count - lru_eject.ix);
+            quick_sort_tcache(lru_eject.tbl, lru_eject.count);
+        }
+        if (tcache_eject_printf != dummy_printf) {
+            tcache_eject_printf("LRU: ------------------------ cycle:%lu %lu/%lu -> %lu\n",
+                    render_cycle,
+                    num_texture_bytes, max_num_texture_bytes,
+                    num_texture_bytes + increment);
+            for(int ix=lru_eject.ix; ix < lru_eject.count; ++ix) {
+                tcache_entry* tce = lru_eject.tbl[ix];
+                tcache_eject_printf("    %5d) lru_count=%lx %7.4f %s\n", ix,
+                       tce->lru_count,
+                       (float)tce->num_bytes/(1024*1024),
+                       tce->path);
+            }
+            tcache_eject_printf("-----------------------------\n");
+        }
+        
+        // TODO : remove this debugging code.
+        for(int ix=lru_eject.ix; ix < lru_eject.count -1; ++ix) {
+            if (lru_eject.tbl[ix]->lru_count > lru_eject.tbl[ix+1]->lru_count) {
+                // quick sort bug!!!
+                error_printf("incorrect eject table sort %lx %lx %d/%d %s %s\n",
+                        lru_eject.tbl[ix]->lru_count,
+                        lru_eject.tbl[ix+1]->lru_count,
+                        ix, lru_eject.count,
+                        lru_eject.tbl[ix]->path,
+                        lru_eject.tbl[ix+1]->path
+                        );
+#if TEXTURE_CACHE_FAILFAST
+                exit(EXIT_FAILURE);
+#else
+                // attempt to fix.
+                swap_tcache_entries(lru_eject.tbl+ix, lru_eject.tbl+ix+1);
+#endif
+            }
+        }
         tcache_eject(increment, cap_exceeded);
+        lru_eject.eject_time += get_micro_seconds() - ms_0;
     }
 }
 
@@ -590,12 +629,9 @@ bool tcache_load_from_file(texture_id_t texture_id, SDL_Renderer* renderer) {
                 tce->h = tce->surface->h;
                 tce->num_surface_bytes = tce->surface->pitch * tce->h;
                 __atomic_add_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
-                tcache_eject_printf("tcache_load_from_file: loaded: %s\n", tce->path);
             }
-        } else {
-            tcache_eject_printf("tcache_load_from_file: %s\n", tce->path);
         }
-        __atomic_store_n(&tce->lru_count, lru_counter, __ATOMIC_RELEASE);
+        update_lru(tce);
         return tce->texture != NULL || tce->surface !=NULL; 
     }
     error_printf("tcache_load_from_file: invalid: %d\n", texture_id);
@@ -626,7 +662,7 @@ bool tcache_set_surface(texture_id_t texture_id, SDL_Surface* surface) {
             return true;
         } else {
             SDL_Surface *obsolete = __atomic_exchange_n(&tce->surface, surface, __ATOMIC_ACQ_REL);
-            __atomic_store_n(&tce->lru_count, lru_counter, __ATOMIC_RELEASE);
+            update_lru(tce);
             if (obsolete) {
                 __atomic_sub_fetch(&num_surface_bytes, obsolete->pitch * obsolete->h, __ATOMIC_ACQ_REL);
                 SDL_FreeSurface(obsolete);
@@ -678,7 +714,33 @@ void tcache_concise_dump() {
         printf("%s\n", locked_caption[ixlock]);
         for(int ix=0; ix < HASHTPRIME; ++ix) {
             tcache_entry* tce = tbl[ix];
-            if (tce && tce != tce_deleted && tce->locked == locked_vals[ixlock]) {
+            if (tce && tce != tce_deleted && tce->locked == locked_vals[ixlock] && tce->num_bytes == 0) {
+                size_t num_bytes = tce->num_surface_bytes;
+                char   src_num_bytes = 'S';
+                if (tce->num_bytes) {
+                    num_bytes = tce->num_bytes;
+                    src_num_bytes = 'T';
+                }
+                printf("    %05d) w=%4d h=%4d %c=%7.4f MiB %s\n",
+                       ix, 
+                       tce->w,
+                       tce->h,
+                       src_num_bytes,
+                       (float)num_bytes/(1024*1024),
+                       tce->path);
+                ++count;
+                if (tce->ejected) {
+                    ejected_texture_bytes += tce->num_bytes;
+                } else if (tce->locked) {
+                    locked_texture_bytes += tce->num_bytes;
+                } else {
+                    unlocked_texture_bytes += tce->num_bytes;
+                }
+            }
+        }
+        for(int ix=0; ix < HASHTPRIME; ++ix) {
+            tcache_entry* tce = tbl[ix];
+            if (tce && tce != tce_deleted && tce->locked == locked_vals[ixlock] && tce->num_bytes) {
                 size_t num_bytes = tce->num_surface_bytes;
                 char   src_num_bytes = 'S';
                 if (tce->num_bytes) {
@@ -721,7 +783,7 @@ void tcache_dump_LRU() {
     printf("LRU: ------------------------\n");
     for(int ix=0; ix < count; ++ix) {
         tcache_entry* tce = stbl[ix];
-        printf("    %5d) lru_count=%016x %7.4f %s\n", ix,
+        printf("    %5d) lru_count=%lx %7.4f %s\n", ix,
                tce->lru_count,
                (float)tce->num_bytes/(1024*1024),
                tce->path);
@@ -737,7 +799,7 @@ void tcache_dump() {
     for(int ix=0; ix < HASHTPRIME; ++ix) {
         tcache_entry* tce = tbl[ix];
         if (tce && tce != tce_deleted) {
-            printf("    %05d) delta=%4d hashv=%08x lru_count=%016x %s tce:%p surface:%p,%8lu bytes texture:%p,%8lu bytes w=%4d h=%4d %s\n",
+            printf("    %05d) delta=%4d hashv=%08x lru_count=%lx %s tce:%p surface:%p,%8lu bytes texture:%p,%8lu bytes w=%4d h=%4d %s\n",
                    ix, ix - last_ix,
                    tce->hashv,
                    tce->lru_count,
@@ -869,22 +931,37 @@ void tcache_flush_textures(SDL_Renderer* renderer) {
     _tcache_flush_textures(renderer);
 }
 
-// texture cache prep for render must be called by the render thread,
-// before each frame render.
-void tcache_render_prep(SDL_Renderer* renderer) {
+// Must be called by the render thread, before each frame render.
+void tcache_render_frame_start(SDL_Renderer* renderer) {
     if (!check_permitted()) {
         return;
     }
+    ++render_cycle;
     _tcache_flush_textures(renderer);
+    lru_eject.render_cycle = render_cycle;
+    lru_eject.eject_time = 0;
    
+/*
     // bump the LRU counter
-    __atomic_add_fetch(&lru_counter, 1, __ATOMIC_ACQ_REL);
+//    __atomic_add_fetch(&lru_counter, 1, __ATOMIC_ACQ_REL);
     // setup for lru cache ejection,
 //    int64_t ms_sort_0 = get_micro_seconds();
     lru_eject.count = lru_sort_tce(lru_eject.tbl);
     lru_eject.ix = 0;
 //    int64_t ms_sort_1 = get_micro_seconds();
 //    profile_texture_printf("lru_sort_tcache: %06lu\n", ms_sort_1 - ms_sort_0);
+*/
+}
+
+void tcache_render_frame_done(SDL_Renderer* renderer) {
+    if (!check_permitted()) {
+        return;
+    }
+    _tcache_flush_textures(renderer);
+    ++render_cycle;
+    if (lru_eject.eject_time >= 1000) {
+        printf("eject_time = %f millis\n", (float)lru_eject.eject_time/1000);
+    }
 }
 
 // Get texture width and height 
