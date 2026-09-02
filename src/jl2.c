@@ -465,18 +465,6 @@ printf("starting controller\n"); fflush(stdout);
         }
         size_t nt = tcache_get_texture_bytes_count();
         size_t ns = tcache_get_surface_bytes_count();
-#if     0
-        static size_t num_texture_bytes;
-        static size_t num_surface_bytes;
-        if (nt != num_texture_bytes || ns != num_surface_bytes) {
-            printf("+++ t=%09lu %.02f s=%09lu %.02f (delta t=%ld s=%ld)\n",
-                    nt, (float)nt/(1024*1024),
-                    ns, (float)ns/(1024*1024),
-                    (long)nt-(long)num_texture_bytes, (long)ns-(long)num_surface_bytes);
-            num_texture_bytes = nt;
-            num_surface_bytes = ns;
-        }
-#endif
         if (monitor_tcache && 0 == (iters%50)) {
             static size_t prev_nt_val, prev_ns_val;
             float f_nt = (float)nt/(1024*1024);
@@ -576,7 +564,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                             widget_list_react(pv->list, USEREVENT_PREV_VISU ? PREV_VISU: PREV_VU, NULL);
                         }
                     }
-#if 1
+#if 0
                     print_tcache_stats();
 #endif
                 }break;
