@@ -75,10 +75,40 @@
     ],
     "resources": {
         "LEFT_BG": "frame2000.png", "RIGHT_BG": "frame2000.png",
-        "$SEQUENCE" : [
-            { "key_prefix": "L", "start": 0,  "end": 48,  "value": "L-lsp1620.png"},
-            { "key_prefix": "R", "start": 0,  "end": 48,  "value": "R-lsp1620.png"}
-        ]
+        "led_cyan_off": "led-cyan-off.png",
+        "led_cyan": "led-cyan.png",
+        "led_orange": "led-orange.png",
+        "led_red": "led-red.png",
+        "led_orange_off": "led-orange-off.png",
+        "led_red_off": "led-red-off.png",
+        "lspeaker": "L-lsp1620.png",
+        "rspeaker": "R-lsp1620.png"
+    },
+    "rotaries": {
+        "led_cyan_off": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_cyan_off"
+        },
+        "led_cyan": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_cyan"
+        },
+        "led_orange_off": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_orange_off"
+        },
+        "led_orange": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_orange"
+        },
+        "led_red_off": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_red_off"
+        },
+        "led_red": {
+            "enclosure": { "w": 2000, "h": 2000 }, "axle": { "x": 1000, "y": 1000 }, "bearing": { "x": 48, "y": -890, "w": 96, "h": 112 },
+            "resource": "led_red"
+        }
     },
     "#placement": [
         "placement is an associative array of image aliases to coordinates",
@@ -86,7 +116,40 @@
         "Format: ",
         "alias: { x-coordinate, y-coordinate} "
     ],
-    "placement": {},
+    "placement": {
+        "$ROTATION_SEQUENCE" : [
+            {"prefix": "LEDCYANOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_cyan_off"},
+            {"prefix": "LEDCYANOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan_off"},
+            {"prefix": "LEDCYANOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_cyan_off"},
+            {"prefix": "LEDCYANOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan_off"},
+
+            {"prefix": "LEDORANGEOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_orange_off"},
+            {"prefix": "LEDORANGEOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange_off"},
+            {"prefix": "LEDORANGEOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_orange_off"},
+            {"prefix": "LEDORANGEOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange_off"},
+
+            {"prefix": "LEDREDOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_red_off"},
+            {"prefix": "LEDREDOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red_off"},
+            {"prefix": "LEDREDOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_red_off"},
+            {"prefix": "LEDREDOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red_off"},
+
+
+            {"prefix": "LEDCYAN-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_cyan"},
+            {"prefix": "LEDCYAN-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan"},
+            {"prefix": "LEDCYAN-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_cyan"},
+            {"prefix": "LEDCYAN-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan"},
+
+            {"prefix": "LEDORANGE-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_orange"},
+            {"prefix": "LEDORANGE-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange"},
+            {"prefix": "LEDORANGE-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_orange"},
+            {"prefix": "LEDORANGE-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange"},
+
+            {"prefix": "LEDRED-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_red"},
+            {"prefix": "LEDRED-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red"},
+            {"prefix": "LEDRED-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_red"},
+            {"prefix": "LEDRED-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red"}
+        ]
+    },
     "#compositions*":[
         "associative array with keys",
         "The contents of each key must be objects which are associative arrays with keys",
@@ -145,6 +208,90 @@
                     { "start": 0,  "end": 48, "value": "R{index}"}
                 ]
             }
+        },
+        "OFF-L": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYANOFF-L-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGEOFF-L-{index}"},
+                    { "start": 43,  "end": 48, "value": "LEDREDOFF-L-{index}"}
+                ]
+            }
+        },
+        "OFF-R": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYANOFF-R-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGEOFF-R-{index}"},
+                    { "start": 43,  "end": 48, "value": "LEDREDOFF-R-{index}"}
+                ]
+            }
+        },
+        "OFF-LL": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYANOFF-LL-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGEOFF-LL-{index}"},
+                    { "start": 43,  "end": 47, "value": "LEDREDOFF-LL-{index}"}
+                ]
+            }
+        },
+        "OFF-RR": {
+            "render_op": "static",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYANOFF-RR-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGEOFF-RR-{index}"},
+                    { "start": 43,  "end": 47, "value": "LEDREDOFF-RR-{index}"}
+                ]
+            }
+        },
+        "ON-L": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYAN-L-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGE-L-{index}"},
+                    { "start": 43,  "end": 48, "value": "LEDRED-L-{index}"}
+                ]
+            }
+        },
+        "ON-R": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYAN-R-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGE-R-{index}"},
+                    { "start": 43,  "end": 48, "value": "LEDRED-R-{index}"}
+                ]
+            }
+        },
+        "ON-LL": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYAN-LL-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGE-LL-{index}"},
+                    { "start": 43,  "end": 47, "value": "LEDRED-LL-{index}"}
+                ]
+            }
+        },
+        "ON-RR": {
+            "render_op": "aggregate",
+            "volume_type" : "peak-hold+sampled",
+            "placements": {
+                "$SEQUENCE": [
+                    { "start": 1,  "end": 36, "value": "LEDCYAN-RR-{index}"},
+                    { "start": 37,  "end": 42, "value": "LEDORANGE-RR-{index}"},
+                    { "start": 43,  "end": 47, "value": "LEDRED-RR-{index}"}
+                ]
+            }
         }
     },
     "#vumeters": [
@@ -155,8 +302,18 @@
     ],
     "vumeters" :{
         "SpeakerGray": {
-            "left":  [ "L00", "L01"],
-            "right": [ "R00", "R01"]
+            "left":  [
+                "L00",
+                "OFF-L", "OFF-R", "OFF-LL", "OFF-RR",
+                "L01",
+                "ON-L", "ON-R", "ON-LL", "ON-RR"
+            ],
+            "right": [
+                "R00",
+                "OFF-L", "OFF-R", "OFF-LL", "OFF-RR",
+                "R01",
+                "ON-L", "ON-R", "ON-LL", "ON-RR"
+            ]
         }
     }
 }
