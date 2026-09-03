@@ -783,8 +783,8 @@ void tcache_dump_LRU() {
     printf("LRU: ------------------------\n");
     for(int ix=0; ix < count; ++ix) {
         tcache_entry* tce = stbl[ix];
-        printf("    %5d) lru_count=%lx %7.4f %s\n", ix,
-               tce->lru_count,
+        printf("    %5d) lru_count=%llx %7.4f %s\n", ix,
+               (long long)tce->lru_count,
                (float)tce->num_bytes/(1024*1024),
                tce->path);
     }
@@ -799,10 +799,10 @@ void tcache_dump() {
     for(int ix=0; ix < HASHTPRIME; ++ix) {
         tcache_entry* tce = tbl[ix];
         if (tce && tce != tce_deleted) {
-            printf("    %05d) delta=%4d hashv=%08x lru_count=%lx %s tce:%p surface:%p,%8lu bytes texture:%p,%8lu bytes w=%4d h=%4d %s\n",
+            printf("    %05d) delta=%4d hashv=%08x lru_count=%llx %s tce:%p surface:%p,%8lu bytes texture:%p,%8lu bytes w=%4d h=%4d %s\n",
                    ix, ix - last_ix,
                    tce->hashv,
-                   tce->lru_count,
+                   (long long)tce->lru_count,
                    tce->locked ? "locked  ": "unlocked",
                    tce,
                    tce->surface,
