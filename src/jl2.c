@@ -377,7 +377,7 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
                ||
                widget_get_hotspot(t)) {
                 widget_set_renderhf(t);
-                log_printf("widget_set_renderhf %d\n", widget_get_type_name(t));
+                log_printf("widget_set_renderhf %s\n", widget_get_type_name(t));
             }
         }
     }
