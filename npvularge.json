@@ -552,20 +552,6 @@
                 "image": "./images/sd/arrow_back_ios_1000dp_1F1F1F_FILL0_wght700_GRAD0_opsz48.png",
                 "action": "main_view"
             }
-        },
-        {
-            "#button": {
-                "location": {
-                    "position": {
-                        "x": 0,
-                        "y": 0,
-                        "w": 32,
-                        "h": 32
-                    }
-                },
-                "image": "./images/sd/close.png",
-                "action": "quit"
-            }
         }
     ]
 }
