@@ -12,6 +12,7 @@
 #include "application.h"
 #include "widgets_internal.h"
 #include "visualizer.h"
+#include "timing.h"
 
 struct vumeter_widget_s_t {
     vumeter_instance_t meters[100];
@@ -112,11 +113,12 @@ static bool vumeter_select(widget_t *wdgt, int indx) {
     {
         // let texture cache handle release of textures on demand
         if (!vu_meters_load_media(wdgt->view->app->renderer, vw->meters[indx].vss)) {
-            error_printf("failed to load VUMeter media, limping along!");
-            {
+            error_printf("failed to load VUMeter media, retrying in 1 second!");
+            sleep_milli_seconds(1000);
+            if (!vu_meters_load_media(wdgt->view->app->renderer, vw->meters[indx].vss)) {
                 unsigned texture_bytes = tcache_get_texture_bytes_count();
                 unsigned surface_bytes = tcache_get_surface_bytes_count();
-                error_printf("texture cache memory: texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
+                error_printf("failed to load VUMeter media: texture cache memory: texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
             }
 //            exit(EXIT_FAILURE);
         }
