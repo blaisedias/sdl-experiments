@@ -91,6 +91,7 @@ static bool my_query_render_backdrop(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
 
+static SDL_mutex* view_change_mutex;
 
 static app_context_t app_ctx = {
 //        .window = NULL,
@@ -115,7 +116,16 @@ static void invalid_args(const char* opt) {
 }
 
 static void set_current_view(view_context_ptr new_view) {
+    SDL_LockMutex(view_change_mutex);
+    view_context_ptr prev_view = __atomic_load_n(&current_view, __ATOMIC_ACQUIRE);
+    if (prev_view) {
+        widget_list_unload_media(prev_view->list, "./images");
+    }
+    if (new_view) {
+        widget_list_load_media(new_view->list, "./images");
+    }
     __atomic_store_n(&current_view, new_view, __ATOMIC_RELEASE);
+    SDL_UnlockMutex(view_change_mutex);
 }
 
 static view_context_ptr get_current_view() {
@@ -123,6 +133,7 @@ static view_context_ptr get_current_view() {
 }
 
 int main(int argc, char** argv) {
+    view_change_mutex = SDL_CreateMutex();
 
     for(int i = 1; i < argc; ++i) {
         if (0 == strcmp(argv[i], "max_secs")) {
@@ -287,6 +298,7 @@ int main(int argc, char** argv) {
 
     app_cleanup(&app_ctx, EXIT_SUCCESS);
 
+    SDL_DestroyMutex(view_change_mutex);
     return 0;
 }
 
@@ -356,7 +368,6 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
         destroy_widget_list(vw->list);
         FREE(vw);
     } else {
-        widget_list_load_media(vw->list, "./images");
         for(widget_t* t = widget_list_tail(vw->list); t != NULL; t = widget_list_prev(vw->list, t)) {
             const char* player_value_key = widget_get_player_value_key(t);
             const char* runtime_value_key = widget_get_runtime_value_key(t);
