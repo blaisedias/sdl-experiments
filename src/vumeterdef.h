@@ -9,19 +9,8 @@
 #include <SDL2/SDL.h>
 #include "texture_cache.h"
 #include "vumeter_enum.h"
+#include "audio_volume.h"
 
-typedef struct {
-    int     vol;
-    int     peak_hold_vol;
-    int     peak_hold_counter;
-    int     decay_hold_counter;
-    float   decay_vol;
-    float   decay_unit;
-}runtime_volume_t, *runtime_volume_ptr;
-
-// For now the number of channels is fix at 2
-// a future change will remove this hard-coding
-#define     NUM_VU_CHANNELS     2
 #define     NUM_COMPONENTS      1 + NUM_VU_CHANNELS
 
 typedef struct {

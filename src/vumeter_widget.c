@@ -75,9 +75,7 @@ static void vumeter_render_fg(widget_t* wdgt) {
     vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->num_meters) {
         vumeter_instance_t* vumtr = vw->meters + vw->render_meter_indx;
-        int vols[2];
-        visualizer_vumeter(vols);
-        update_volume_levels(vw->vol_runtimes, vols, vumtr->decay_unit); 
+        update_volume_levels(vw->vol_runtimes, vumtr->decay_unit); 
         vumeter_render_foreground(wdgt->view->app->renderer, vumtr, vw->vol_runtimes);
     }
 }

@@ -47,6 +47,7 @@ static const char* help_text=""
 " - printftcache enable printing of texture cache module\n"
 " - printftcacheeject enable printing of texture cache module ejects\n"
 " - printfapp enable printing of application processing\n"
+" - printfvolcalib enable printing of volume calibration messages\n"
 " - debug_redraw_backdrop enable printing when backdrop is redrawn\n"
 "\n"  
 " - dl <path-to-object-file> : dynamically load VU meter in object file\n"
@@ -199,6 +200,8 @@ int main(int argc, char** argv) {
             enable_printf(TEXTURE_CACHE_EJECT_PRINTF);
         } else if (0 == strcmp(argv[i], "printfapp")) {
             enable_printf(APP_PRINTF);
+        } else if (0 == strcmp(argv[i], "printfvolcalib")) {
+            enable_printf(VOL_CALIB_PRINTF);
         } else if (0 == strcmp(argv[i], "debug_redraw_backdrop")) {
             app_ctx.debug_redraw_backdrop = true;
         } else if (0 == strcmp(argv[i], "fs") || 0 == strcmp(argv[i], "fullscreen")) {

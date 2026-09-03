@@ -385,55 +385,6 @@ void vumeter_render_foreground_ms(SDL_Renderer* renderer, vumeter_instance_t* vu
 }
 // ==== render }
 
-
-// ==== volume levels {
-// @60 FPS 30 => 1/2 a second
-static int peak_hold_counter_init_value = 30;
-// fine tune decay behaviour - default is 0 so decay immediately
-// @60 FPS 4 appears to be a reasonable value.
-static int decay_hold_counter_init_value = 3;
-
-void update_volume_levels(runtime_volume_ptr vol_runtimes, int* vols, float decay_unit) {
-    vol_runtimes[0].vol = vols[0];
-    vol_runtimes[1].vol = vols[1];
-
-    for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-        vol_runtimes[ix_chan].vol = vols[ix_chan];
-        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
-//            vol_runtimes[ix_chan].eak_hold_counter = peak_hold_counter_start;
-            vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
-            vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
-        }
-        if (--vol_runtimes[ix_chan].peak_hold_counter < 0) {
-            vol_runtimes[ix_chan].peak_hold_vol = 0;
-            vol_runtimes[ix_chan].peak_hold_counter = 0;
-        }
-        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].decay_vol) {
-            vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
-            vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
-        } else {
-            if (--vol_runtimes[ix_chan].decay_hold_counter < 0) {
-                vol_runtimes[ix_chan].decay_vol -= decay_unit;
-                vol_runtimes[ix_chan].decay_hold_counter = 0;
-            }
-        }
-    }
-}
-
-int vumeter_set_peak_hold(int v) {
-    int retv = peak_hold_counter_init_value;
-    peak_hold_counter_init_value = v;
-    return retv;
-}
-
-int vumeter_set_decay_hold(int v) {
-    int retv = decay_hold_counter_init_value;
-    decay_hold_counter_init_value = v;
-    return retv;
-}
-
-// ==== volume levels }
-
 // ==== json file {
 static vu_meters_t* vu_meters_list = NULL;
 
