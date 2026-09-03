@@ -145,6 +145,7 @@ void widget_list_add_widget(widget_list_t* widget_list, widget_t* wdgt);
 // VUmeter
 widget_t *vumeter_widget_destroy(widget_t *wdgt);
 void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path);
+void vumeter_widget_unload_media(widget_t *wdgt, const char* resource_path);
 // Slider
 widget_t *widget_slider_track(widget_t* wdgt, const SDL_Point *pt);
 widget_t *widget_slider_tracking_commit(widget_t* wdgt, const SDL_Point *pt);

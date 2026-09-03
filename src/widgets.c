@@ -282,6 +282,47 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
     return wdgt;
 }
 
+widget_t* widget_unload_media(widget_t* wdgt, const char* resource_path) {
+    if (wdgt) {
+        switch(wdgt->type) {
+            case WIDGET_NONE:
+            case WIDGET_END:
+                break;
+            case WIDGET_VUMETER:
+                vumeter_widget_unload_media(wdgt, resource_path);
+                break;
+            case WIDGET_IMAGE:
+                tcache_unlock_texture(wdgt->sub.image.texture_id);
+                break;
+            case WIDGET_BUTTON:
+                tcache_unlock_texture(wdgt->sub.button.texture_id);
+                break;
+            case WIDGET_MULTISTATE_BUTTON:
+                {
+                    _bnt_resource_t* res =  wdgt->sub.multistate_button.res;
+                    for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
+                        tcache_unlock_texture(res[ims].texture_id);
+                    }
+                }break;
+            case WIDGET_SLIDER:
+            case WIDGET_VSLIDER:
+                for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
+                    for(int ix_txtr=0; ix_txtr < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_txtr) {
+                        tcache_unlock_texture(wdgt->sub.slider.res[ix].texture_ids[ix_txtr]);
+                    }
+                }
+                break;
+            case WIDGET_TEXT:
+                {
+                    _text_data_ptr txt_w = &wdgt->sub.text;
+                    tcache_unlock_texture(txt_w->texture_id);
+                }
+                break;
+        }
+    }
+    return wdgt;
+}
+
 widget_t* widget_rect(widget_t *wdgt, const SDL_Rect *rect) {
     if (wdgt) {
         copyRect(rect, &wdgt->rect);
@@ -1146,11 +1187,23 @@ widget_list_t* destroy_widget_list(widget_list_t* list) {
 }
 
 void widget_list_load_media(const widget_list_t* list, const char* resource_path) {
-    SDL_LockMutex(list->mutex);
-    for (widget_t* widget = list->head.next; widget != NULL; widget = widget->next) {
-        widget_load_media(widget, resource_path);
+    if (list) {
+        SDL_LockMutex(list->mutex);
+        for (widget_t* widget = list->head.next; widget != NULL; widget = widget->next) {
+            widget_load_media(widget, resource_path);
+        }
+        SDL_UnlockMutex(list->mutex);
     }
-    SDL_UnlockMutex(list->mutex);
+}
+
+void widget_list_unload_media(const widget_list_t* list, const char* resource_path) {
+    if (list) {
+        SDL_LockMutex(list->mutex);
+        for (widget_t* widget = list->head.next; widget != NULL; widget = widget->next) {
+            widget_unload_media(widget, resource_path);
+        }
+        SDL_UnlockMutex(list->mutex);
+    }
 }
 
 void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt) {

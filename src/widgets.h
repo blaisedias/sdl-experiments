@@ -173,6 +173,7 @@ widget_list_t* destroy_widget_list(widget_list_t*);
 widget_list_t* destroy_widgets_in_list(widget_list_t*);
 
 void widget_list_load_media(const widget_list_t* list, const char* resource_path);
+void widget_list_unload_media(const widget_list_t* list, const char* resource_path);
 void widget_list_react(const widget_list_t* list, const pointer_input_t input, SDL_Point* pt);
 bool widget_list_query_render_backdrop(const widget_list_t* wdgt_list);
 void widget_list_render_backdrop(const widget_list_t* wdgt_list);

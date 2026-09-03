@@ -53,6 +53,9 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
     }
 }
 
+void vumeter_widget_unload_media(widget_t *wdgt, const char* resource_path) {
+}
+
 static void vumeter_render_bg(widget_t* wdgt) {
     vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->num_meters) {
