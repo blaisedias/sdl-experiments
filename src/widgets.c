@@ -1329,9 +1329,11 @@ void widget_list_render_backdrop(const widget_list_t* wdgt_list) {
         }
     }
 
+/*  TODO: review commenting out  
     for(widget_t* widget=wdgt_list->head.next; widget != NULL; widget=widget->next) {
         if (widget->render_backdrop != NULL && widget->redraw_required) { error_printf("!? %d\n", widget->type); }
     }
+*/
 
 }
 
