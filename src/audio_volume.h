@@ -12,10 +12,16 @@ typedef struct {
     int     decay_hold_counter;
     float   decay_vol;
     float   decay_unit;
-}runtime_volume_t, *runtime_volume_ptr;
+    long long sq_summed;
+    long long div256Sq;
+    long long summed;
+}runtime_volume_t;
 
-void update_volume_levels(runtime_volume_ptr vol_runtimes, float decay_unit);
+typedef const runtime_volume_t* runtime_volume_ptr;
+
+void update_volume_levels(float decay_unit);
 int vumeter_set_peak_hold(int v);
 int vumeter_set_decay_hold(int v);
+runtime_volume_ptr get_runtime_volume();
 
 #endif

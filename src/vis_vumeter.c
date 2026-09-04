@@ -20,20 +20,20 @@ static long long RMS_MAP[] = {
 	3227, 3414, 3601, 3788, 3975, 4162, 4349, 4536, 4755, 5000,
 };
 
+static runtime_volume_t vol_runtimes[2];
+
 extern void (*vol_printf)(char *format, ...);
 extern void (*vol_calib_printf)(char *format, ...);
 extern void (*log_printf)(char *format, ...);
 
-void _digitise(int* levels, long long* sample_accumulator, size_t num_samples) {
-	sample_accumulator[0] /= num_samples;
-	sample_accumulator[1] /= num_samples;
-
+static void legacy_digitise() {
 	for(int indx =0; indx < 2; ++indx) {
-		levels[indx] = 0;
+		vol_runtimes[indx].vol = 0;
 		for (int level = 48; level >=0; --level) {
-			if (sample_accumulator[indx] > RMS_MAP[level]) {
-				levels[indx] = level;
-				vol_printf("%02d a:%08lld rms:%08lld ", level, sample_accumulator[indx], RMS_MAP[level]);
+			if (vol_runtimes[indx].div256Sq > RMS_MAP[level]) {
+				vol_runtimes[indx].vol = level;
+				vol_printf("%02d a:%08lld rms:%08lld ",
+						level, vol_runtimes[indx].div256Sq, RMS_MAP[level]);
 				break;
 			}
 		}
@@ -96,7 +96,9 @@ int _visualizer_vumeter_div256_squared(int* levels) {
 		vis_unlock();
 	}
 
-	_digitise(levels, sample_accumulator, num_samples);
+	vol_runtimes[0].div256Sq = sample_accumulator[0]/num_samples;
+	vol_runtimes[1].div256Sq = sample_accumulator[1]/num_samples;
+	legacy_digitise();
 
 	return 1;
 }
@@ -107,16 +109,21 @@ static inline bool tenpc_delta(long long a, long long b) {
 	return d > a /10;
 }
 
-int _visualizer_vumeter_cp(int* levels) {
+#ifndef  VOLUME_CALIB_LEVEL
+#define  VOLUME_CALIB_LEVEL     0
+#endif
+
+int _visualizer_vumeter_cp() {
 static int16_t buff[VUMETER_DEFAULT_SAMPLE_WINDOW*2];
+#if  VOLUME_CALIB_LEVEL
 static int same_count =0;
 static bool vc_displayed = false;
 static long long prev_sq_summed[2] = { 0, 0};
+#endif // VOLUME_CALIB_LEVEL
 
 	long long div256Sq_accumulator[2] = {0,0};
 	long long summed_accumulator[2] = {0,0};
 	float f_sq_summed_accumulator[2] = {0.0, 0.0};
-	long long sq_summed_accumulator[2] = {0.0, 0.0};
 	size_t num_samples;
 
 	num_samples = VUMETER_DEFAULT_SAMPLE_WINDOW;
@@ -137,8 +144,8 @@ static long long prev_sq_summed[2] = { 0, 0};
 		memcpy(buff, ptr, sizeof(*ptr)*ns1);
 		if (ns2) {
 			memcpy(buff + ns1,
-				   vis_get_buffer(),
-				   sizeof(*ptr)*ns2);
+					vis_get_buffer(),
+					sizeof(*ptr)*ns2);
 		}
 		vis_unlock();
 
@@ -164,13 +171,16 @@ static long long prev_sq_summed[2] = { 0, 0};
 			div256Sq_accumulator[1] += sample_sq;
 		}
 	}
-	summed_accumulator[0] /= num_samples;
-	summed_accumulator[1] /= num_samples;
-	sq_summed_accumulator[0] = sqrt(f_sq_summed_accumulator[0]/num_samples);
-	sq_summed_accumulator[1] = sqrt(f_sq_summed_accumulator[1]/num_samples);
+	vol_runtimes[0].div256Sq = div256Sq_accumulator[0]/num_samples;
+	vol_runtimes[1].div256Sq = div256Sq_accumulator[1]/num_samples;
+	vol_runtimes[0].summed = summed_accumulator[0]/num_samples;
+	vol_runtimes[1].summed = summed_accumulator[1]/num_samples;
+	vol_runtimes[0].sq_summed = sqrt(f_sq_summed_accumulator[0]/num_samples);
+	vol_runtimes[1].sq_summed = sqrt(f_sq_summed_accumulator[1]/num_samples);
 
+#if VOLUME_CALIB_LEVEL
 //	if (prev_sq_summed[0] != sq_summed_accumulator[0] || prev_sq_summed[1] != sq_summed_accumulator[1]) {
-	if (tenpc_delta(prev_sq_summed[0],sq_summed_accumulator[0]) || tenpc_delta(prev_sq_summed[1],sq_summed_accumulator[1])) {
+	if (tenpc_delta(prev_sq_summed[0],vol_runtimes[0].sq_summed) || tenpc_delta(prev_sq_summed[1],vol_runtimes[1].sq_summed)) {
 		same_count = 0;
 		vc_displayed = false;
 	} else {
@@ -180,13 +190,15 @@ static long long prev_sq_summed[2] = { 0, 0};
 			vol_calib_printf("Summed:%lld %lld Div256Sq:%lld %lld SqSummed:%lld %lld\n",
 					summed_accumulator[0], summed_accumulator[1],
 					div256Sq_accumulator[0]/num_samples, div256Sq_accumulator[1]/num_samples,
-					(long long)sq_summed_accumulator[0], (long long)sq_summed_accumulator[1]
+					(long long)vol_runtimes[0].sq_summed, (long long)vol_runtimes[1].sq_summed
 					);
 		}
 	}
-	prev_sq_summed[0] = sq_summed_accumulator[0]; 
-	prev_sq_summed[1] = sq_summed_accumulator[1]; 
-	_digitise(levels, div256Sq_accumulator, num_samples);
+	prev_sq_summed[0] = vol_runtimes[0].sq_summed;
+	prev_sq_summed[1] = vol_runtimes[1].sq_summed;
+#endif // VOLUME_CALIB_LEVEL
+
+	legacy_digitise();
 	return 1;
 }
 
@@ -210,48 +222,44 @@ static int peak_hold_counter_init_value = 30;
 // @60 FPS 4 appears to be a reasonable value.
 static int decay_hold_counter_init_value = 3;
 
-void update_volume_levels(runtime_volume_ptr vol_runtimes, float decay_unit) {
-    int vols[2];
-    // FIXME: read directly into runtime volumes
-    _visualizer_vumeter_cp(vols);
+void update_volume_levels(float decay_unit) {
+	_visualizer_vumeter_cp();
 
-    vol_runtimes[0].vol = vols[0];
-    vol_runtimes[1].vol = vols[1];
-
-    for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
-        vol_runtimes[ix_chan].vol = vols[ix_chan];
-        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
-//            vol_runtimes[ix_chan].eak_hold_counter = peak_hold_counter_start;
-            vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
-            vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
-        }
-        if (--vol_runtimes[ix_chan].peak_hold_counter < 0) {
-            vol_runtimes[ix_chan].peak_hold_vol = 0;
-            vol_runtimes[ix_chan].peak_hold_counter = 0;
-        }
-        if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].decay_vol) {
-            vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
-            vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
-        } else {
-            if (--vol_runtimes[ix_chan].decay_hold_counter < 0) {
-                vol_runtimes[ix_chan].decay_vol -= decay_unit;
-                vol_runtimes[ix_chan].decay_hold_counter = 0;
-            }
-        }
-    }
+	for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
+		if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
+			vol_runtimes[ix_chan].peak_hold_counter = peak_hold_counter_init_value;
+			vol_runtimes[ix_chan].peak_hold_vol = vol_runtimes[ix_chan].vol;
+		}
+		if (--vol_runtimes[ix_chan].peak_hold_counter < 0) {
+			vol_runtimes[ix_chan].peak_hold_vol = 0;
+			vol_runtimes[ix_chan].peak_hold_counter = 0;
+		}
+		if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].decay_vol) {
+			vol_runtimes[ix_chan].decay_vol = vol_runtimes[ix_chan].vol;
+			vol_runtimes[ix_chan].decay_hold_counter = decay_hold_counter_init_value;
+		} else {
+			if (--vol_runtimes[ix_chan].decay_hold_counter < 0) {
+				vol_runtimes[ix_chan].decay_vol -= decay_unit;
+				vol_runtimes[ix_chan].decay_hold_counter = 0;
+			}
+		}
+	}
 }
 
 int vumeter_set_peak_hold(int v) {
-    int retv = peak_hold_counter_init_value;
-    peak_hold_counter_init_value = v;
-    return retv;
+	int retv = peak_hold_counter_init_value;
+	peak_hold_counter_init_value = v;
+	return retv;
 }
 
 int vumeter_set_decay_hold(int v) {
-    int retv = decay_hold_counter_init_value;
-    decay_hold_counter_init_value = v;
-    return retv;
+	int retv = decay_hold_counter_init_value;
+	decay_hold_counter_init_value = v;
+	return retv;
 }
 
+runtime_volume_ptr get_runtime_volume() {
+	return vol_runtimes;
+}
 // ==== volume levels }
 

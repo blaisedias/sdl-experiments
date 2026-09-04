@@ -22,7 +22,6 @@ struct vumeter_widget_s_t {
     bool    equal_horizontal_spacing;
     // only used by render code. 
     volatile int render_meter_indx;
-    runtime_volume_t vol_runtimes[NUM_VU_CHANNELS];
 };
 
 static inline int vumeter_index(vumeter_widget_t* wdgt) {
@@ -75,8 +74,8 @@ static void vumeter_render_fg(widget_t* wdgt) {
     vumeter_widget_t* vw = wdgt->sub.vu;
     if (vw->num_meters) {
         vumeter_instance_t* vumtr = vw->meters + vw->render_meter_indx;
-        update_volume_levels(vw->vol_runtimes, vumtr->decay_unit); 
-        vumeter_render_foreground(wdgt->view->app->renderer, vumtr, vw->vol_runtimes);
+        update_volume_levels(vumtr->decay_unit); 
+        vumeter_render_foreground(wdgt->view->app->renderer, vumtr, get_runtime_volume());
     }
 }
 
