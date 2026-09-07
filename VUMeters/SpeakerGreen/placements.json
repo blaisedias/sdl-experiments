@@ -350,7 +350,7 @@
             "y": 0
         },
         "R00": {
-            "flip": 1,
+            "flip": "H",
             "h": 1292,
             "w": 1292,
             "x": 354,
@@ -358,7 +358,7 @@
             "resource": "speaker"
         },
         "R01": {
-            "flip": 1,
+            "flip": "H",
             "h": 1298,
             "w": 1298,
             "x": 351,
@@ -366,7 +366,7 @@
             "resource": "speaker"
         },
         "R02": {
-            "flip": 1,
+            "flip": "H",
             "h": 1304,
             "w": 1304,
             "x": 348,
@@ -374,7 +374,7 @@
             "resource": "speaker"
         },
         "R03": {
-            "flip": 1,
+            "flip": "H",
             "h": 1310,
             "w": 1310,
             "x": 345,
@@ -382,7 +382,7 @@
             "resource": "speaker"
         },
         "R04": {
-            "flip": 1,
+            "flip": "H",
             "h": 1316,
             "w": 1316,
             "x": 342,
@@ -390,7 +390,7 @@
             "resource": "speaker"
         },
         "R05": {
-            "flip": 1,
+            "flip": "H",
             "h": 1322,
             "w": 1322,
             "x": 339,
@@ -398,7 +398,7 @@
             "resource": "speaker"
         },
         "R06": {
-            "flip": 1,
+            "flip": "H",
             "h": 1328,
             "w": 1328,
             "x": 336,
@@ -406,7 +406,7 @@
             "resource": "speaker"
         },
         "R07": {
-            "flip": 1,
+            "flip": "H",
             "h": 1334,
             "w": 1334,
             "x": 333,
@@ -414,7 +414,7 @@
             "resource": "speaker"
         },
         "R08": {
-            "flip": 1,
+            "flip": "H",
             "h": 1340,
             "w": 1340,
             "x": 330,
@@ -422,7 +422,7 @@
             "resource": "speaker"
         },
         "R09": {
-            "flip": 1,
+            "flip": "H",
             "h": 1346,
             "w": 1346,
             "x": 327,
@@ -430,7 +430,7 @@
             "resource": "speaker"
         },
         "R10": {
-            "flip": 1,
+            "flip": "H",
             "h": 1352,
             "w": 1352,
             "x": 324,
@@ -438,7 +438,7 @@
             "resource": "speaker"
         },
         "R11": {
-            "flip": 1,
+            "flip": "H",
             "h": 1358,
             "w": 1358,
             "x": 321,
@@ -446,7 +446,7 @@
             "resource": "speaker"
         },
         "R12": {
-            "flip": 1,
+            "flip": "H",
             "h": 1364,
             "w": 1364,
             "x": 318,
@@ -454,7 +454,7 @@
             "resource": "speaker"
         },
         "R13": {
-            "flip": 1,
+            "flip": "H",
             "h": 1370,
             "w": 1370,
             "x": 315,
@@ -462,7 +462,7 @@
             "resource": "speaker"
         },
         "R14": {
-            "flip": 1,
+            "flip": "H",
             "h": 1376,
             "w": 1376,
             "x": 312,
@@ -470,7 +470,7 @@
             "resource": "speaker"
         },
         "R15": {
-            "flip": 1,
+            "flip": "H",
             "h": 1382,
             "w": 1382,
             "x": 309,
@@ -478,7 +478,7 @@
             "resource": "speaker"
         },
         "R16": {
-            "flip": 1,
+            "flip": "H",
             "h": 1388,
             "w": 1388,
             "x": 306,
@@ -486,7 +486,7 @@
             "resource": "speaker"
         },
         "R17": {
-            "flip": 1,
+            "flip": "H",
             "h": 1394,
             "w": 1394,
             "x": 303,
@@ -494,7 +494,7 @@
             "resource": "speaker"
         },
         "R18": {
-            "flip": 1,
+            "flip": "H",
             "h": 1400,
             "w": 1400,
             "x": 300,
@@ -502,7 +502,7 @@
             "resource": "speaker"
         },
         "R19": {
-            "flip": 1,
+            "flip": "H",
             "h": 1406,
             "w": 1406,
             "x": 297,
@@ -510,7 +510,7 @@
             "resource": "speaker"
         },
         "R20": {
-            "flip": 1,
+            "flip": "H",
             "h": 1412,
             "w": 1412,
             "x": 294,
@@ -518,7 +518,7 @@
             "resource": "speaker"
         },
         "R21": {
-            "flip": 1,
+            "flip": "H",
             "h": 1418,
             "w": 1418,
             "x": 291,
@@ -526,7 +526,7 @@
             "resource": "speaker"
         },
         "R22": {
-            "flip": 1,
+            "flip": "H",
             "h": 1424,
             "w": 1424,
             "x": 288,
@@ -534,7 +534,7 @@
             "resource": "speaker"
         },
         "R23": {
-            "flip": 1,
+            "flip": "H",
             "h": 1430,
             "w": 1430,
             "x": 285,
@@ -542,7 +542,7 @@
             "resource": "speaker"
         },
         "R24": {
-            "flip": 1,
+            "flip": "H",
             "h": 1436,
             "w": 1436,
             "x": 282,
@@ -550,7 +550,7 @@
             "resource": "speaker"
         },
         "R25": {
-            "flip": 1,
+            "flip": "H",
             "h": 1442,
             "w": 1442,
             "x": 279,
@@ -558,7 +558,7 @@
             "resource": "speaker"
         },
         "R26": {
-            "flip": 1,
+            "flip": "H",
             "h": 1448,
             "w": 1448,
             "x": 276,
@@ -566,7 +566,7 @@
             "resource": "speaker"
         },
         "R27": {
-            "flip": 1,
+            "flip": "H",
             "h": 1454,
             "w": 1454,
             "x": 273,
@@ -574,7 +574,7 @@
             "resource": "speaker"
         },
         "R28": {
-            "flip": 1,
+            "flip": "H",
             "h": 1460,
             "w": 1460,
             "x": 270,
@@ -582,7 +582,7 @@
             "resource": "speaker"
         },
         "R29": {
-            "flip": 1,
+            "flip": "H",
             "h": 1466,
             "w": 1466,
             "x": 267,
@@ -590,7 +590,7 @@
             "resource": "speaker"
         },
         "R30": {
-            "flip": 1,
+            "flip": "H",
             "h": 1472,
             "w": 1472,
             "x": 264,
@@ -598,7 +598,7 @@
             "resource": "speaker"
         },
         "R31": {
-            "flip": 1,
+            "flip": "H",
             "h": 1478,
             "w": 1478,
             "x": 261,
@@ -606,7 +606,7 @@
             "resource": "speaker"
         },
         "R32": {
-            "flip": 1,
+            "flip": "H",
             "h": 1484,
             "w": 1484,
             "x": 258,
@@ -614,7 +614,7 @@
             "resource": "speaker"
         },
         "R33": {
-            "flip": 1,
+            "flip": "H",
             "h": 1490,
             "w": 1490,
             "x": 255,
@@ -622,7 +622,7 @@
             "resource": "speaker"
         },
         "R34": {
-            "flip": 1,
+            "flip": "H",
             "h": 1496,
             "w": 1496,
             "x": 252,
@@ -630,7 +630,7 @@
             "resource": "speaker"
         },
         "R35": {
-            "flip": 1,
+            "flip": "H",
             "h": 1502,
             "w": 1502,
             "x": 249,
@@ -638,7 +638,7 @@
             "resource": "speaker"
         },
         "R36": {
-            "flip": 1,
+            "flip": "H",
             "h": 1508,
             "w": 1508,
             "x": 246,
@@ -646,7 +646,7 @@
             "resource": "speaker"
         },
         "R37": {
-            "flip": 1,
+            "flip": "H",
             "h": 1514,
             "w": 1514,
             "x": 243,
@@ -654,7 +654,7 @@
             "resource": "speaker"
         },
         "R38": {
-            "flip": 1,
+            "flip": "H",
             "h": 1520,
             "w": 1520,
             "x": 240,
@@ -662,7 +662,7 @@
             "resource": "speaker"
         },
         "R39": {
-            "flip": 1,
+            "flip": "H",
             "h": 1526,
             "w": 1526,
             "x": 237,
@@ -670,7 +670,7 @@
             "resource": "speaker"
         },
         "R40": {
-            "flip": 1,
+            "flip": "H",
             "h": 1532,
             "w": 1532,
             "x": 234,
@@ -678,7 +678,7 @@
             "resource": "speaker"
         },
         "R41": {
-            "flip": 1,
+            "flip": "H",
             "h": 1538,
             "w": 1538,
             "x": 231,
@@ -686,7 +686,7 @@
             "resource": "speaker"
         },
         "R42": {
-            "flip": 1,
+            "flip": "H",
             "h": 1544,
             "w": 1544,
             "x": 228,
@@ -694,7 +694,7 @@
             "resource": "speaker"
         },
         "R43": {
-            "flip": 1,
+            "flip": "H",
             "h": 1550,
             "w": 1550,
             "x": 225,
@@ -702,7 +702,7 @@
             "resource": "speaker"
         },
         "R44": {
-            "flip": 1,
+            "flip": "H",
             "h": 1556,
             "w": 1556,
             "x": 222,
@@ -710,7 +710,7 @@
             "resource": "speaker"
         },
         "R45": {
-            "flip": 1,
+            "flip": "H",
             "h": 1562,
             "w": 1562,
             "x": 219,
@@ -718,7 +718,7 @@
             "resource": "speaker"
         },
         "R46": {
-            "flip": 1,
+            "flip": "H",
             "h": 1568,
             "w": 1568,
             "x": 216,
@@ -726,7 +726,7 @@
             "resource": "speaker"
         },
         "R47": {
-            "flip": 1,
+            "flip": "H",
             "h": 1574,
             "w": 1574,
             "x": 213,
@@ -734,7 +734,7 @@
             "resource": "speaker"
         },
         "R48": {
-            "flip": 1,
+            "flip": "H",
             "h": 1580,
             "w": 1580,
             "x": 210,
@@ -742,7 +742,7 @@
             "resource": "speaker"
         },
         "RIGHT_BG": {
-            "flip": 1,
+            "flip": "H",
             "h": 2000,
             "w": 2000,
             "x": 0,

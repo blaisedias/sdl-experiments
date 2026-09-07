@@ -26,6 +26,14 @@ typedef enum {
 } composition_volume_type_t;
 
 
+typedef enum {
+    FLIP_NONE,
+    FLIP_HORIZONTAL,
+    FLIP_VERTICAL,
+    FLIP_HORIZONTAL_VERTICAL,
+} flip_t;
+
+
 bool is_string_channel_arrangement(const char* s);
 channel_arrangement_t channel_arrangement_from_string(const char* s, channel_arrangement_t defv);
 const char* string_from_channel_arrangement(channel_arrangement_t v);
@@ -39,5 +47,10 @@ const char* string_from_composition_render_op(composition_render_op_t v);
 bool is_string_composition_volume_type(const char* s);
 composition_volume_type_t composition_volume_type_from_string(const char* s, composition_volume_type_t defv);
 const char* string_from_composition_volume_type(composition_volume_type_t v);
+
+
+bool is_string_flip(const char* s);
+flip_t flip_from_string(const char* s, flip_t defv);
+const char* string_from_flip(flip_t v);
 
 #endif // __vumeter_enum__

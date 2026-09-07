@@ -27,6 +27,14 @@ static const char* composition_volume_type_strings [] = {
 };
 
 
+static const char* flip_strings [] = {
+    "N",
+    "H",
+    "V",
+    "H+V",
+};
+
+
 #define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
 
 
@@ -123,6 +131,39 @@ const char* string_from_composition_volume_type(composition_volume_type_t v) {
     for (int ix = 0; ix < ARRAYLEN(composition_volume_type_strings) ; ++ix) {
         if (v == ix) {
             return composition_volume_type_strings[ix];
+        }
+    }
+    return NULL;
+}
+
+
+bool is_string_flip(const char* s) {
+    bool found = false;
+    if (NULL != s) {
+        for (int ix = 0; ix < ARRAYLEN(flip_strings) ; ++ix) {
+            if (0 == strcmp(s, flip_strings[ix])) {
+                return true;
+            }
+        }
+    }
+    return found;
+}
+
+flip_t flip_from_string(const char* s, flip_t defv) {
+    if (NULL != s) {
+        for (int ix = 0; ix < ARRAYLEN(flip_strings) ; ++ix) {
+            if (0 == strcmp(s, flip_strings[ix])) {
+                return ix;
+            }
+        }
+    }
+    return defv;
+}
+
+const char* string_from_flip(flip_t v) {
+    for (int ix = 0; ix < ARRAYLEN(flip_strings) ; ++ix) {
+        if (v == ix) {
+            return flip_strings[ix];
         }
     }
     return NULL;

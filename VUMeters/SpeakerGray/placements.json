@@ -693,7 +693,7 @@
             "resource": "rspeaker"
         },
         "RIGHT_BG": {
-            "flip": 1,
+            "flip": "H",
             "h": 2000,
             "w": 2000,
             "x": 0,

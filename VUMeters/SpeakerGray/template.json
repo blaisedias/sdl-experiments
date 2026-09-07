@@ -119,35 +119,35 @@
     "placement": {
         "$ROTATION_SEQUENCE" : [
             {"prefix": "LEDCYANOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_cyan_off"},
-            {"prefix": "LEDCYANOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan_off"},
+            {"prefix": "LEDCYANOFF-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan_off"},
             {"prefix": "LEDCYANOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_cyan_off"},
-            {"prefix": "LEDCYANOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan_off"},
+            {"prefix": "LEDCYANOFF-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan_off"},
 
             {"prefix": "LEDORANGEOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_orange_off"},
-            {"prefix": "LEDORANGEOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange_off"},
+            {"prefix": "LEDORANGEOFF-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange_off"},
             {"prefix": "LEDORANGEOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_orange_off"},
-            {"prefix": "LEDORANGEOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange_off"},
+            {"prefix": "LEDORANGEOFF-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange_off"},
 
             {"prefix": "LEDREDOFF-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_red_off"},
-            {"prefix": "LEDREDOFF-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red_off"},
+            {"prefix": "LEDREDOFF-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red_off"},
             {"prefix": "LEDREDOFF-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_red_off"},
-            {"prefix": "LEDREDOFF-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red_off"},
+            {"prefix": "LEDREDOFF-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red_off"},
 
 
             {"prefix": "LEDCYAN-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_cyan"},
-            {"prefix": "LEDCYAN-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan"},
+            {"prefix": "LEDCYAN-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_cyan"},
             {"prefix": "LEDCYAN-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_cyan"},
-            {"prefix": "LEDCYAN-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan"},
+            {"prefix": "LEDCYAN-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_cyan"},
 
             {"prefix": "LEDORANGE-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_orange"},
-            {"prefix": "LEDORANGE-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange"},
+            {"prefix": "LEDORANGE-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_orange"},
             {"prefix": "LEDORANGE-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_orange"},
-            {"prefix": "LEDORANGE-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange"},
+            {"prefix": "LEDORANGE-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_orange"},
 
             {"prefix": "LEDRED-R-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 1.875, "angle_step": -3.75, "rotary": "led_red"},
-            {"prefix": "LEDRED-L-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red"},
+            {"prefix": "LEDRED-L-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": -1.875, "angle_step": 3.75, "rotary": "led_red"},
             {"prefix": "LEDRED-RR-", "x":0, "y": 0, "start":0, "end": 48, "start_angle": 0.0, "angle_step": -3.75, "rotary": "led_red"},
-            {"prefix": "LEDRED-LL-", "x":0, "y": 0, "flip":1, "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red"}
+            {"prefix": "LEDRED-LL-", "x":0, "y": 0, "flip":"H", "start":0, "end": 48, "start_angle": 0.0, "angle_step": 3.75, "rotary": "led_red"}
         ]
     },
     "#compositions*":[

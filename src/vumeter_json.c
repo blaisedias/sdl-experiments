@@ -417,12 +417,12 @@ static int deserialise_placement_list(json_value* jplacements, vu_meters_specs_t
                 error_printf("deserialise_placement_list: failed to deserialise center point\n");
             }
         }
-        int int_flip;
-        if (!read_object_int_value(jelem, "flip", &int_flip, 0)) {
-            error_printf("deserialise_placement_list: failed to deserialise placement flip %d\n", ix);
-            return -1;
+
+        const char* str = get_object_string_value(jelem,"flip", NULL);
+        if (str && !is_string_flip(str)) {
+            error_printf("deserialise_placement_list: invalid values for flip\n", str);
         }
-        placement->flip = int_flip;
+        placement->flip = flip_from_string(str, 0);
         if (!read_object_float_value(jelem, "angle", &placement->angle, 0)) {
             error_printf("deserialise_placement_list: failed to deserialise placement angle %d\n", ix);
             return -1;

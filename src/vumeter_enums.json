@@ -26,6 +26,15 @@
                 { "string": "peak-hold+decay", "symbol": "PEAK_HOLD_AND_DECAY"},
                 { "string": "none", "symbol": "NONE"}
             ]
+        },
+        {
+            "name" : "flip",
+            "enum": [
+                { "string": "N", "symbol": "FLIP_NONE"},
+                { "string": "H", "symbol": "FLIP_HORIZONTAL"},
+                { "string": "V", "symbol": "FLIP_VERTICAL"},
+                { "string": "H+V", "symbol": "FLIP_HORIZONTAL_VERTICAL"}
+            ]
         }
     ]
 }
