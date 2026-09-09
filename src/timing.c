@@ -26,7 +26,7 @@ void sleep_milli_seconds(int64_t millis) {
     if (millis < 0) {
         return;
     }
-    struct timespec ts = {.tv_sec =0, .tv_nsec = 1000000*millis};
+    struct timespec ts = {.tv_sec =millis/1000, .tv_nsec = 1000000*(millis%1000)};
     nanosleep(&ts, NULL);
 }
 
@@ -34,6 +34,6 @@ void sleep_micro_seconds(int64_t micros) {
     if (micros < 0) {
         return;
     }
-    struct timespec ts = {.tv_sec =0, .tv_nsec = 1000*micros};
+    struct timespec ts = {.tv_sec =micros/1000000, .tv_nsec = 1000*(micros%1000000)};
     nanosleep(&ts, NULL);
 }
