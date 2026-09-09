@@ -97,7 +97,6 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path);
 widget_t* widget_destroy(widget_t* wdgt);
 widget_t* widget_action(widget_t* wdgt, action_t action);
 bool widget_has_action(widget_t* wdgt, action_t action);
-action_t widget_get_action(widget_t* wdgt);
 widget_t* widget_hide(widget_t* wdgt, bool hide);
 bool widget_is_hidden(widget_t* wdgt);
 widget_t* widget_hotspot(widget_t* wdgt, bool hotspot);

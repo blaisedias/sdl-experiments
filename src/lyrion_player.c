@@ -466,7 +466,7 @@ static int escaped_strlen(const char* str) {
     return len;
 }
 
-static int __lms_req(lyrion_player_ptr player, const char* prefix, const char* suffix, const char *format, va_list args, char** data_ptr, lms_io_ptr io_ptr) {
+static int __lms_req(const char* prefix, const char* suffix, const char *format, va_list args, char** data_ptr, lms_io_ptr io_ptr) {
     // if send fails return value is -1,
     int rv = -2;
     *data_ptr = NULL;
@@ -486,7 +486,7 @@ static int __lms_req(lyrion_player_ptr player, const char* prefix, const char* s
     if (suffix) {
         suffixlen = strlen(suffix);
     }
-    if (w < len - suffixlen - 1) {
+    if (w < (int)len - suffixlen - 1) {
         strcat(p, suffix);
         int len = strlen(io_ptr->cmd_buff);
         rv = send(io_ptr->sockfd, io_ptr->cmd_buff, len, 0);
@@ -566,7 +566,7 @@ static int _lms_req(lyrion_player_ptr player, const char* prefix, const char* su
             player->connection_failed_ts = 0;
             io.fp = fdopen(io.sockfd, "r");
             if (io.fp) {
-                rv = __lms_req(player, prefix, suffix, format, args, data_ptr, &io);
+                rv = __lms_req(prefix, suffix, format, args, data_ptr, &io);
                 fclose(io.fp);
                 io.fp = NULL;
             } else {
@@ -616,6 +616,7 @@ static char* lms_query(lyrion_player_ptr player, const char *format, ...) {
     return rv;
 }
 
+#if 0
 static char* lms_query_player(lyrion_player_ptr player, const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -623,6 +624,7 @@ static char* lms_query_player(lyrion_player_ptr player, const char *format, ...)
     va_end(args);
     return rv;
 }
+#endif
 
 static char* lms_compound_query_player(lyrion_player_ptr player, const char *format, ...) {
     va_list args;
@@ -705,7 +707,7 @@ static bool update_player_status(lyrion_player_ptr player) {
     bool status_changed = false;
     int cur_index = player->status.playlist_cur_index;
     cur_index = cur_index < 0 ? 0 : cur_index;
-    player_status status = {};
+    player_status status;
     ZERO(&status);
     do {
         char* p = lms_compound_query_player(player, "status %d 1 tags:aAACGNQliImoqrtyTXY duration", cur_index);
@@ -920,7 +922,7 @@ static bool update_player_status(lyrion_player_ptr player) {
         }
         FREE(p);
     } while(status.playlist_cur_index != status.playlist_index);
-    for(int ix=0; status_changed == false && ix < sizeof(status.field_set); ++ix) {
+    for(size_t ix=0; status_changed == false && ix < sizeof(status.field_set); ++ix) {
         status_changed = status_changed || player->status.field_set[ix] != status.field_set[ix];
     }
     if (status_changed) {
@@ -1442,7 +1444,7 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
             if (player->status.waitingToPlay > 0) {
                 return_value = PFV_INT;
                 pfv->integer =  player->status.waitingToPlay;
-            }
+            } break;
          case MODE:
             if (player->status.mode) {
                 return_value = PFV_INT;

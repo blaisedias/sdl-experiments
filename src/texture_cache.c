@@ -20,7 +20,9 @@
 
 #define TEXTURE_CACHE_FAILFAST 1
 
-#define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
+#define ARRAYLEN(a) (int)(sizeof((a))/sizeof((a)[0]))
+#define UNUSED(a) (void)(a)
+
 typedef struct tcache_entry tcache_entry;
 
 struct tcache_entry {
@@ -45,8 +47,7 @@ static tcache_entry empty_tce = {
 // indicates further probing is not required.
 // On delete the entries are set to point to the deleted entry
 // with NULL as the string pointer, so comparing strings should always fail.
-static tcache_entry deleted_entry = {
-};
+static tcache_entry deleted_entry;
 static tcache_entry* tce_deleted=&deleted_entry;
 
 static void tcache_cap_num_bytes(unsigned inc);
@@ -499,6 +500,7 @@ static int lru_sort_tce(tcache_entry** lru_sorted_tbl) {
 }
 
 static bool cap_exceeded(int increment, int ejected) {
+    UNUSED(ejected);
     return max_num_texture_bytes && (num_texture_bytes + increment) > max_num_texture_bytes;
 }
 
@@ -585,6 +587,7 @@ static void tcache_cap_num_bytes(unsigned increment) {
 }
 
 static bool test_cap_exceeded(int increment, int ejected_count) {
+    UNUSED(increment);
     return ejected_count == 0;
 }
 
@@ -602,6 +605,7 @@ bool tcache_test_lru_eject() {
 // returns : texture, NULL is the texture is not found
 //          texture ID or -1 is texture is not found
 bool tcache_load_from_file(texture_id_t texture_id, SDL_Renderer* renderer) {
+    UNUSED(renderer);
     if (texture_id < 0 || texture_id >= NUM_TBL_ENTRIES) {
         error_printf("tcache_load_from_file: invalid id %d\n", texture_id);
         exit(EXIT_FAILURE);
@@ -804,10 +808,10 @@ void tcache_dump() {
                    tce->hashv,
                    (long long)tce->lru_count,
                    tce->locked ? "locked  ": "unlocked",
-                   tce,
-                   tce->surface,
+                   (void*)tce,
+                   (void*)tce->surface,
                    (long unsigned)tce->num_surface_bytes,
-                   tce->texture,
+                   (void*)tce->texture,
                    (long unsigned)tce->num_bytes,
                    tce->w,
                    tce->h,
@@ -892,6 +896,7 @@ texture_id_t tcache_get_texture_id(const char* token) {
 }
 
 static void _tcache_flush_textures(SDL_Renderer* renderer) {
+    UNUSED(renderer);
     // When an image is deleted the delete request counter is incremented
     // When deletes are performed the delete done counter is synchronised with the req counter
     // since *all* deletes are performed.

@@ -2,14 +2,14 @@
 #ifndef __jl_util_h_
 #define __jl_util_h_
 
-extern const SDL_RendererFlip* const oriented_flip;
+//extern const SDL_RendererFlip* const oriented_flip;
 extern void setup_orientation(float orientation, int w, int h, SDL_Rect* screen);
 
 //extern const void (*translate_xy)(int* x, int* y);
-extern const void (*translate_screen_rect)(SDL_Rect* rect);
-extern const void (*translate_point)(SDL_Point* pt);
-extern const void (*translate_image_rect)(SDL_Rect* rect);
-extern const void (*translate_draw_rect)(SDL_Rect* rect);
+extern void (*translate_screen_rect)(SDL_Rect* rect);
+extern void (*translate_point)(SDL_Point* pt);
+extern void (*translate_image_rect)(SDL_Rect* rect);
+extern void (*translate_draw_rect)(SDL_Rect* rect);
 void translate_axle(const SDL_Rect* enclosure, const SDL_Point* axle, SDL_Rect* rect);
 
 
@@ -18,7 +18,7 @@ extern void copyPoint(const SDL_Point *src, SDL_Point *dst);
 void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst);
 void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst);
 void offset_rect(const SDL_Point* offset, const SDL_Rect* src, SDL_Rect* dst);
-void offset_point(const SDL_Point* offset,const SDL_Point* src, SDL_Point* dst);
+void offset_point(const SDL_Point* offset, const SDL_Point* src, SDL_Point* dst);
 void center_rect(const SDL_Rect* outer, const SDL_Rect* inner, SDL_Rect* dst);
 void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef);
 void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef);
@@ -33,5 +33,6 @@ void free_ex(void** tgt);
 void* calloc_ex(void** tgt, int nmemb, size_t memb_size);
 #define CALLOC(n,p) calloc_ex((void**)&p, n, sizeof(*p))
 
-#define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])
+#define ARRAYLEN(a) (int)(sizeof((a))/sizeof((a)[0]))
+#define UNUSED(a) (void)(a)
 #endif // __jl_util_h_

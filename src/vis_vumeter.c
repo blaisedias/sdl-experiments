@@ -51,7 +51,7 @@ static void legacy_digitise() {
 // 256
 #define MASK_OFF_LSB_8 ((~0)^0xff)
 
-int _visualizer_vumeter_div256_squared(int* levels) {
+int _visualizer_vumeter_div256_squared() {
 	long long sample_accumulator[2];
 	int16_t *ptr;
 	s16_t sample;
@@ -153,7 +153,7 @@ static long long prev_sq_summed[2] = { 0, 0};
 		s32_t sample_sq;
 
 		ptr = buff;
-		for (int i=0; i<num_samples; i++) {
+		for (size_t i=0; i < num_samples; i++) {
 			float f = abs(*ptr);
 			f *=f;
 			f_sq_summed_accumulator[0] += f;

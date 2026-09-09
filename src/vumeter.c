@@ -95,7 +95,7 @@ bool vu_meters_load_media(SDL_Renderer* renderer, vu_meters_t* vu) {
             if ( NULL != vu->spec->resource_list.names[indx]) {
                 int n = snprintf(load_buffer, sizeof(load_buffer), "%s/%s",
                         vu->resource_path, vu->spec->resource_list.names[indx]);
-                if (0 > n || n >= sizeof(load_buffer)) {
+                if (0 > n || n >= (int)sizeof(load_buffer)) {
                     error_printf("snprintf %ld %s/%s/n",
                             sizeof(load_buffer),
                             vu->resource_path, vu->spec->resource_list.names[indx]);
@@ -259,6 +259,7 @@ void vumeter_render_foreground(SDL_Renderer* renderer, vumeter_instance_t* vumet
                             case PEAK_HOLD_AND_DECAY:
                                 vol_printf("SHD:%02d ", (int)(runtime->decay_vol + 0.5));
                                 _RENDER_VOLUME_LEVEL_((int)(runtime->decay_vol + 0.5));
+                                break;
                             case PEAK_HOLD_AND_SAMPLED:
                                 vol_printf("SH:%02d ", runtime->peak_hold_vol);
                                 _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol);
@@ -405,7 +406,7 @@ int vumeter_populate_instance_array(vumeter_instance_t* array, size_t length) {
     int insert = 0;
     for(vu_meters_t* vu = vu_meters_list; vu; vu = vu->next) {
         for(int ix=0; ix < vu->spec->vumeter_list.count; ++ix, ++insert) {
-            if (insert < length) {
+            if (insert < (int)length) {
                 vumeter_instance_t* vumtr = &array[insert];
                 vumtr->vss = vu;
                 vumtr->defn = &vu->spec->vumeter_list.vumeters[ix];

@@ -223,7 +223,7 @@ widget_t *widget_slider_image_paths(widget_t* wdgt, slider_reosurce_ID_t id, con
             case SLIDER_PICK:
             case SLIDER_BAR_END:
             case SLIDER_BAR_START:
-                for(int ix=0; ix < sizeof(wdgt->sub.slider.res[id].image_paths)/sizeof(wdgt->sub.slider.res[id].image_paths[0]); ++ix) {
+                for(int ix=0; ix < ARRAYLEN(wdgt->sub.slider.res[id].image_paths); ++ix) {
                     if (wdgt->sub.slider.res[id].image_paths[ix] != NULL) {
                         FREE(wdgt->sub.slider.res[id].image_paths[ix]);
                     }

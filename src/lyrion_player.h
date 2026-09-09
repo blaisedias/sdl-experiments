@@ -22,6 +22,13 @@ uint64_t compute_player_hash(const char* s);
 int poll_player(lyrion_player_ptr player, player_transient_state_ptr transient);
 
 typedef enum {
+    PLAYER_MODE_PAUSED,
+    PLAYER_MODE_PLAYING,
+    PLAYER_MODE_STOPPED,
+    PLAYER_MODE_UNDEFINED
+} player_mode_t;
+
+typedef enum {
     PFV_NONE,
     PFV_INT,
     PFV_STRINGPTR
@@ -29,15 +36,9 @@ typedef enum {
 
 typedef union {
     int  integer;
+    player_mode_t mode;
     const char* strptr;
 }player_value, *player_value_ptr;
-
-typedef enum {
-    PLAYER_MODE_PAUSED,
-    PLAYER_MODE_PLAYING,
-    PLAYER_MODE_STOPPED,
-    PLAYER_MODE_UNDEFINED
-} player_mode_t;
 
 /*
     for key values see LMS CLI status documentation:

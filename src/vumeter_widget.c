@@ -34,6 +34,7 @@ static inline void vumeter_set_index(vumeter_widget_t* wdgt, int ix) {
 
 
 void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
+    UNUSED(resource_path);
     vumeter_widget_t* vw = wdgt->sub.vu;
     vw->num_meters = vumeter_populate_instance_array(vw->meters, ARRAYLEN(vw->meters));
     debug_printf("VU Meter widget:\n");
@@ -53,6 +54,8 @@ void vumeter_widget_load_media(widget_t *wdgt, const char* resource_path) {
 }
 
 void vumeter_widget_unload_media(widget_t *wdgt, const char* resource_path) {
+    UNUSED(wdgt);
+    UNUSED(resource_path);
 }
 
 static void vumeter_render_bg(widget_t* wdgt) {

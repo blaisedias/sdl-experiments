@@ -76,7 +76,8 @@ widget_type_t widget_get_type(widget_t* wdgt) {
     return WIDGET_NONE;
 }
 
-void render_none(widget_t* btn) {
+void render_none(widget_t* w) {
+    UNUSED(w);
 }
 
 static void _debug_draw_rect(widget_t* wdgt) {
@@ -232,7 +233,7 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
                 }
                 break;
             case WIDGET_MULTISTATE_BUTTON:
-                for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
+                for(unsigned ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                     bool loaded = false;
                     _bnt_resource_t* res = wdgt->sub.multistate_button.res + ims;
                     res->texture_id = tcache_load_media(res->resource_path, wdgt->view->app->renderer, &loaded, NULL);
@@ -247,7 +248,7 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
             case WIDGET_SLIDER:
             case WIDGET_VSLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
-                    for(int ix_img=0; ix_img < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_img) {
+                    for(int ix_img=0; ix_img < ARRAYLEN(wdgt->sub.slider.res[ix].image_paths); ++ix_img) {
                         if (wdgt->sub.slider.res[ix].image_paths[ix_img]) {
                             bool loaded = false;
                             wdgt->sub.slider.res[ix].texture_ids[ix_img] = tcache_load_media(
@@ -300,14 +301,14 @@ widget_t* widget_unload_media(widget_t* wdgt, const char* resource_path) {
             case WIDGET_MULTISTATE_BUTTON:
                 {
                     _bnt_resource_t* res =  wdgt->sub.multistate_button.res;
-                    for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
+                    for(unsigned ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                         tcache_unlock_texture(res[ims].texture_id);
                     }
                 }break;
             case WIDGET_SLIDER:
             case WIDGET_VSLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
-                    for(int ix_txtr=0; ix_txtr < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_txtr) {
+                    for(int ix_txtr=0; ix_txtr < ARRAYLEN(wdgt->sub.slider.res[ix].image_paths); ++ix_txtr) {
                         tcache_unlock_texture(wdgt->sub.slider.res[ix].texture_ids[ix_txtr]);
                     }
                 }
@@ -418,7 +419,7 @@ bool widget_has_action(widget_t* wdgt, action_t action) {
         if (wdgt->type != WIDGET_MULTISTATE_BUTTON) {
             return wdgt->action == action;
         } else {
-            for(int ix_state=0; ix_state<wdgt->sub.multistate_button.state_count; ++ix_state) {
+            for(unsigned ix_state=0; ix_state < wdgt->sub.multistate_button.state_count; ++ix_state) {
                 if (action == wdgt->sub.multistate_button.res[ix_state].dispatch_action) {
                     return true;
                 }
@@ -426,10 +427,6 @@ bool widget_has_action(widget_t* wdgt, action_t action) {
         }
     }
     return false;
-}
-
-action_t widget_get_action(widget_t* wdgt) {
-    return ACTION_NONE;
 }
 
 widget_t* widget_hide(widget_t* wdgt, bool hide) {
@@ -481,7 +478,7 @@ bool widget_get_focussed(widget_t* wdgt) {
 }
 
 widget_t* widget_create(const view_context_t *view) {
-    widget_t* wdgt = calloc(sizeof(*wdgt), 1);
+    widget_t* wdgt = calloc(1, sizeof(*wdgt));
     if (wdgt && view && view->list) {
         wdgt->view = view;
         wdgt->action = ACTION_NONE;
@@ -511,7 +508,7 @@ widget_t* widget_destroy(widget_t* wdgt) {
             case WIDGET_MULTISTATE_BUTTON:
                 {
                     _bnt_resource_t* res =  wdgt->sub.multistate_button.res;
-                    for(int ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
+                    for(unsigned ims=0; ims < wdgt->sub.multistate_button.state_count; ++ims) {
                         tcache_unlock_texture(res[ims].texture_id);
                         FREE(res[ims].resource_path);
                     }
@@ -520,11 +517,11 @@ widget_t* widget_destroy(widget_t* wdgt) {
             case WIDGET_SLIDER:
             case WIDGET_VSLIDER:
                 for(int ix=0; ix<SLIDER_RESOURCE_COUNT; ++ix) {
-                    for(int ix_txtr=0; ix_txtr < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_txtr) {
+                    for(int ix_txtr=0; ix_txtr < ARRAYLEN(wdgt->sub.slider.res[ix].image_paths); ++ix_txtr) {
                         tcache_unlock_texture(wdgt->sub.slider.res[ix].texture_ids[ix_txtr]);
                         wdgt->sub.slider.res[ix].texture_ids[ix_txtr] = 0;
                     }
-                    for(int ix_img=0; ix_img < sizeof(wdgt->sub.slider.res[ix].image_paths)/sizeof(wdgt->sub.slider.res[ix].image_paths[0]); ++ix_img) {
+                    for(int ix_img=0; ix_img < ARRAYLEN(wdgt->sub.slider.res[ix].image_paths); ++ix_img) {
                         if ( wdgt->sub.slider.res[ix].image_paths[ix_img] ) {
                             FREE(wdgt->sub.slider.res[ix].image_paths[ix_img]);
                         }
@@ -772,7 +769,7 @@ widget_t* widget_multistate_button_get_state(widget_t* wdgt, unsigned* statenum)
 
 widget_t* widget_multistate_button_sync_on_action(widget_t* wdgt, action_t act) {
     if (wdgt->type == WIDGET_MULTISTATE_BUTTON) {
-        for(int ix_state=0; ix_state<wdgt->sub.multistate_button.state_count; ++ix_state) {
+        for(unsigned ix_state=0; ix_state  <wdgt->sub.multistate_button.state_count; ++ix_state) {
             if (act == wdgt->sub.multistate_button.res[ix_state].sync_on_action) {
                 widget_multistate_button_set_state(wdgt, ix_state);
             }
@@ -1156,7 +1153,7 @@ static widget_list_t* widget_list_initialise(widget_list_t* list, view_context_t
 }
 
 widget_list_t* create_widget_list(view_context_t* view) {
-    return widget_list_initialise(calloc(sizeof(widget_list_t), 1), view);
+    return widget_list_initialise(calloc(1, sizeof(widget_list_t)), view);
 }
 
 widget_list_t* destroy_widgets_in_list(widget_list_t* list) {

@@ -58,7 +58,7 @@ const char* string_from_{enum_name}({enum_name}_t v);
                 print(f'    "{e["string"]}",', file=fp)
             print('};\n', file=fp)
 
-        print('\n#define ARRAYLEN(a) sizeof((a))/sizeof((a)[0])\n',
+        print('\n#define ARRAYLEN(a) (int)(sizeof((a))/sizeof((a)[0]))\n',
               file=fp)
 
         for entry in data['enums']:
@@ -67,7 +67,7 @@ const char* string_from_{enum_name}({enum_name}_t v);
 bool is_string_{enum_name}(const char* s) {{
     bool found = false;
     if (NULL != s) {{
-        for (int ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
+        for (size_t ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
             if (0 == strcmp(s, {enum_name}_strings[ix])) {{
                 return true;
             }}
@@ -78,7 +78,7 @@ bool is_string_{enum_name}(const char* s) {{
 
 {enum_name}_t {enum_name}_from_string(const char* s, {enum_name}_t defv) {{
     if (NULL != s) {{
-        for (int ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
+        for (size_t ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
             if (0 == strcmp(s, {enum_name}_strings[ix])) {{
                 return ix;
             }}
@@ -88,7 +88,7 @@ bool is_string_{enum_name}(const char* s) {{
 }}
 
 const char* string_from_{enum_name}({enum_name}_t v) {{
-    for (int ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
+    for (size_t ix = 0; ix < ARRAYLEN({enum_name}_strings) ; ++ix) {{
         if (v == ix) {{
             return {enum_name}_strings[ix];
         }}

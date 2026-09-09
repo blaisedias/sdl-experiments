@@ -22,7 +22,7 @@ void vumeter_check_setup(SDL_Rect* bounds_in, int count) {
         printf_rect(bounds_in + ixb);
         printf("\n");
     }
-    for (int ix=0; ix < sizeof(vumeters)/sizeof(vumeters[0]); ++ix) {
+    for (int ix=0; ix < ARRAYLEN(vumeters); ++ix) {
         vumeter_instance_t* vumtr = &vumeters[ix];
         if (NULL != vumtr->vss) {
             printf("%02d) %s\n", ix, vumtr->defn->name);

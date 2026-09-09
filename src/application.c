@@ -35,7 +35,7 @@ typedef struct {
     int64_t  micros;
 }fps_sample_point;
 
-void ___app_input_loop(app_context_t* app_ctx);
+int ___app_input_loop(app_context_t* app_ctx);
 
 //#define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC|SDL_INIT_GAMECONTROLLER|SDL_INIT_EVENTS
 #define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_EVENTS
@@ -417,7 +417,7 @@ void app_render_loop(app_context_ptr app_ctx_in) {
     app_printf("*** render loop done ****\n");
     SDL_WaitThread(app_ctx->input_thread, NULL);
     profile_printf("low_fps_count=%u/%ld %f\n", low_fps_count, (long)render_iters, (float)low_fps_count*100/render_iters);
-    for(int i =0; i < sizeof(fps_distribution)/sizeof(fps_distribution[0]); ++i) {
+    for(int i =0; i < ARRAYLEN(fps_distribution); ++i) {
         if (fps_distribution[i]) {
             profile_printf("    %d -> %d\n", i, fps_distribution[i]);
         }
@@ -436,7 +436,7 @@ int app_render_rotated(app_context_t* app_ctx,  SDL_Texture * texture, const SDL
 //void app_input_loop(app_context_t* app_ctx) {
 //}
 
-void ___app_input_loop(app_context_t* app_ctx) {
+int ___app_input_loop(app_context_t* app_ctx) {
     while(__atomic_load_n(&render_ready, __ATOMIC_ACQUIRE) == 0) {
         sleep_milli_seconds(100);
     }
@@ -466,14 +466,17 @@ void ___app_input_loop(app_context_t* app_ctx) {
         }
         sleep_milli_seconds(app_ctx->input_loop_sleep_millis);
     }
+    return 0;
 }
 
 void app_stop(app_context_ptr app_ctx) {
+    UNUSED(app_ctx);
     render_loop = false;
     input_loop = false;
 }
 
 bool app_running(app_context_ptr app_ctx) {
+    UNUSED(app_ctx);
     return render_loop;
 }
 

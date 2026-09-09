@@ -62,7 +62,7 @@ static const char* action_strings[] = {
 
 action_t action_from_string(const char* str) {
     if (str != NULL ) {
-        for(int a=0; a < sizeof(action_strings)/sizeof(action_strings[0]); ++a) {
+        for(int a=0; a < ARRAYLEN(action_strings); ++a) {
             if (0 == strcmp(action_strings[a], str)) {
                 return a;
             }

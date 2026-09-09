@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "util.h"
 #include "logging.h"
 
 static float screen_orientation=0.0f;
@@ -28,6 +29,7 @@ void copyPoint(const SDL_Point *src, SDL_Point *dst) {
     dst->y = src->y;
 }
 
+/*
 static const SDL_RendererFlip flip0_180[4] = {
     SDL_FLIP_NONE,
     SDL_FLIP_HORIZONTAL,
@@ -35,17 +37,18 @@ static const SDL_RendererFlip flip0_180[4] = {
     SDL_FLIP_HORIZONTAL|SDL_FLIP_VERTICAL
 };
 
-/*
 static const SDL_RendererFlip flip90_270[3] = {
     SDL_FLIP_NONE,
     SDL_FLIP_VERTICAL,
     SDL_FLIP_HORIZONTAL
 };
-*/
 
 const SDL_RendererFlip* oriented_flip = flip0_180;
+*/
 
-static void xlate_point_0(SDL_Point* pt) {}
+static void xlate_point_0(SDL_Point* pt) {
+    UNUSED(pt);
+}
 
 static void xlate_point_180(SDL_Point* pt) {
     pt->x = screen_width - pt->x;
@@ -67,7 +70,9 @@ static void xlate_point_270(SDL_Point* pt) {
 }
 
 
-static void xlate_centered_dest_rect_0(SDL_Rect* rect) {}
+static void xlate_centered_dest_rect_0(SDL_Rect* rect) {
+    UNUSED(rect);
+}
 
 static void xlate_centered_dest_rect_180(SDL_Rect* rect) {
     rect->x = screen_width - rect->x - rect->w;
@@ -88,7 +93,9 @@ static void xlate_centered_dest_rect_270(SDL_Rect* rect) {
     rect->y = screen_height - rect->w -x + ((rect->w - rect->h)/2);
 }
 
-static void xlate_draw_rect_0(SDL_Rect* rect) {}
+static void xlate_draw_rect_0(SDL_Rect* rect) {
+    UNUSED(rect);
+}
 /*
 static void xlate_draw_rect_180(SDL_Rect* rect) {
     rect->x = screen_width - rect->x - rect->w;
@@ -208,7 +215,7 @@ void offset_rect(const SDL_Point* offset, const SDL_Rect* src, SDL_Rect* dst) {
     dst->h = src->h;
 }
 
-void offset_point(const SDL_Rect* offset, const SDL_Point* src, SDL_Point* dst) {
+void offset_point(const SDL_Point* offset, const SDL_Point* src, SDL_Point* dst) {
     dst->x = offset->x + src->x;
     dst->y = offset->y + src->y;
 }

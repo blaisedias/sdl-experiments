@@ -91,15 +91,14 @@ static void my_render_backdrop(app_context_ptr app_ctx);
 static void my_render_foreground(app_context_ptr app_ctx);
 static bool my_query_render_backdrop(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
-static void player_poll_loop(app_context_ptr app_ctx);
+static int player_poll_loop(app_context_ptr app_ctx);
 static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx);
 static void select_splash_view();
 
 static SDL_mutex* view_change_mutex;
 
 static int num_vumeter_json_files;
-const char* vumeter_json_files[100] = {
-};
+const char* vumeter_json_files[100];
 
 static app_context_t app_ctx = {
 //        .window = NULL,
@@ -115,7 +114,7 @@ static app_context_t app_ctx = {
         .cb_input = my_event_handler,
     };
 
-static void controller(app_context_ptr app_ctx);
+static int controller(app_context_ptr app_ctx);
 
 static void invalid_args(const char* opt) {
     puts(help_text);
@@ -376,7 +375,7 @@ static void select_splash_view() {
 
 
 static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx) {
-    view_context_t* vw = calloc(sizeof(*vw),1);
+    view_context_t* vw = calloc(1, sizeof(*vw));
     if(NULL == vw) {
         return vw;
     }
@@ -403,7 +402,7 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
     return vw;
 }
 
-static void controller(app_context_ptr app_ctx) {
+static int controller(app_context_ptr app_ctx) {
     app_wait_ready();
     sleep_milli_seconds(1000);
 //debug
@@ -531,9 +530,11 @@ log_printf("ending controller\n");
         destroy_widget_list(main_view->list);
         free(main_view);
     }
+    return 0;
 }
 
 static bool my_query_render_backdrop(app_context_ptr app_ctx) {
+    UNUSED(app_ctx);
     view_context_ptr view = get_current_view();
     static view_context_ptr previous_view = NULL;
     if (view) {
@@ -547,6 +548,7 @@ static bool my_query_render_backdrop(app_context_ptr app_ctx) {
 }
 
 static void my_render_backdrop(app_context_ptr app_ctx) {
+    UNUSED(app_ctx);
     view_context_ptr view = get_current_view();
     if (view) {
         widget_list_render_backdrop(view->list);
@@ -554,6 +556,7 @@ static void my_render_backdrop(app_context_ptr app_ctx) {
 }
 
 static void my_render_foreground(app_context_ptr app_ctx) {
+    UNUSED(app_ctx);
     view_context_ptr view = get_current_view();
     if (view) {
         widget_list_render_foreground(view->list);
@@ -804,7 +807,7 @@ lyrion_player_ptr get_player() {
     return player;
 }
 
-static void player_poll_loop(app_context_ptr app_ctx) {
+static int player_poll_loop(app_context_ptr app_ctx) {
     player_mode_t    player_mode = PLAYER_MODE_UNDEFINED;
 //    int64_t          player_mode_start_timestamp = 0;
 
@@ -920,8 +923,8 @@ log_printf("starting player_poll_loop\n");
             sig = new_sig;
             player_value pv;
             if (PFV_INT == get_player_value(player, &pv, "MODE")) {
-                if (player_mode != pv.integer) {
-                    player_mode = pv.integer;
+                if (player_mode != pv.mode) {
+                    player_mode = pv.mode;
 //                    player_mode_start_timestamp = get_milli_seconds();
                 }
             }
@@ -994,6 +997,7 @@ log_printf("starting player_poll_loop\n");
 //debug
 log_printf("ending player_poll_loop\n");
     puts("\n\n");
+    return 0;
 }
 
 static void set_visualiser_lock(bool lock, action_t action) {

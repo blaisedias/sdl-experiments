@@ -2,6 +2,8 @@
 #include "event_queue.h"
 #include "logging.h"
 
+#define UNUSED(a)   (void)(a)
+
 #ifdef   USE_TSLIB_FOR_TOUCH
 
 static touch_screen_svc_config cfg;
@@ -43,6 +45,7 @@ static void postUp(int x, int y) {
 static SDL_Thread* tseg_thrd = NULL;
 
 int start_touch_screen_event_generator(touch_screen_svc_config* config) {
+    UNUSED(config);
     if (getenv("TSLIB_TSDEVICE") == NULL) {
         error_printf("TSLIB_TSDEVICE environment variable not defined, not starting touch screen service\n");
         return EXIT_FAILURE;
@@ -54,7 +57,7 @@ int start_touch_screen_event_generator(touch_screen_svc_config* config) {
         cfg.motion = postMotion;
 
         tseg_thrd = SDL_CreateThread((SDL_ThreadFunction)touch_screen_service, "TouchScreenEventGenerator", &cfg);
-        printf("started touch screen thread %p\n", tseg_thrd);
+        printf("started touch screen thread %p\n", (void *)tseg_thrd);
     } else {
         error_printf("touch screen service is already running\n");
     }
@@ -73,6 +76,7 @@ int stop_touch_screen_event_generator(void) {
 
 #else   // } USE_TSLIB_TOUCH {
 int start_touch_screen_event_generator(touch_screen_svc_config* config) {
+    UNUSED(config);
     return 0;
 }
 

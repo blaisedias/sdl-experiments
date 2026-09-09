@@ -29,7 +29,7 @@ static widget_type_t tokenise_widget(const char* str) {
     if (str == NULL) {
         return WIDGET_NONE;
     }
-    for(int x=0; x<sizeof(widget_type_strings)/sizeof(widget_type_strings[0]); ++x) {
+    for(int x=0; x < ARRAYLEN(widget_type_strings); ++x) {
         if (0 == strcmp(widget_type_strings[x], str)) {
             return x;
         }
@@ -173,7 +173,7 @@ static const char* json_token_strings[]= {
 };
 
 static json_token tokenise(json_object_entry* joe) {
-    for(int x=0; x < sizeof(json_token_strings)/sizeof(json_token_strings[0]); ++x) {
+    for(int x=0; x < ARRAYLEN(json_token_strings); ++x) {
         if ( 0 == strcmp(json_token_strings[x], joe->name)) {
             return x;
         }
@@ -193,7 +193,7 @@ static hotspot_edge_t tokenise_hotspot_edge(const char* str) {
     if (str == NULL) {
         return EDGE_NONE;
     }
-    for(int x=0; x<sizeof(edge_strings)/sizeof(edge_strings[0]); ++x) {
+    for(int x=0; x < ARRAYLEN(edge_strings); ++x) {
         if (0 == strcmp(edge_strings[x], str)) {
             return x;
         }
@@ -212,7 +212,7 @@ static image_scaling_t tokenise_image_scaling(const char* str) {
     if (str == NULL) {
         return IMAGE_FIT;
     }
-    for(int x=0; x<sizeof(image_scaling_strings)/sizeof(image_scaling_strings[0]); ++x) {
+    for(int x=0; x < ARRAYLEN(image_scaling_strings); ++x) {
         if (0 == strcmp(image_scaling_strings[x], str)) {
             return x;
         }
@@ -230,7 +230,7 @@ static json_value* get_object_value(json_value* value, json_token jt) {
         error_printf("get_object_value: != object\n");
         return NULL;
     }
-    for (int x=0; x < value->u.object.length; x++) {
+    for (unsigned x=0; x < value->u.object.length; x++) {
         if (jt == tokenise(value->u.object.values + x) ) {
             return value->u.object.values[x].value;
         }
@@ -336,7 +336,7 @@ const char* position_strings[] = {
 
 static position tokenise_position(const char* str) {
     if (str) {
-        for(int x=0; x < sizeof(position_strings)/sizeof(position_strings[0]); ++x) {
+        for(int x=0; x < ARRAYLEN(position_strings); ++x) {
             if (0 == strcmp(str, position_strings[x])) {
                 return x;
             }
@@ -347,6 +347,7 @@ static position tokenise_position(const char* str) {
 }
 
 static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rect* rect, view_context_t* ctx) {
+    UNUSED(ctx);
     if (value == NULL) {
         error_printf("deserialise_position: value==NULL\n");
         return;
@@ -598,7 +599,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 if (jstates != NULL && jstates->type == json_array) {
                     json_printf("     states\n");
                     widget = widget_create_multistate_button(ctx, jstates->u.array.length);
-                    for(int x=0; x<jstates->u.array.length; ++x) {
+                    for(unsigned x=0; x < jstates->u.array.length; ++x) {
                         json_value* svalue = jstates->u.array.values[x];
                         widget_multistate_button_addstate(widget, x, 
                                 get_object_string_value(svalue, JT_IMAGE, "__EMPTY__"),
@@ -710,7 +711,7 @@ static void deserialise_widgets(json_value* value, view_context_t* ctx) {
     }
     json_value* jwidgets = get_object_value(value, JT_WIDGETS);
     if (jwidgets && jwidgets->type == json_array) {
-        for (int x = 0; x < jwidgets->u.array.length; ++x) {
+        for (unsigned x = 0; x < jwidgets->u.array.length; ++x) {
             deserialise_one_widget(jwidgets->u.array.values[x], ctx);
         }
     } else {
@@ -719,6 +720,7 @@ static void deserialise_widgets(json_value* value, view_context_t* ctx) {
 }
 
 static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect* rect) {
+    UNUSED(ctx);
     if (value == NULL) {
         error_printf("deserialise_screen value==NULL\n");
         return false;

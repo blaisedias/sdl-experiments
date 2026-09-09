@@ -49,7 +49,7 @@ void dump_vumeter_specs(const vu_meters_specs_t* vu_specs) {
             string_from_channel_arrangement(vu_specs->layout.arrangement)
             );
     printf("  viewports:\n");
-    for(int ix = 0; ix < sizeof(vu_specs->layout.viewports)/sizeof(vu_specs->layout.viewports[0]); ++ix) {
+    for(int ix = 0; ix < ARRAYLEN(vu_specs->layout.viewports); ++ix) {
         printf("    ");
         printf_rect(vu_specs->layout.viewports+ix);
         printf("\n");
@@ -209,7 +209,7 @@ static json_value* get_object_value(json_value* jvalue, const char* jt) {
         error_printf("get_object_value: != object\n");
         return NULL;
     }
-    for (int x=0; x < jvalue->u.object.length; x++) {
+    for (unsigned x=0; x < jvalue->u.object.length; x++) {
         if (0 == strcmp_ex((jvalue->u.object.values + x)->name, jt) ) {
             return jvalue->u.object.values[x].value;
         }
@@ -323,11 +323,11 @@ static int deserialise_layout(json_value* jvalue, vu_meters_specs_t* vu_specs) {
     vu_specs->layout.arrangement = channel_arrangement_from_string(str, NO_ARRANGEMENT);
     json_value* viewport_value = get_object_array_value(jvalue, "rectangles");
     if (viewport_value) {
-        int n_viewport = sizeof(vu_specs->layout.viewports)/sizeof(vu_specs->layout.viewports[0]);
+        unsigned n_viewport = ARRAYLEN(vu_specs->layout.viewports);
         if (viewport_value->u.array.length != n_viewport) {
             error_printf("deserialise_layout: number of layout viewports != %d\n", n_viewport);
         }
-        for(int ix=0; ix < MIN(viewport_value->u.array.length, n_viewport); ++ix) {
+        for(unsigned ix=0; ix < MIN(viewport_value->u.array.length, n_viewport); ++ix) {
             if (!deserialise_rect(viewport_value->u.array.values[ix], vu_specs->layout.viewports + ix)) {
                 error_printf("deserialise_layout: failed to read viewport %d\n", ix);
             }
@@ -345,7 +345,7 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
     }
     vu_specs->resource_list.count = jresources->u.array.length;
     size_t bufflen = jresources->u.array.length;
-    for(int ix=0; ix < jresources->u.array.length; ++ix) {
+    for(unsigned ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
         switch (jelem->type) {
             case json_null:
@@ -366,7 +366,7 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
     }
     vu_specs->resource_list.names = (char **)buffer;
     char *p = (char*)(&vu_specs->resource_list.names[vu_specs->resource_list.count]);
-    for(int ix=0; ix < jresources->u.array.length; ++ix) {
+    for(unsigned ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
         switch (jelem->type) {
             case json_null:
@@ -422,7 +422,7 @@ static int deserialise_placement_list(json_value* jplacements, vu_meters_specs_t
         if (str && !is_string_flip(str)) {
             error_printf("deserialise_placement_list: invalid values for flip\n", str);
         }
-        placement->flip = flip_from_string(str, 0);
+        placement->flip = (SDL_RendererFlip)flip_from_string(str, 0);
         if (!read_object_float_value(jelem, "angle", &placement->angle, 0)) {
             error_printf("deserialise_placement_list: failed to deserialise placement angle %d\n", ix);
             return -1;
@@ -448,7 +448,7 @@ static int deserialise_composition(json_value* jcomposition, vu_composition_t* c
         error_printf("invalid value for volume type %s\n", str);
         return -1;
     }
-    composition->volume_type = composition_volume_type_from_string(str, STATIC);
+    composition->volume_type = composition_volume_type_from_string(str, NONE);
 
     json_value* jcp = get_object_array_value(jcomposition, "placements");
     if (jcp == NULL) {
@@ -510,7 +510,7 @@ static int deserialise_component(json_value* jcomponent,  vu_component_t* compon
     }
 
     component->composition_count = jcomponent->u.array.length;
-    for(int ix = 0; ix < jcomponent->u.array.length; ++ix) {
+    for(unsigned ix = 0; ix < jcomponent->u.array.length; ++ix) {
         json_value* jcomp = jcomponent->u.array.values[ix];
         if (jcomp->type != json_integer) {
             error_printf("deserialise_component: composition value is not an integer\n");
@@ -542,7 +542,7 @@ static int deserialise_vumeter(json_value* jvumeter, vumeter_defn_t* vumeter) {
         return -1;
     }
     vumeter->component_count = jcomponents->u.array.length;
-    for(int ix = 0; ix < jcomponents->u.array.length; ++ix) {
+    for(unsigned ix = 0; ix < jcomponents->u.array.length; ++ix) {
         if (0 != deserialise_component(jcomponents->u.array.values[ix], &vumeter->components[ix])) {
             return -1;
         }

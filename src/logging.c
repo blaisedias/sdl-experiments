@@ -10,6 +10,8 @@
 #include <sys/time.h>
 #include "logging.h"
 
+#define UNUSED(a) (void)(a)
+
 static void logfprintf_no_timestamp(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -50,6 +52,7 @@ void error_printf(const char *format, ...) {
 void dummy_printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
+    UNUSED(format);
     va_end(args);
 }
 
