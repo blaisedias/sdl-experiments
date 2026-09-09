@@ -41,6 +41,7 @@ void ___app_input_loop(app_context_t* app_ctx);
 #define MY_SDL_INIT_FLAGS SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_EVENTS
 
 bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
+log_printf("app_initialize\n");
     app_context_t* app_ctx = (app_context_t*)app_ctx_in;
     app_ctx->input_thread =  SDL_CreateThread((SDL_ThreadFunction)___app_input_loop, "input", app_ctx);
 
@@ -285,6 +286,7 @@ bool app_initialize(app_context_ptr app_ctx_in, const char* window_title) {
            app_ctx->cycle_secs);
     }
     
+log_printf("app_initialize done\n");
     return false;
 }
 

@@ -68,7 +68,7 @@ action_t action_from_string(const char* str) {
             }
         }
     }
-    if (str) {
+    if (str && strcmp("none", str)) {
         error_printf("unknown action %s\n", str);
     }
     return ACTION_NONE;

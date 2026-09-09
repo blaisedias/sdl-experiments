@@ -763,7 +763,7 @@ static int deserialise_json(const char* json_string, const int len, view_context
             (float)ctx->app->window_rect.w/spec_rect.w,
             (float)ctx->app->window_rect.h/spec_rect.h
             );
-    printf("scaling factor = %f\n", scalef);
+    debug_printf("scaling factor = %f\n", scalef);
     deserialise_widgets(value, ctx);
     json_value_free(value);
     return 0;

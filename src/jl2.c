@@ -94,6 +94,10 @@ static void player_poll_loop(app_context_ptr app_ctx);
 
 static SDL_mutex* view_change_mutex;
 
+static int num_vumeter_json_files;
+const char* vumeter_json_files[100] = {
+};
+
 static app_context_t app_ctx = {
 //        .window = NULL,
 //        .renderer = NULL,
@@ -244,9 +248,11 @@ int main(int argc, char** argv) {
             }
         } else if (0 == strcmp(argv[i], "dl")) {
             if (argc > i+1) {
-                if (!vumeter_load_from_json_file(argv[i+1])) {
-                    error_printf("Failed to load VU meters from %s\n", argv[i+1]);
-                }
+                vumeter_json_files[num_vumeter_json_files] = argv[i+1];
+                ++num_vumeter_json_files;
+//                if (!vumeter_load_from_json_file(argv[i+1])) {
+//                    error_printf("Failed to load VU meters from %s\n", argv[i+1]);
+//                }
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "json")) {
@@ -380,7 +386,7 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
                ||
                widget_get_hotspot(t)) {
                 widget_set_renderhf(t);
-                log_printf("widget_set_renderhf %s\n", widget_get_type_name(t));
+                debug_printf("widget_set_renderhf %s\n", widget_get_type_name(t));
             }
         }
     }
@@ -389,8 +395,9 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
 
 static void controller(app_context_ptr app_ctx) {
     app_wait_ready();
-//debug    
-printf("starting controller\n"); fflush(stdout);
+
+//debug
+log_printf("starting controller\n");
     SDL_ShowCursor(SDL_DISABLE);
     int64_t endtime = app_ctx->max_secs * 1000;
     if (endtime) {
@@ -401,6 +408,11 @@ printf("starting controller\n"); fflush(stdout);
         exit(EXIT_FAILURE);
     }
     main_view = vw;
+    for (int ix=0; ix < num_vumeter_json_files; ++ix) {
+        if(!vumeter_load_from_json_file(vumeter_json_files[ix])) {
+            error_printf("Failed to load VU meters from %s\n", vumeter_json_files[ix]);
+        }
+    }
 
     if (json_files && strlen(json_files)) {
         char *tmp = strdup(json_files);
@@ -494,6 +506,8 @@ printf("starting controller\n"); fflush(stdout);
             }
         }
     }
+//debug
+log_printf("ending controller\n");
     SDL_SemWait(controller_sem);
     set_current_view(NULL);
     for(int ix = 0; ix < MAX_NP_VIEWS; ++ix) {
@@ -543,6 +557,10 @@ static void print_tcache_stats(){
 }
 
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
+    view_context_ptr view = get_current_view();
+    if (NULL == view) {
+        return;
+    }    
     static  SDL_Scancode prev_keydown;
     static int64_t keydown_start_time = 0;
     int key_press_duration = 0;
@@ -792,7 +810,7 @@ static void player_poll_loop(app_context_ptr app_ctx) {
     player_set_volume_step(player, 3);
 
 //debug
-printf("starting player_poll_loop\n"); fflush(stdout);
+log_printf("starting player_poll_loop\n");
     unsigned fps = 0;
 
     while(app_running(app_ctx)) {
@@ -963,6 +981,8 @@ printf("starting player_poll_loop\n"); fflush(stdout);
     }
     close_local_player(player);
     player = NULL;
+//debug
+log_printf("ending player_poll_loop\n");
     puts("\n\n");
 }
 
