@@ -10,7 +10,7 @@
 #include <sys/time.h>
 #include "logging.h"
 
-static void logfprintf_no_timestamp(char *format, ...) {
+static void logfprintf_no_timestamp(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
 	vfprintf(stdout, format, args);
@@ -29,7 +29,7 @@ static void logprintf_timestamp(FILE* fp) {
 				(long)(t.tv_usec / 1000));
 }
 
-static void logfprintf(char *format, ...) {
+static void logfprintf(const char *format, ...) {
     logprintf_timestamp(stdout);
 	va_list args;
 	va_start(args, format);
@@ -38,7 +38,7 @@ static void logfprintf(char *format, ...) {
 	fflush(stdout);
 }
 
-void error_printf(char *format, ...) {
+void error_printf(const char *format, ...) {
     logprintf_timestamp(stderr);
 	va_list args;
 	va_start(args, format);
@@ -47,27 +47,27 @@ void error_printf(char *format, ...) {
 	fflush(stderr);
 }
 
-void dummy_printf(char *format, ...) {
+void dummy_printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
     va_end(args);
 }
 
-void (*log_printf)(char *format, ...) = logfprintf;
-void (*vol_printf)(char *format, ...) = dummy_printf;
-void (*vol_calib_printf)(char *format, ...) = dummy_printf;
-void (*perf_printf)(char *format, ...) = dummy_printf;
-void (*load_printf)(char *format, ...) = dummy_printf;
-void (*scale_printf)(char *format, ...) = dummy_printf;
-void (*input_printf)(char *format, ...) = dummy_printf;
-void (*debug_printf)(char *format, ...) = dummy_printf;
-void (*tcache_printf)(char *format, ...) = dummy_printf;
-void (*tcache_eject_printf)(char *format, ...) = dummy_printf;
-void (*profile_printf)(char *format, ...) = dummy_printf;
-void (*profile_texture_printf)(char *format, ...) = dummy_printf;
-void (*json_printf)(char *format, ...) = dummy_printf;
-void (*action_printf)(char *format, ...) = dummy_printf;
-void (*app_printf)(char *format, ...) = dummy_printf;
+void (*log_printf)(const char *format, ...) = logfprintf;
+void (*vol_printf)(const char *format, ...) = dummy_printf;
+void (*vol_calib_printf)(const char *format, ...) = dummy_printf;
+void (*perf_printf)(const char *format, ...) = dummy_printf;
+void (*load_printf)(const char *format, ...) = dummy_printf;
+void (*scale_printf)(const char *format, ...) = dummy_printf;
+void (*input_printf)(const char *format, ...) = dummy_printf;
+void (*debug_printf)(const char *format, ...) = dummy_printf;
+void (*tcache_printf)(const char *format, ...) = dummy_printf;
+void (*tcache_eject_printf)(const char *format, ...) = dummy_printf;
+void (*profile_printf)(const char *format, ...) = dummy_printf;
+void (*profile_texture_printf)(const char *format, ...) = dummy_printf;
+void (*json_printf)(const char *format, ...) = dummy_printf;
+void (*action_printf)(const char *format, ...) = dummy_printf;
+void (*app_printf)(const char *format, ...) = dummy_printf;
 
 
 void enable_printf(vu_printf_typ v) {

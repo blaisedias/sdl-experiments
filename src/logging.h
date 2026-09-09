@@ -9,24 +9,24 @@
 #define __jl_logging_h_
 #include "types.h"
 
-extern void error_printf(char *format, ...);
-extern void dummy_printf(char *format, ...);
+extern void error_printf(const char *format, ...);
+extern void dummy_printf(const char *format, ...);
 
-extern void (*log_printf)(char *format, ...);
-extern void (*vol_printf)(char *format, ...);
-extern void (*perf_printf)(char *format, ...);
-extern void (*load_printf)(char *format, ...);
-extern void (*scale_printf)(char *format, ...);
-extern void (*input_printf)(char *format, ...);
-extern void (*debug_printf)(char *format, ...);
-extern void (*tcache_printf)(char *format, ...);
-extern void (*tcache_eject_printf)(char *format, ...);
-extern void (*profile_printf)(char *format, ...);
-extern void (*profile_texture_printf)(char *format, ...);
-extern void (*json_printf)(char *format, ...);
-extern void (*action_printf)(char *format, ...);
-extern void (*app_printf)(char *format, ...);
-extern void (*vol_calib_printf)(char *format, ...);
+extern void (*log_printf)(const char *format, ...);
+extern void (*vol_printf)(const char *format, ...);
+extern void (*perf_printf)(const char *format, ...);
+extern void (*load_printf)(const char *format, ...);
+extern void (*scale_printf)(const char *format, ...);
+extern void (*input_printf)(const char *format, ...);
+extern void (*debug_printf)(const char *format, ...);
+extern void (*tcache_printf)(const char *format, ...);
+extern void (*tcache_eject_printf)(const char *format, ...);
+extern void (*profile_printf)(const char *format, ...);
+extern void (*profile_texture_printf)(const char *format, ...);
+extern void (*json_printf)(const char *format, ...);
+extern void (*action_printf)(const char *format, ...);
+extern void (*app_printf)(const char *format, ...);
+extern void (*vol_calib_printf)(const char *format, ...);
 
 typedef enum {
     DEBUG_PRINTF,
