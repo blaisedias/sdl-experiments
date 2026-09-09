@@ -77,6 +77,7 @@ static bool monitor_tcache = false;
 
 #define MAX_NP_VIEWS   10
 static volatile view_context_ptr current_view = NULL;
+static view_context_t* splash_view = NULL;
 static view_context_t* main_view = NULL;
 static view_context_t* np_views[MAX_NP_VIEWS];
 static volatile int np_view_indx=0;
@@ -91,6 +92,8 @@ static void my_render_foreground(app_context_ptr app_ctx);
 static bool my_query_render_backdrop(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static void player_poll_loop(app_context_ptr app_ctx);
+static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx);
+static void select_splash_view();
 
 static SDL_mutex* view_change_mutex;
 
@@ -293,6 +296,8 @@ int main(int argc, char** argv) {
     if (app_initialize(&app_ctx, WINDOW_TITLE)) {
         app_cleanup(&app_ctx, EXIT_FAILURE);
     }
+    splash_view = load_json_view("splash.json", &app_ctx);
+    select_splash_view();
 
     app_render_loop(&app_ctx);
 
@@ -364,6 +369,11 @@ void select_main_view() {
     }
 }
 
+static void select_splash_view() {
+    set_current_view(splash_view);
+    refresh_widget_contents = true;
+}
+
 
 static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx) {
     view_context_t* vw = calloc(sizeof(*vw),1);
@@ -395,7 +405,7 @@ static view_context_t* load_json_view(const char* json_path, app_context_ptr app
 
 static void controller(app_context_ptr app_ctx) {
     app_wait_ready();
-
+    sleep_milli_seconds(1000);
 //debug
 log_printf("starting controller\n");
     SDL_ShowCursor(SDL_DISABLE);

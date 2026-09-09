@@ -1,0 +1,26 @@
+{
+    "screen" : {
+        "comment" : "values are scaled to match",
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 480
+    },
+    "widgets": [
+        {
+            "image": {
+                "location": {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 0,
+                        "h": 0
+                    }
+                },
+                "image": "./images/sd/splash.png",
+                "image_scaling": "fill",
+                "focus_enable": false
+            }
+        }
+    ]
+}
