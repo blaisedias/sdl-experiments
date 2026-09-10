@@ -743,8 +743,8 @@ static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect*
     return false;
 }
 
-int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
-    json_value* value = json_parse(json_string, len);
+int deserialise_json(const char* json_str, const int len, view_context_t* ctx) {
+    json_value* value = json_parse(json_str, len);
 
     if (value == NULL) {
         error_printf("deserialise_json: failed to parse json string\n");
@@ -775,36 +775,36 @@ int deserialise_json(const char* json_string, const int len, view_context_t* ctx
 int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
     FILE *fp;
     struct stat filestatus;
-    char* json_string;
+    char* json_str;
 
     if ( stat(filepath, &filestatus) != 0) {
         error_printf("deserialise_widgets_file: file %s not found\n", filepath);
         return EXIT_FAILURE;
     }
 
-    json_string =  calloc(filestatus.st_size, 1);
-    if (json_string == NULL) {
+    json_str =  calloc(filestatus.st_size, 1);
+    if (json_str == NULL) {
         error_printf("deserialise_widgets_file: OOM %d %s \n", filestatus.st_size, filepath);
         return EXIT_FAILURE;
     }
 
     fp = fopen(filepath, "rt");
     if (fp == NULL) {
-        free(json_string);
+        free(json_str);
         error_printf("deserialise_widgets_file: failed to open file %s \n", filepath);
         return EXIT_FAILURE;
     }
 
-    if (1 != fread(json_string, filestatus.st_size, 1, fp)) {
+    if (1 != fread(json_str, filestatus.st_size, 1, fp)) {
         fclose(fp);
-        free(json_string);
+        free(json_str);
         error_printf("deserialise_widgets_file: failed to read file data %s \n", filepath);
         return EXIT_FAILURE;
     }
 
     fclose(fp);
-    int rv = deserialise_json(json_string, filestatus.st_size, ctx);
-    free(json_string);
+    int rv = deserialise_json(json_str, filestatus.st_size, ctx);
+    free(json_str);
 
     if (rv != 0) {
         error_printf("deserialise_widgets_file: failed to parse json file %s\n", filepath);

@@ -692,7 +692,7 @@ vu_meters_t* release_deserialised_vumeters(vu_meters_t* vu) {
     return NULL;
 }
 
-static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json_string, size_t length, const char* identifier) {
+static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json_str, size_t length, const char* identifier) {
     vu_meters_t* vu = CALLOC(1, vu);
     *pvu = vu;
     // allocate the vu_meters object
@@ -707,7 +707,7 @@ static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json
         return false;
     }
 
-    json_value* jvalue = json_parse(json_string, length);
+    json_value* jvalue = json_parse(json_str, length);
     if (NULL == jvalue) {
         error_printf("deserialise_vumeter: failed to parse string\n");
         return false;
@@ -749,9 +749,9 @@ static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json
     return true;
 }
 
-vu_meters_t* deserialise_vumeters_json_string(const char* json_string, size_t length, const char* identifier) {
+vu_meters_t* deserialise_vumeters_json_string(const char* json_str, size_t length, const char* identifier) {
     vu_meters_t* vu = NULL;
-    if (!_deserialise_vumeter_json_string(&vu, json_string, length, identifier)) {
+    if (!_deserialise_vumeter_json_string(&vu, json_str, length, identifier)) {
         vu = release_deserialised_vumeters(vu);
     }
     return vu;
@@ -760,35 +760,35 @@ vu_meters_t* deserialise_vumeters_json_string(const char* json_string, size_t le
 vu_meters_t* deserialise_vumeters_json_file(const char* filepath) {
     FILE *fp;
     struct stat filestatus;
-    char* json_string;
+    char* json_str;
 
     if ( stat(filepath, &filestatus) != 0) {
         error_printf("deserialise_vumeters_file: file %s not found\n", filepath);
         return NULL;
     }
 
-    if (CALLOC(filestatus.st_size, json_string)  == NULL) {
+    if (CALLOC(filestatus.st_size, json_str)  == NULL) {
         error_printf("deserialise_vumeters_file: OOM %d %s \n", filestatus.st_size, filepath);
         return NULL;
     }
 
     fp = fopen(filepath, "rt");
     if (fp == NULL) {
-        free(json_string);
+        free(json_str);
         error_printf("deserialise_vumeters_file: failed to open file %s \n", filepath);
         return NULL;
     }
 
-    if (1 != fread(json_string, filestatus.st_size, 1, fp)) {
+    if (1 != fread(json_str, filestatus.st_size, 1, fp)) {
         fclose(fp);
-        free(json_string);
+        free(json_str);
         error_printf("deserialise_vumeters_file: failed to read file data %s \n", filepath);
         return NULL;
     }
     fclose(fp);
 
-    vu_meters_t* vu = deserialise_vumeters_json_string(json_string, filestatus.st_size, filepath);
-    free(json_string);
+    vu_meters_t* vu = deserialise_vumeters_json_string(json_str, filestatus.st_size, filepath);
+    free(json_str);
 
     if (NULL == vu) {
         error_printf("deserialise_vumeters_file: failed to deserialise json file %s\n", filepath);

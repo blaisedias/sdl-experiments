@@ -488,8 +488,8 @@ static int __lms_req(const char* prefix, const char* suffix, const char *format,
     }
     if (w < (int)len - suffixlen - 1) {
         strcat(p, suffix);
-        int len = strlen(io_ptr->cmd_buff);
-        rv = send(io_ptr->sockfd, io_ptr->cmd_buff, len, 0);
+        int s_len = strlen(io_ptr->cmd_buff);
+        rv = send(io_ptr->sockfd, io_ptr->cmd_buff, s_len, 0);
         if ( 0 < rv )
         {
             fgets(io_ptr->buffer, sizeof(io_ptr->buffer), io_ptr->fp);

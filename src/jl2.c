@@ -100,7 +100,7 @@ static SDL_mutex* view_change_mutex;
 static int num_vumeter_json_files;
 const char* vumeter_json_files[100];
 
-static app_context_t app_ctx = {
+static app_context_t app_context = {
 //        .window = NULL,
 //        .renderer = NULL,
         .screen_width = 800,
@@ -145,38 +145,38 @@ int main(int argc, char** argv) {
     for(int i = 1; i < argc; ++i) {
         if (0 == strcmp(argv[i], "max_secs")) {
             if (argc > i+1) {
-                app_ctx.max_secs = atoi(argv[i+1]);
+                app_context.max_secs = atoi(argv[i+1]);
                 i += 1;
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "cycle")) {
             if (argc > i+1) {
-                app_ctx.cycle_secs = atof(argv[i+1]);
+                app_context.cycle_secs = atof(argv[i+1]);
                 i += 1;
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "wxh")) {
             if (argc > i+1) {
                 char *hvalue = strchr(argv[i+1], 'x');
                 if (hvalue) {
-                    app_ctx.screen_width = atoi(argv[i+1]);
-                    app_ctx.screen_height = atoi(hvalue+1);
+                    app_context.screen_width = atoi(argv[i+1]);
+                    app_context.screen_height = atoi(hvalue+1);
                     i += 1;
                 }
                 else if (argc > i+2) {
-                    app_ctx.screen_width = atoi(argv[i+1]);
-                    app_ctx.screen_height = atoi(argv[i+2]);
+                    app_context.screen_width = atoi(argv[i+1]);
+                    app_context.screen_height = atoi(argv[i+2]);
                     i += 2;
                 } else { invalid_args(argv[i]); }
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "novsync")) {
-            app_ctx.vsync = false;
+            app_context.vsync = false;
         } else if (0 == strcmp(argv[i], "0.0")) {
-            app_ctx.orientation = 0.0;
+            app_context.orientation = 0.0;
         } else if (0 == strcmp(argv[i], "180.0")) {
-            app_ctx.orientation = 180.0;
+            app_context.orientation = 180.0;
         } else if (0 == strcmp(argv[i], "90.0")) {
-            app_ctx.orientation = 90.0;
+            app_context.orientation = 90.0;
         } else if (0 == strcmp(argv[i], "270.0")) {
-            app_ctx.orientation = 270.0;
+            app_context.orientation = 270.0;
         } else if (0 == strcmp(argv[i], "printfdebug")) {
             enable_printf(DEBUG_PRINTF);
         } else if (0 == strcmp(argv[i], "printfinput")) {
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
             enable_printf(PROFILE_PERF_PRINTF);
         } else if (0 == strcmp(argv[i], "profile_fps_deviation")) {
             enable_printf(PROFILE_PERF_PRINTF);
-            app_ctx.profile_fps_deviation = true;
+            app_context.profile_fps_deviation = true;
          } else if (0 == strcmp(argv[i], "profile_texture")) {
             enable_printf(PROFILE_TEXTURE_PERF_PRINTF);
          } else if (0 == strcmp(argv[i], "printfjson")) {
@@ -209,9 +209,9 @@ int main(int argc, char** argv) {
         } else if (0 == strcmp(argv[i], "printfvolcalib")) {
             enable_printf(VOL_CALIB_PRINTF);
         } else if (0 == strcmp(argv[i], "debug_redraw_backdrop")) {
-            app_ctx.debug_redraw_backdrop = true;
+            app_context.debug_redraw_backdrop = true;
         } else if (0 == strcmp(argv[i], "fs") || 0 == strcmp(argv[i], "fullscreen")) {
-            app_ctx.fullscreen = true;
+            app_context.fullscreen = true;
         } else if (0 == strcmp(argv[i], "texture_cache_size")) {
             if (argc > i+1) {
                 tcache_set_limit(atoi(argv[i+1]));
@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "lms")) {
             if (argc > i+1) {
-                app_ctx.lms = strdup(argv[i+1]);
+                app_context.lms = strdup(argv[i+1]);
                 i += 1;
             } else { invalid_args(argv[i]); } 
             
@@ -232,7 +232,7 @@ int main(int argc, char** argv) {
             }
         } else if (0 == strcmp(argv[i], "lms")) {
             if (argc > i+1) {
-                app_ctx.lms = strdup(argv[i+1]);
+                app_context.lms = strdup(argv[i+1]);
                 i += 1;
             } 
         } else if (0 == strcmp(argv[i], "debugrects")) {
@@ -285,20 +285,20 @@ int main(int argc, char** argv) {
         }
     }
 
-    app_printf("screen= %dx%d orientation=%f\n", app_ctx.screen_width, app_ctx.screen_height, app_ctx.orientation);
+    app_printf("screen= %dx%d orientation=%f\n", app_context.screen_width, app_context.screen_height, app_context.orientation);
 
     controller_sem = SDL_CreateSemaphore(0);
-    SDL_Thread* main_thread = SDL_CreateThread((SDL_ThreadFunction)controller, "controller", &app_ctx);
-    SDL_Thread* player_thread = SDL_CreateThread((SDL_ThreadFunction)player_poll_loop, "player", &app_ctx);
+    SDL_Thread* main_thread = SDL_CreateThread((SDL_ThreadFunction)controller, "controller", &app_context);
+    SDL_Thread* player_thread = SDL_CreateThread((SDL_ThreadFunction)player_poll_loop, "player", &app_context);
 //    SDL_Thread* input_thread = SDL_CreateThread((SDL_ThreadFunction)app_input_loop, "input", &app_ctx);
 
-    if (app_initialize(&app_ctx, WINDOW_TITLE)) {
-        app_cleanup(&app_ctx, EXIT_FAILURE);
+    if (app_initialize(&app_context, WINDOW_TITLE)) {
+        app_cleanup(&app_context, EXIT_FAILURE);
     }
-    splash_view = load_json_view("splash.json", &app_ctx);
+    splash_view = load_json_view("splash.json", &app_context);
     select_splash_view();
 
-    app_render_loop(&app_ctx);
+    app_render_loop(&app_context);
 
 //    app_printf("Waiting for input thread\n");
 //    SDL_WaitThread(input_thread, NULL);
@@ -309,7 +309,7 @@ int main(int argc, char** argv) {
     app_printf("Waiting for controller thread\n");
     SDL_WaitThread(main_thread, NULL);
 
-    app_cleanup(&app_ctx, EXIT_SUCCESS);
+    app_cleanup(&app_context, EXIT_SUCCESS);
 
     SDL_DestroyMutex(view_change_mutex);
     return 0;
@@ -571,7 +571,7 @@ static void print_tcache_stats(){
 
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
     view_context_ptr view = get_current_view();
-    if (NULL == view) {
+    if (NULL == get_current_view()) {
         return;
     }    
     static  SDL_Scancode prev_keydown;
@@ -582,7 +582,6 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
             case USEREVENT_NEXT_VISU:
             case USEREVENT_NEXT_VU:
                 {
-                    view_context_ptr view = get_current_view();
                     if(view) {
                         widget_list_react(view->list, USEREVENT_NEXT_VISU ? NEXT_VISU: NEXT_VU, NULL);
                     }
@@ -599,7 +598,6 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
             case USEREVENT_PREV_VISU:
             case USEREVENT_PREV_VU:
                 {
-                    view_context_ptr view = get_current_view();
                     if (view) {
                         widget_list_react(view->list, USEREVENT_PREV_VISU ? PREV_VISU: PREV_VU, NULL);
                     }
@@ -720,7 +718,6 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 } break;
             case SDL_MOUSEBUTTONDOWN:
@@ -728,7 +725,6 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 } break;
             case SDL_MOUSEBUTTONUP:
@@ -736,7 +732,6 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     SDL_ShowCursor(SDL_ENABLE);
                     show_cursor = HIDE_CURSOR_COUNT;
                     SDL_Point pt = {.x=eventp->button.x, .y=eventp->button.y};
-                    view_context_ptr view = get_current_view();
                     widget_list_react(view->list, POINTER_UP, &pt);
                 } break;
             case SDL_FINGERMOTION:
@@ -748,14 +743,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 }
                 break;
             case USEREVENT_FINGERMOTION:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 } break;
             case SDL_FINGERDOWN:
@@ -767,14 +760,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 }
                 break;
             case USEREVENT_FINGERDOWN:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 } break;
             case SDL_FINGERUP:
@@ -786,14 +777,12 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                         .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
                         .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
                     };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_UP, &pt); }
                 }
                 break;
             case USEREVENT_FINGERUP:
                 {
                     SDL_Point pt = { .x = eventp->motion.x, .y = eventp->motion.y };
-                    view_context_ptr view = get_current_view();
                     if (view) { widget_list_react(view->list, POINTER_UP, &pt); }
                 } break;
         
