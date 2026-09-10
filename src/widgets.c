@@ -193,6 +193,9 @@ static void setup_image_fit_src_rect(widget_t *wdgt) {
 //                    translate_image_rect(&wdgt->sub.image.dst_rect);
 //                }
               }break;
+            default:
+                error_printf("setup_image_fit_src_rect: unknown op %d\n", wdgt->sub.image.scale_op);
+                break;
         }
     }
 }
@@ -278,6 +281,9 @@ widget_t* widget_load_media(widget_t* wdgt, const char* resource_path) {
                     wdgt->redraw_required = true;
                 }
                 break;
+            default:
+                error_printf("widget_load_media: unknown widget %d\n", wdgt->type);
+                break;
         }
     }
     return wdgt;
@@ -318,6 +324,9 @@ widget_t* widget_unload_media(widget_t* wdgt, const char* resource_path) {
                     _text_data_ptr txt_w = &wdgt->sub.text;
                     tcache_unlock_texture(txt_w->texture_id);
                 }
+                break;
+            default:
+                error_printf("widget_unload_media: unknown widget %d\n", wdgt->type);
                 break;
         }
     }
@@ -542,6 +551,9 @@ widget_t* widget_destroy(widget_t* wdgt) {
                     }
                 }
                 break;
+            default:
+                error_printf("widget_destroy: unknown widget %d\n", wdgt->type);
+                break;
         }
         if (wdgt->player_value_key) {
             FREE(wdgt->player_value_key);
@@ -624,6 +636,9 @@ static void image_widget_render(widget_t* wdgt) {
                     0.0,
                     NULL, flip);
             break;
+        default:
+            error_printf("image_widget_render: unknown scale op %d\n", wdgt->sub.image.scale_op);
+            break;
     }
 }
 
@@ -660,6 +675,9 @@ widget_t* widget_hotspot_edge(widget_t* wdgt, hotspot_edge_t edge, SDL_Rect *r) 
                 wdgt->input_rect.x = 0;
                 wdgt->input_rect.w = 10000;
                 break;
+            default:
+                error_printf("widget_hotspot_edge: unknown edge %d for NULL rect \n", edge);
+                break;
         }
     } else {
         SDL_Rect rect;
@@ -682,6 +700,9 @@ widget_t* widget_hotspot_edge(widget_t* wdgt, hotspot_edge_t edge, SDL_Rect *r) 
             case EDGE_BOTTOM:
                 wdgt->input_rect.x = rect.x;
                 wdgt->input_rect.w = rect.w;
+                break;
+            default:
+                error_printf("widget_hotspot_edge: unknown edge %d\n", edge);
                 break;
         }
     }
@@ -1036,6 +1057,9 @@ widget_t* widget_configure(widget_t* wdgt) {
             wdgt->configured = true;
             slider_widget_configure(wdgt);
             break;
+        default:
+            error_printf("widget_configure: unknown widget type %d\n", wdgt->type);
+            break;
     }
     return wdgt;
 }
@@ -1296,6 +1320,9 @@ void widget_list_react(const widget_list_t* list, const pointer_input_t input, S
                     widget_vumeter_select_prev(widget);
                 }
             }
+            break;
+        default:
+            error_printf("widget_list_react: unhandle input %d\n", input) ;
             break;
     }
     SDL_UnlockMutex(list->mutex);

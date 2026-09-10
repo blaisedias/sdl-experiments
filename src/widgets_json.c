@@ -384,6 +384,10 @@ static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rec
                     case P_RIGHT:
                         rect->x = container->x + container->w - rect->w -1;
                         break;
+                    case P_TOP:
+                    case P_BOTTOM:
+                    case P_END:
+                    case P_NONE:
                     default:
                         error_printf("deserialise_position: invalid string value for x= %s\n", strX);
                         rect->x = container->x;
@@ -433,6 +437,10 @@ static void deserialise_position(json_value* value, SDL_Rect* container, SDL_Rec
                     case P_BOTTOM:
                         rect->y = container->y + container->h - rect->h -1;
                         break;
+                    case P_LEFT:
+                    case P_RIGHT:
+                    case P_END:
+                    case P_NONE:
                     default:
                         error_printf("deserialise_position invalid string value for y= %s\n",strY);
                         rect->y = container->y;
@@ -695,6 +703,9 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                     }
                 }
             }break;
+        default:
+            error_printf("deserialise_one_widget: unknown widget type %d\n", wdgt_type);
+            break;
     }
     if (NULL == widget) {
         error_printf("deserialise_one_widget NULL widget for type %d\n", wdgt_type);

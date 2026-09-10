@@ -300,7 +300,8 @@ static widget_t *hslider_image_height(widget_t* wdgt, slider_reosurce_ID_t id, i
 widget_t *widget_slider_track(widget_t* wdgt, const SDL_Point *pt) {
     if (_is_slider(wdgt)) {
         if (slider_is_interactive(wdgt)) {
-            if (widget_pressed(wdgt) && (wdgt->sub.slider.range.end - wdgt->sub.slider.range.start) > 0) {
+            int delta = wdgt->sub.slider.range.end - wdgt->sub.slider.range.start;
+            if (widget_pressed(wdgt) && delta > 0) {
                 _slider_resource_t* pick = wdgt->sub.slider.res+SLIDER_PICK;
                 _slider_workspace_t* wk = &wdgt->sub.slider.wk;
                 if (pick) {
@@ -657,6 +658,8 @@ static widget_t *vslider_image_width(widget_t* wdgt, slider_reosurce_ID_t id, in
 
 widget_t *widget_slider_image_height(widget_t* wdgt, slider_reosurce_ID_t id, int height) {
     if (_is_slider(wdgt)) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
         switch(wdgt->type) {
             case WIDGET_SLIDER:
                 hslider_image_height(wdgt, id, height);
@@ -667,12 +670,15 @@ widget_t *widget_slider_image_height(widget_t* wdgt, slider_reosurce_ID_t id, in
             default:
                 break;
         }
+#pragma GCC diagnostic pop
     }
     return wdgt;
 }
 
 widget_t *widget_slider_image_width(widget_t* wdgt, slider_reosurce_ID_t id, int width) {
     if (_is_slider(wdgt)) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
         switch(wdgt->type) {
             case WIDGET_SLIDER:
                 hslider_image_width(wdgt, id, width);
@@ -683,6 +689,7 @@ widget_t *widget_slider_image_width(widget_t* wdgt, slider_reosurce_ID_t id, int
             default:
                 break;
         }
+#pragma GCC diagnostic pop
     }
     return wdgt;
 }
@@ -712,6 +719,8 @@ _slider_workspace_t* slider_widget_configure(widget_t* wdgt) {
         sleep_milli_seconds(10);
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
     switch(wdgt->type) {
         case WIDGET_SLIDER:
             hslider_widget_configure(wdgt);
@@ -722,6 +731,7 @@ _slider_workspace_t* slider_widget_configure(widget_t* wdgt) {
         default:
             break;
     }
+#pragma GCC diagnostic pop
 
     // release the spin lock
     lock_expected = SDL_GetThreadID(NULL);

@@ -861,6 +861,12 @@ static bool update_player_status(lyrion_player_ptr player) {
                         SET_INTVALUE(use_volume_control);
                         break;
 
+                    // FIXME {
+                    case ALBUM_OR_REMOTE_TITLE:
+                    case BITRATE:
+                    case PLAYLIST_TRACKS:
+                    // }
+
                     case player_name:
                     case player_connected:
                     case player_ip:
@@ -1507,6 +1513,9 @@ static pfv_type _get_player_value(lyrion_player_ptr player, player_value_ptr pfv
         case PLAYLIST_TRACKS:
             PFV_INTVALUE(playlist_tracks, 1);
             break;
+        default:
+            error_printf("player_sprintf: unknown string %s\n", key);
+            break;
     }
 #undef PFV_INTVALUE
 #undef PFV_STRVALUE
@@ -1523,6 +1532,9 @@ pfv_type get_player_value(lyrion_player_ptr player, player_value_ptr pfv, const 
             break;
         case PFV_STRINGPTR:
             pfv->strptr = strdup(pfv->strptr);
+            break;
+        default:
+            error_printf("get_player_value: unknown player value type\n");
             break;
     }
     return pft;
@@ -1685,6 +1697,9 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
                     SNPRINTF_STR_FIELD(pfv.strptr);
                     SNPRINTF(post);
                     break;
+                default:
+                    error_printf("player_sprintf: unknown player value type\n");
+                    break;
             }
             pre = post = scan; // pre and post point to empty strings
             ++scan;
@@ -1724,6 +1739,9 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
                 case PFV_STRINGPTR:
                     SNPRINTF(pre);
                     SNPRINTF_STR_FIELD(pfv.strptr);
+                    break;
+                default:
+                    error_printf("player_sprintf: unknown player value type\n");
                     break;
             }
             pre = post = scan; // pre and post point to empty strings

@@ -117,6 +117,9 @@ void enable_printf(vu_printf_typ v) {
         case APP_PRINTF:
             app_printf = logfprintf;
             break;
+        default:
+            error_printf("enable_printf: unknown typ %d\n");
+            break;
     }
 }
 
@@ -164,6 +167,9 @@ void disable_printf(vu_printf_typ v) {
         case APP_PRINTF:
             app_printf = dummy_printf;
             break;
+        default:
+            error_printf("disable_printf: unknown typ %d\n");
+            break;
     }
 }
 
@@ -176,6 +182,9 @@ bool set_printf_onoff(vu_printf_typ v, bool on) {
             break;
         case VOL_PRINTF:
             current = vol_printf == dummy_printf;
+            break;
+        case VOL_CALIB_PRINTF:
+            current = vol_calib_printf == dummy_printf;
             break;
         case PERF_PRINTF:
             current = perf_printf == dummy_printf;
@@ -206,6 +215,9 @@ bool set_printf_onoff(vu_printf_typ v, bool on) {
             break;
         case ACTION_PRINTF:
             current = action_printf == dummy_printf;
+            break;
+        case APP_PRINTF:
+            current = app_printf == dummy_printf;
             break;
     }
 

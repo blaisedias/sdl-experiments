@@ -57,8 +57,19 @@ SANITIZE =
 #SANITIZE =  -fsanitize=memory -fno-omit-frame-pointer -fsanitize=undefined
 GLOBAL_DEPS = ./Makefile
 #CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE)
-CF = -Werror -Wall -Wextra -pedantic -Wuninitialized -Wmissing-declarations -Wshadow \
+CF_WARNINGS_COMMON = -Wall -Wextra -pedantic \
+					 -Wuninitialized -Wmissing-declarations -Wshadow -Wstrict-overflow=5 \
+					 -Wcast-align \
+					 -Wswitch-default \
+					 -Werror
+
+CF = $(CF_WARNINGS_COMMON) \
+	 -Wswitch-enum \
 	 -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+
+CF_JSON_PARSER = $(CF_WARNINGS_COMMON) \
+	 -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+
 CCP = g++
 CC = gcc
 CF_PIC = $(CF) -fpic
@@ -140,10 +151,10 @@ $(OBJS_DIR)/%.o: $(SRC)/%.c | $(OBJS_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)
 
 $(OBJS_DIR)/%.o: $(JSON-PARSER-SRC)/%.cpp | $(OBJS_DIR)
-	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
+	$(CCP) $(CF_JSON_PARSER) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
 
 $(OBJS_DIR)/%.o: $(JSON-PARSER-SRC)/%.c | $(OBJS_DIR)
-	$(CC) $(CF) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
+	$(CC) $(CF_JSON_PARSER) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
 
 $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJS_DIR)
 	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES-CITYHASH)

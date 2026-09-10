@@ -264,6 +264,9 @@ void vumeter_render_foreground(SDL_Renderer* renderer, vumeter_instance_t* vumet
                                 vol_printf("SH:%02d ", runtime->peak_hold_vol);
                                 _RENDER_VOLUME_LEVEL_(runtime->peak_hold_vol);
                                 break;
+                            default:
+                                error_printf("vumeter_render_foreground: SINGLE: unknown volume type %d\n",  composition->volume_type);
+                                break;
                         }
                     }break;
                 case AGGREGATE:
@@ -293,6 +296,9 @@ void vumeter_render_foreground(SDL_Renderer* renderer, vumeter_instance_t* vumet
                                 peak_vol = runtime->peak_hold_vol;
                                 vol_printf("A v:%02d p:%02d ", vol, peak_vol);
                                 break;
+                            default:
+                                error_printf("vumeter_render_foreground: AGGREGATE: unknown volume type %d\n",  composition->volume_type);
+                                break;
                         }
 
                         for(int lvl=0; lvl <= vol; ++lvl) {
@@ -316,12 +322,18 @@ void vumeter_render_foreground(SDL_Renderer* renderer, vumeter_instance_t* vumet
                             case PEAK_HOLD_AND_DECAY:
                                 vol = (int)(runtime->decay_vol + 0.5);
                                 break;
+                            default:
+                                error_printf("vumeter_render_foreground: AGGREGATEOFF: unknown volume type %d\n",  composition->volume_type);
+                                break;
                         }
                         vol_printf("a v:%02d ", vol);
                         for(int lvl=vol+1; lvl< composition->placement_count; ++lvl) {
                             _RENDER_VOLUME_LEVEL_(lvl);
                         }
                     }break;
+                default:
+                    error_printf("vumeter_render_foreground: unknown render op %d\n",  composition->render_op);
+                    break;
             }
         }
         if (debug_rects) {

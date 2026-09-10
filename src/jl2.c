@@ -630,6 +630,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     }
                 }
                 app_printf("key press duration = %d ms\n", key_press_duration);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
                 switch (eventp->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE: 
                     {
@@ -713,6 +715,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
                     break;
                 }
                 break;
+#pragma GCC diagnostic pop
             case SDL_MOUSEMOTION:
                 {
                     SDL_ShowCursor(SDL_ENABLE);
@@ -836,6 +839,9 @@ log_printf("starting player_poll_loop\n");
                             error_printf("got string %s for player value CAN_SEEK\n", pvalue.strptr);
                             FREE(pvalue.strptr);
                             break;
+                        default:
+                            error_printf("unhandled player value type");
+                            break;
                 }
             }
 
@@ -861,6 +867,9 @@ log_printf("starting player_poll_loop\n");
                             error_printf("got string %s for player range value %s\n", pvalue.strptr, player_range_value_key);
                             FREE(pvalue.strptr);
                             break;
+                        default:
+                            error_printf("unhandled player value type");
+                            break;
                     }
                 }
                 if (*player_value_key) {
@@ -884,6 +893,9 @@ log_printf("starting player_poll_loop\n");
                         case PFV_STRINGPTR:
                             error_printf("got string %s for player value %s\n", pvalue.strptr, player_value_key);
                             FREE(pvalue.strptr);
+                            break;
+                        default:
+                            error_printf("unhandled player value type");
                             break;
                     }
                 }

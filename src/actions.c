@@ -200,6 +200,10 @@ void dispatch_action(action_t act, int value) {
 
         case ACTION_END:
             break;
+
+        default:
+            error_printf("unknown action %d\n", act);
+            break;
     }
 }
 

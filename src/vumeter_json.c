@@ -354,6 +354,12 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
             case json_string:
                 bufflen += jelem->u.string.length;
                 break;
+            case json_none:
+            case json_object:
+            case json_array:
+            case json_integer:
+            case json_double:
+            case json_boolean:
             default:
                 error_printf("resources: not a string\n");
                 return -1;
@@ -378,6 +384,12 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
                 vu_specs->resource_list.names[ix] = p;
                 p += 1 + jelem->u.string.length;
                 break;
+            case json_none:
+            case json_object:
+            case json_array:
+            case json_integer:
+            case json_double:
+            case json_boolean:
             default:
                 error_printf("resources: not a string\n");
                 return -1;

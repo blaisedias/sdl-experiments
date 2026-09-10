@@ -172,6 +172,9 @@ log_printf("app_initialize\n");
            case SDL_SYSWM_RISCOS:
                // puts("SDL_SYSWM_RISCOS");
                break;
+           default:
+               error_printf("unknown swmi.subsystem");
+               break;
         }
     }
 
@@ -241,6 +244,7 @@ log_printf("app_initialize\n");
         case SDL_PIXELFORMAT_YVYU: printf("SDL_PIXELFORMAT_YVYU\n"); break;
         case SDL_PIXELFORMAT_NV12: printf("SDL_PIXELFORMAT_NV12\n"); break;
         case SDL_PIXELFORMAT_NV21: printf("SDL_PIXELFORMAT_NV21\n"); break;
+        default: error_printf("unknown pixel format!"); break;
     }
 
     setup_orientation(app_ctx->orientation, app_ctx->screen_width, app_ctx->screen_height, &app_ctx->window_rect);
