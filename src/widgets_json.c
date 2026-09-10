@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include "application.h"
 #include "widgets_internal.h"
+#include "widgets_json.h"
 #include "actions.h"
 #include "logging.h"
 #include "util.h"
@@ -742,7 +743,7 @@ static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect*
     return false;
 }
 
-static int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
+int deserialise_json(const char* json_string, const int len, view_context_t* ctx) {
     json_value* value = json_parse(json_string, len);
 
     if (value == NULL) {

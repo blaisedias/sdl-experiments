@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
+#include "timing.h"
 
 
 int64_t get_micro_seconds() {

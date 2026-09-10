@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "platform.h"
 
 
 // search first 4 interfaces returned by IFCONF - same method used by squeezelite

@@ -9,6 +9,7 @@
 #include "util.h"
 #define DEBUG_VUMETER_JSON
 #include "vumeterdef.h"
+#include "vumeter_json.h"
 
 #define bool  SDL_bool
 

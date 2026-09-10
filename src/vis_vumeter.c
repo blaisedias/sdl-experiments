@@ -9,6 +9,7 @@
 #include "types.h"
 #include "visualizer.h"
 #include "audio_volume.h"
+#include "platform.h"
 
 #define VUMETER_DEFAULT_SAMPLE_WINDOW 1024 * 2
 
@@ -51,7 +52,8 @@ static void legacy_digitise() {
 // 256
 #define MASK_OFF_LSB_8 ((~0)^0xff)
 
-int _visualizer_vumeter_div256_squared() {
+#if 0
+static int _visualizer_vumeter_div256_squared() {
 	long long sample_accumulator[2];
 	int16_t *ptr;
 	s16_t sample;
@@ -102,7 +104,7 @@ int _visualizer_vumeter_div256_squared() {
 
 	return 1;
 }
-
+#endif
 
 static inline bool tenpc_delta(long long a, long long b) {
 	long long d = llabs(a - b);
@@ -113,7 +115,7 @@ static inline bool tenpc_delta(long long a, long long b) {
 #define  VOLUME_CALIB_LEVEL     0
 #endif
 
-int _visualizer_vumeter_cp() {
+static int _visualizer_vumeter_cp() {
 static int16_t buff[VUMETER_DEFAULT_SAMPLE_WINDOW*2];
 #if  VOLUME_CALIB_LEVEL
 static int same_count =0;

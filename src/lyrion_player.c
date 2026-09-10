@@ -513,7 +513,7 @@ static int __lms_req(const char* prefix, const char* suffix, const char *format,
 }
 
 // returns 0 on success
-int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
+static int connect_timeout(int sockfd, struct sockaddr* sockaddr, struct timeval* tv) {
     // get socket flags
     int flags = fcntl(sockfd, F_GETFL, 0);
     // set socket to non-blocking

@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "visualizer.h"
 
 extern char *platform_get_mac_address();
 #define VIS_BUF_SIZE 16384

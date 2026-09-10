@@ -8,6 +8,7 @@
 #include "types.h"
 #include "logging.h"
 #include "timing.h"
+#include "event_queue.h"
 #include <assert.h>
 
 static SDL_threadID event_queue_lock = 0;

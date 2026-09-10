@@ -239,7 +239,7 @@ static void update_texture(tcache_entry* tce, const SDL_Texture* texture) {
 }
 
 // custom string compare to handle NULL string pointers robustly
-int compare_tce_paths(const char* path1, const char* path2) {
+static int compare_tce_paths(const char* path1, const char* path2) {
     if (path1 == path2) {
         return 0;
     }
