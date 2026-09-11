@@ -1023,7 +1023,17 @@ static in_addr_t get_server_ip(const char* servername) {
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         switch(rp->ai_family) {
             case AF_INET:
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+/* armv6 32 bit compiler emits a warning however, man pages state
+       sockaddr_storage
+              A structure at least as large as any other sockaddr_*
+              address structures.  It's aligned so that a pointer to it
+              can be cast as a pointer to other sockaddr_* structures and
+              used to access its fields.
+*/
                 server_ip = ((struct sockaddr_in*)rp->ai_addr)->sin_addr.s_addr;
+#pragma GCC diagnostic pop
                 break;
             case AF_INET6:
             default:
