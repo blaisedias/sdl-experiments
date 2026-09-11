@@ -423,6 +423,10 @@ log_printf("starting controller\n");
         }
     }
 
+    if (dump_vu) {
+        vumeter_dump_all_specs();
+    }
+
     if (json_files && strlen(json_files)) {
         char *tmp = strdup(json_files);
         char *json_file = tmp;
