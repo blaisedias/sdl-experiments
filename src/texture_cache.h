@@ -20,7 +20,7 @@ void tcache_render_frame_start(SDL_Renderer* renderer);
 void tcache_render_frame_done(SDL_Renderer* renderer);
 
 // Test only function
-bool tcache_test_lru_eject();
+bool tcache_test_lru_eject(void);
 // }
 
 // These functions can be called by any thread
@@ -47,8 +47,8 @@ bool tcache_quick_delete_texture(texture_id_t texture_id);
 bool tcache_delete_texture(const char* token);
 
 // Diagnostics
-void tcache_dump();
-void tcache_concise_dump();
-void tcache_dump_LRU();
+void tcache_dump(void);
+void tcache_concise_dump(void);
+void tcache_dump_LRU(void);
 
 #endif // __jl_texture_h_

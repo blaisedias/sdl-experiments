@@ -19,7 +19,7 @@
 #include "vumeter.h"
 #include "nowplaying.h"
 
-lyrion_player_ptr get_player();
+lyrion_player_ptr get_player(void);
 
 #define WINDOW_TITLE "Tsp"
 #define HIDE_CURSOR_COUNT 50
@@ -71,7 +71,7 @@ static const char* help_text=""
 " - monitor-tcache: print texture cache memory usage at regular intervals \n"
 "\n";  
 
-static char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
+static const char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
 static bool dump_vu = false;
 static bool monitor_tcache = false;
 
@@ -93,7 +93,7 @@ static bool my_query_render_backdrop(app_context_ptr app_ctx);
 static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp);
 static int player_poll_loop(app_context_ptr app_ctx);
 static view_context_t* load_json_view(const char* json_path, app_context_ptr app_ctx);
-static void select_splash_view();
+static void select_splash_view(void);
 
 static SDL_mutex* view_change_mutex;
 
@@ -135,7 +135,7 @@ static void set_current_view(view_context_ptr new_view) {
     SDL_UnlockMutex(view_change_mutex);
 }
 
-static view_context_ptr get_current_view() {
+static view_context_ptr get_current_view(void) {
     return __atomic_load_n(&current_view, __ATOMIC_ACQUIRE);
 }
 
@@ -315,7 +315,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void next_np_view() {
+void next_np_view(void) {
     view_context_ptr view = get_current_view();
     if (view != main_view) {
         for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
@@ -330,7 +330,7 @@ void next_np_view() {
     }
 }
 
-void prev_np_view() {
+void prev_np_view(void) {
     view_context_ptr view = get_current_view();
     if (view != main_view) {
         for (int ix=1; ix < MAX_NP_VIEWS; ++ix) {
@@ -348,7 +348,7 @@ void prev_np_view() {
     }
 }
 
-void select_np_view() {
+void select_np_view(void) {
     view_context_ptr view = get_current_view();
     if (view == main_view) {
         if (np_views[np_view_indx]) {
@@ -360,7 +360,7 @@ void select_np_view() {
     }
 }
 
-void select_main_view() {
+void select_main_view(void) {
     view_context_ptr view = get_current_view();
     if (view != main_view) {
         set_current_view(main_view);
@@ -368,7 +368,7 @@ void select_main_view() {
     }
 }
 
-static void select_splash_view() {
+static void select_splash_view(void) {
     set_current_view(splash_view);
     refresh_widget_contents = true;
 }
@@ -563,7 +563,7 @@ static void my_render_foreground(app_context_ptr app_ctx) {
     }
 }
 
-static void print_tcache_stats(){
+static void print_tcache_stats(void){
     unsigned texture_bytes = tcache_get_texture_bytes_count();
     unsigned surface_bytes = tcache_get_surface_bytes_count();
     log_printf("texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
@@ -795,7 +795,7 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
 }
 
 static lyrion_player_ptr    player = NULL;
-lyrion_player_ptr get_player() {
+lyrion_player_ptr get_player(void) {
     return player;
 }
 
@@ -1017,20 +1017,20 @@ static void set_visualiser_lock(bool lock, action_t action) {
     }
 }
 
-void lock_vu_meters() {
+void lock_vu_meters(void) {
     set_visualiser_lock(true, ACTION_LOCK_VUMETER);
 }
 
-void unlock_vu_meters() {
+void unlock_vu_meters(void) {
     set_visualiser_lock(false, ACTION_UNLOCK_VUMETER);
 }
 
-void lock_visualisers() {
+void lock_visualisers(void) {
     set_visualiser_lock(true, ACTION_LOCK_VUMETER);
     set_visualiser_lock(true, ACTION_LOCK_VISU);
 }
 
-void unlock_visualisers() {
+void unlock_visualisers(void) {
     set_visualiser_lock(false, ACTION_UNLOCK_VUMETER);
     set_visualiser_lock(false, ACTION_UNLOCK_VISU);
 }

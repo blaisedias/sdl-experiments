@@ -61,9 +61,9 @@ void vumeter_setup(vumeter_instance_t* vumeter, SDL_Rect* bounds_in, bool equal_
         // the total number of "whitespace" pixels on the horizontal axis
         int avail = (lrect->x - z_bounds.x ) + ((z_bounds.x + z_bounds.w) - (rrect->x + rrect->w)) + middle;
 //printf("avail=%d\n", avail);
-        float fraction = ((float)avail/(lead+trail+middle));
-        lead = lead * fraction;
-        trail = trail * fraction;
+        float fraction = ((float)avail/(float)(lead+trail+middle));
+        lead = (int)((float)lead * fraction);
+        trail = (int)((float)trail * fraction);
         middle = avail - lead - trail;
 //printf("++ lead=%d, trail=%d, middle=%d\n", lead, trail, middle);
         // reposition the left component
@@ -164,7 +164,7 @@ static void render_placement(SDL_Renderer* renderer, vumeter_instance_t* vumeter
         exit(EXIT_FAILURE);
     }
     vu_placement_t* pve = vumeter->vss->spec->placement_list.elements + placement_index;
-#define _SCALE_PLACEMENT(val) ((val)*vumeter->scale_factor + 0.5)
+#define _SCALE_PLACEMENT(val) (int)(((float)val)*vumeter->scale_factor + 0.5)
     SDL_Rect    render_rect= {
         .x = _SCALE_PLACEMENT(pve->rect.x),
         .y = _SCALE_PLACEMENT(pve->rect.y),
@@ -377,16 +377,18 @@ void vumeter_render_foreground_ms(SDL_Renderer* renderer, vumeter_instance_t* vu
     ++frame_count;
     if (sample_frame_count >= 100) {
         ms_2 = get_micro_seconds();
-        float fps = 1000000.0 * sample_frame_count/(ms_2-ms_1);
+        float fps = 1000000.0;
+        fps *= (float)sample_frame_count;
+        fps /= (float)(ms_2-ms_1);
         switch(profile_level) {
             case 3:
             case 2:
             default:
                 perf_printf("\rFPS:%05.2f frame:millis: avg:%5.2f, max:%05.2f sample: millis:%5.2f, frames:%d texture_cache:%ld",
                         fps,
-                        ((float)acc_render_time/sample_frame_count)/1000,
-                        (float)max_render_time/1000,
-                        (float)(ms_2 - ms_1)/1000, sample_frame_count,
+                        ((float)acc_render_time/(float)sample_frame_count)/1000.0,
+                        (float)max_render_time/1000.0,
+                        (float)(ms_2 - ms_1)/1000.0, sample_frame_count,
                         tcache_get_texture_bytes_count()
                     );
         }

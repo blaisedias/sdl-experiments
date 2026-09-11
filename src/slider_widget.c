@@ -345,7 +345,7 @@ widget_t *widget_slider_update_value(widget_t* wdgt, int value, bool* in_range) 
                 _slider_workspace_t* wk = &wdgt->sub.slider.wk;
                 if (wk->value_range_delta) {
                     // range must be non-zero to calculate the position of the pick
-                    float offset = ((float)(value - wdgt->sub.slider.range.start)*(wk->max_pos - wk->min_pos))/wk->value_range_delta;
+                    float offset = ((float)(value - wdgt->sub.slider.range.start)*(float)(wk->max_pos - wk->min_pos))/(float)wk->value_range_delta;
                     bool updated;
                     if (wdgt->type == WIDGET_SLIDER) {
                         // Horizontal sliders "naturally" progress from left (smaller offset values) to right (larger offset values)

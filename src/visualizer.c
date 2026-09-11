@@ -14,8 +14,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "visualizer.h"
+#include "platform.h"
 
-extern char *platform_get_mac_address();
+
 #define VIS_BUF_SIZE 16384
 
 static struct vis_t {

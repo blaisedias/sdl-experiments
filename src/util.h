@@ -3,9 +3,9 @@
 #define __jl_util_h_
 
 //extern const SDL_RendererFlip* const oriented_flip;
-extern void setup_orientation(float orientation, int w, int h, SDL_Rect* screen);
+void setup_orientation(float orientation, int w, int h, SDL_Rect* screen);
 
-//extern const void (*translate_xy)(int* x, int* y);
+//const void (*translate_xy)(int* x, int* y);
 extern void (*translate_screen_rect)(SDL_Rect* rect);
 extern void (*translate_point)(SDL_Point* pt);
 extern void (*translate_image_rect)(SDL_Rect* rect);
@@ -13,8 +13,8 @@ extern void (*translate_draw_rect)(SDL_Rect* rect);
 void translate_axle(const SDL_Rect* enclosure, const SDL_Point* axle, SDL_Rect* rect);
 
 
-extern void copyRect(const SDL_Rect *src, SDL_Rect *dst);
-extern void copyPoint(const SDL_Point *src, SDL_Point *dst);
+void copyRect(const SDL_Rect *src, SDL_Rect *dst);
+void copyPoint(const SDL_Point *src, SDL_Point *dst);
 void rebaseRect(const SDL_Rect* origin, const SDL_Rect* src, SDL_Rect* dst);
 void rebasePoint(const SDL_Rect* origin, const SDL_Point* src, SDL_Point* dst);
 void offset_rect(const SDL_Point* offset, const SDL_Rect* src, SDL_Rect* dst);

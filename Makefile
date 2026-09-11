@@ -55,13 +55,28 @@ SANITIZE =
 #SANITIZE =  -fsanitize=safe-stack
 #SANITIZE =  -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 #SANITIZE =  -fsanitize=memory -fno-omit-frame-pointer -fsanitize=undefined
+#SANITIZE =   -fsanitize=undefined -fsanitize=address 
 GLOBAL_DEPS = ./Makefile
 #CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE)
-CF_WARNINGS_COMMON = -Wall -Wextra -pedantic \
-					 -Wuninitialized -Wmissing-declarations -Wshadow -Wstrict-overflow=5 \
+CF_WARNINGS_COMMON = -Wall -Wextra \
+					 -Wpedantic \
+					 -Wuninitialized \
+					 -Wmissing-declarations \
+					 -Wshadow \
 					 -Wcast-align \
 					 -Wswitch-default \
+					 -Wpointer-arith \
+					 -Wwrite-strings \
+					 -Wundef \
+					 -Wunreachable-code \
+					 -Wstrict-prototypes \
 					 -Werror
+
+
+# commented out for pCP compiler version (14.x) which emits warnings without highlight "offending" code.
+#					 -Wstrict-overflow=5 \
+# commented out - too many warnings
+#					 -Wconversion \
 
 CF = $(CF_WARNINGS_COMMON) \
 	 -Wswitch-enum \
@@ -160,7 +175,7 @@ $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJS_DIR)
 	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES-CITYHASH)
 
 $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.c | $(OBJS_DIR)
-	$(CC) $(CF) -c -o $(@) $< $(INCLUDES-CITYHASH)
+	$(CC) $(CF) -DHAVE_BUILTIN_EXPECT=0 -c -o $(@) $< $(INCLUDES-CITYHASH)
 
 $(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)

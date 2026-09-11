@@ -18,9 +18,9 @@ void vumeter_set_profile_level(int l);
 
 bool vumeter_load_from_json_file(const char* filepath);
 int vumeter_populate_instance_array(vumeter_instance_t* array, size_t length);
-void vumeter_release_all();
+void vumeter_release_all(void);
 
 // debug
-void vumeter_dump_all_specs();
-void vumeter_checked_dump_all_specs();
+void vumeter_dump_all_specs(void);
+void vumeter_checked_dump_all_specs(void);
 #endif  // __jl_vumeter_h_

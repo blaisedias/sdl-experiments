@@ -139,7 +139,7 @@ void tcache_set_renderer_tid(const SDL_threadID tid) {
 }
 
 // check for operations only permitted in the renderer thread context 
-static inline bool check_permitted() {
+static inline bool check_permitted(void) {
 #if TEXTURE_CACHE_FAILFAST
     assert(SDL_GetThreadID(NULL) == renderer_tid);
     return true;

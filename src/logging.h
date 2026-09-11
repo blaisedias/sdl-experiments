@@ -9,8 +9,8 @@
 #define __jl_logging_h_
 #include "types.h"
 
-extern void error_printf(const char *format, ...);
-extern void dummy_printf(const char *format, ...);
+void error_printf(const char *format, ...);
+void dummy_printf(const char *format, ...);
 
 extern void (*log_printf)(const char *format, ...);
 extern void (*vol_printf)(const char *format, ...);

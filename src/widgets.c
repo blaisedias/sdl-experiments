@@ -14,7 +14,7 @@ bool show_input_rects = false;
 
 static SDL_RendererFlip flip = SDL_FLIP_NONE;
 
-static char* widget_type_strings[] = {
+static const char* widget_type_strings[] = {
     "None",
     "Image",
     "Button",

@@ -972,15 +972,13 @@ static void __close_player(lyrion_player_ptr player) {
 static in_addr_t discover_server_ip(int retry, int timeout) {
     struct sockaddr_in d;
     struct sockaddr_in s;
-    char *buf;
+    const char *buf = "e";
     struct pollfd pollinfo;
 
     int disc_sock = socket(AF_INET, SOCK_DGRAM, 0);
 
     socklen_t enable = 1;
     setsockopt(disc_sock, SOL_SOCKET, SO_BROADCAST, (const void *)&enable, sizeof(enable));
-
-    buf = "e";
 
     memset(&d, 0, sizeof(d));
     d.sin_family = AF_INET;
@@ -1584,7 +1582,7 @@ static int snprintf_time(char *buff, size_t bufflen, int seconds, bool suppress0
 }
 
 void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const char *format) {
-    char* pre="";
+    char* pre = NULL;
     char* post;
     char* pprint = buff;
     int   wr;

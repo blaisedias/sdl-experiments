@@ -71,8 +71,8 @@ void app_render_loop(app_context_ptr app_ctx);
 int app_render(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip);
 int app_render_rotated(app_context_t* app_ctx,  SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect, const SDL_Point *center, const SDL_RendererFlip flip, double rotate);
 bool app_running(app_context_ptr app_ctx);
-void app_wait_ready();
-int64_t app_get_render_count();
+void app_wait_ready(void);
+int64_t app_get_render_count(void);
 void app_set_multiple_views(app_context_ptr app_ctx, bool val);
 
 #endif // __jl_application_h_

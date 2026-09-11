@@ -255,6 +255,18 @@ static int get_object_int_value(json_value* value, json_token jt, int default_va
     return default_value;
 }
 
+static uint8_t get_object_uint8_value(json_value* value, json_token jt, uint8_t default_value) {
+    value = get_object_value(value, jt);
+    if (value && value->type == json_integer) {
+        if (value->u.integer >= 0 && value->u.integer <= 256) {
+            return (uint8_t)value->u.integer;
+        } else {
+            error_printf("get_object_uint8_value: got value %d\n", value->u.integer);
+        }
+    }
+    return default_value;
+}
+
 static int get_scaled_object_int_value(json_value* value, json_token jt, int default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_integer) {
@@ -594,10 +606,10 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 json_value* jcolour = get_object_object_value(value, JT_TEXT_COLOUR);
                 if (jcolour) {
                     SDL_Color sdlcolour = { 0, 0, 0, 255};
-                    sdlcolour.r =  get_object_int_value(jcolour, JT_RED, 0);
-                    sdlcolour.g =  get_object_int_value(jcolour, JT_GREEN, 0);
-                    sdlcolour.b =  get_object_int_value(jcolour, JT_BLUE, 0);
-                    sdlcolour.a =  get_object_int_value(jcolour, JT_ALPHA, 255);
+                    sdlcolour.r =  get_object_uint8_value(jcolour, JT_RED, 0);
+                    sdlcolour.g =  get_object_uint8_value(jcolour, JT_GREEN, 0);
+                    sdlcolour.b =  get_object_uint8_value(jcolour, JT_BLUE, 0);
+                    sdlcolour.a =  get_object_uint8_value(jcolour, JT_ALPHA, 255);
                     widget_text_set_colour(widget, sdlcolour);
                 }
                 deserialise_one_widget_generic(widget, value, ctx);
@@ -774,8 +786,8 @@ int deserialise_json(const char* json_str, const int len, view_context_t* ctx) {
     }
 
     scalef = MIN(
-            (float)ctx->app->window_rect.w/spec_rect.w,
-            (float)ctx->app->window_rect.h/spec_rect.h
+            (float)ctx->app->window_rect.w/(float)spec_rect.w,
+            (float)ctx->app->window_rect.h/(float)spec_rect.h
             );
     debug_printf("scaling factor = %f\n", scalef);
     deserialise_widgets(value, ctx);

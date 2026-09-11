@@ -49,7 +49,7 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
     buf[0] = ' ';
     ctime_r(&now, buf+1);
 
-    char*   pre="";
+    char*   pre = NULL;
     char*   post;
     char*   pprint = buff;
     size_t  avail = bufflen;
@@ -57,7 +57,7 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
     char*   scan;
     int     wr;
 
-    char*  fields[8] = {
+    const char*  fields[8] = {
         "", "", "", "",
         "", "", "", ""
     };

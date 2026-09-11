@@ -10,6 +10,7 @@
 #include "visualizer.h"
 #include "audio_volume.h"
 #include "platform.h"
+#include "logging.h"
 
 #define VUMETER_DEFAULT_SAMPLE_WINDOW 1024 * 2
 
@@ -23,11 +24,7 @@ static long long RMS_MAP[] = {
 
 static runtime_volume_t vol_runtimes[2];
 
-extern void (*vol_printf)(char *format, ...);
-extern void (*vol_calib_printf)(char *format, ...);
-extern void (*log_printf)(char *format, ...);
-
-static void legacy_digitise() {
+static void legacy_digitise(void) {
 	for(int indx =0; indx < 2; ++indx) {
 		vol_runtimes[indx].vol = 0;
 		for (int level = 48; level >=0; --level) {
@@ -53,7 +50,7 @@ static void legacy_digitise() {
 #define MASK_OFF_LSB_8 ((~0)^0xff)
 
 #if 0
-static int _visualizer_vumeter_div256_squared() {
+static int _visualizer_vumeter_div256_squared(void) {
 	long long sample_accumulator[2];
 	int16_t *ptr;
 	s16_t sample;
@@ -115,7 +112,7 @@ static inline bool tenpc_delta(long long a, long long b) {
 #define  VOLUME_CALIB_LEVEL     0
 #endif
 
-static int _visualizer_vumeter_cp() {
+static int _visualizer_vumeter_cp(void) {
 static int16_t buff[VUMETER_DEFAULT_SAMPLE_WINDOW*2];
 #if  VOLUME_CALIB_LEVEL
 static int same_count =0;
