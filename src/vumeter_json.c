@@ -345,6 +345,7 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
         return -1;
     }
     vu_specs->resource_list.count = jresources->u.array.length;
+    // allocation should include string termination NULL characters
     size_t bufflen = jresources->u.array.length;
     for(unsigned ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
@@ -352,7 +353,7 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
             case json_null:
                 break;
             case json_string:
-                bufflen += jelem->u.string.length;
+                bufflen += jelem->u.string.length+1;
                 break;
             case json_none:
             case json_object:
@@ -365,14 +366,15 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
                 return -1;
         }
     }
-    bufflen += sizeof(char*) *  jresources->u.array.length;
-    char *buffer;
-    if (NULL == CALLOC(bufflen, buffer)) {
+    if (NULL == CALLOC(bufflen, vu_specs->resource_list.string_buffer)) {
         error_printf("OOM: resources strings %ld\n", bufflen);
         return -1;
     }
-    vu_specs->resource_list.names = (char **)buffer;
-    char *p = (char*)(&vu_specs->resource_list.names[vu_specs->resource_list.count]);
+    if (NULL == CALLOC(jresources->u.array.length, vu_specs->resource_list.names)) {
+        error_printf("OOM: resources strings %ld\n", bufflen);
+        return -1;
+    }
+    char *p =  vu_specs->resource_list.string_buffer;
     for(unsigned ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
         switch (jelem->type) {
@@ -667,6 +669,7 @@ static void free_specs_mem(const vu_meters_specs_t* vu_specs) {
         FREE(vu_specs->format);
 #endif
         FREE(vu_specs->resource_list.names);
+        FREE(vu_specs->resource_list.string_buffer);
 /* FIXME moved to vumeter_state_t
         FREE(vu_specs->resource_list.textures);
 */        

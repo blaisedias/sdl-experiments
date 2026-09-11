@@ -58,6 +58,7 @@ typedef struct vu_props {
     struct {
         int                 count;
         char**              names;
+        char*               string_buffer;
     }resource_list;
     struct {
         int                 count;
