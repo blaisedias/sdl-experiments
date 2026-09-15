@@ -405,7 +405,7 @@ void app_render_loop(app_context_ptr app_ctx_in) {
             ++fps_sample_counter;
             if ( fps_sample_counter >= FPS_SAMPLE_COUNT ) {
                 if (ms_6 > fsp1.micros) {
-                    app_ctx->workspace.reported_fps = unsigned_from_long((render_iters - fsp1.render_count)*1000000/(ms_6-fsp1.micros));
+                    app_ctx->workspace.reported_fps = unsigned_from_int64_t((render_iters - fsp1.render_count)*1000000/(ms_6-fsp1.micros));
                 }
                 fps_sample_counter = 0;
                 fsp1.render_count = render_iters;

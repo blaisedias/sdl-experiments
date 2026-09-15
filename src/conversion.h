@@ -41,7 +41,7 @@ static inline int int_from_ssize_t(ssize_t v) {
 
 // to unsigned {
 static inline unsigned unsigned_from_long(long v) {
-    assert(v <= UINT_MAX && v >=0);
+    assert(v >=0 && (unsigned long long)v <= UINT_MAX);
     return (unsigned)v;
 }
 
@@ -54,6 +54,12 @@ static inline unsigned unsigned_from_size_t(size_t v) {
     assert(v <= UINT_MAX);
     return (unsigned)v;
 }
+
+static inline unsigned unsigned_from_int64_t(int64_t v) {
+    assert(v>= 0 && v <= UINT_MAX);
+    return (unsigned)v;
+}
+
 // } to unsigned 
 
 // to size_t {
