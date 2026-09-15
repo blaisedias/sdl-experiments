@@ -111,7 +111,7 @@ bool evt_q_get(SDL_Event* evt) {
     return ok;
 }
 
-bool evt_q_try_put(SDL_Event* evt, unsigned try_count, int64_t sleepmicros) {
+bool evt_q_try_put(SDL_Event* evt, unsigned try_count, long sleepmicros) {
     bool ok = false;
     while(try_count && !ok) {
         if (evqu_lock_try(&event_queue_lock)) {

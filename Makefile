@@ -70,6 +70,7 @@ CF_WARNINGS_COMMON = -Wall -Wextra \
 					 -Wundef \
 					 -Wunreachable-code \
 					 -Wstrict-prototypes \
+					 -Werror
 
 
 

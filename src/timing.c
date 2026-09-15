@@ -24,33 +24,19 @@ int64_t get_milli_seconds() {
 }
 
 //TODO: change formal parameter to long or unsigned long
-void sleep_milli_seconds(int64_t millis) {
+void sleep_milli_seconds(long millis) {
     if (millis < 0) {
         return;
     }
-    // workaround:
-    // 32 bit ARM compiler issues conversion warnings,
-    // For now: fix by converting 64 bit values to long,
-    // sacrificing top end wait times 
-    long secs = long_from_int64_t(millis)/1000; 
-    long nsecs = long_from_int64_t(millis%1000) * 1000000; 
-//    struct timespec ts = {.tv_sec =millis/1000, .tv_nsec = 1000000*(millis%1000)};
-    struct timespec ts = {.tv_sec = secs, .tv_nsec = nsecs};
+    struct timespec ts = {.tv_sec =millis/1000, .tv_nsec = 1000000*(millis%1000)};
     nanosleep(&ts, NULL);
 }
 
 //TODO: change formal parameter to long or unsigned long
-void sleep_micro_seconds(int64_t micros) {
+void sleep_micro_seconds(long micros) {
     if (micros < 0) {
         return;
     }
-    // workaround:
-    // 32 bit ARM compiler issues conversion warnings
-    // For now: fix by converting 64 bit values to long,
-    // sacrificing top end wait times 
-    long secs = long_from_int64_t(micros)/1000; 
-    long nsecs = long_from_int64_t(micros%1000) * 1000000; 
-//    struct timespec ts = {.tv_sec =micros/1000000, .tv_nsec = 1000*(micros%1000000)};
-    struct timespec ts = {.tv_sec = secs, .tv_nsec = nsecs};
+    struct timespec ts = {.tv_sec =micros/1000000, .tv_nsec = 1000*(micros%1000000)};
     nanosleep(&ts, NULL);
 }

@@ -6,6 +6,6 @@
 bool evt_q_put(SDL_Event* evt);
 bool evt_q_get(SDL_Event* evt);
 bool evt_q_peek(SDL_Event* evt);
-bool evt_q_try_put(SDL_Event* evt, unsigned try_count, int64_t sleepmicros);
+bool evt_q_try_put(SDL_Event* evt, unsigned try_count, long sleepmicros);
 
 #endif // __jl_event_queue_h_

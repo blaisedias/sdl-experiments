@@ -57,7 +57,7 @@ struct app_context_s_t {
 
     SDL_Thread*     input_thread;
     inputfn         cb_input;
-    int64_t         input_loop_sleep_millis;
+    long            input_loop_sleep_millis;
 
     app_workspace_t workspace; 
     bool            debug_redraw_backdrop;
