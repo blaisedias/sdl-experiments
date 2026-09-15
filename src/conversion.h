@@ -37,6 +37,12 @@ static inline int int_from_ssize_t(ssize_t v) {
      assert(v >= INT_MIN);
      return (int)v;
 }
+
+static inline int int_from_int64_t(int64_t v) {
+     assert(v <= INT_MAX);
+     assert(v >= INT_MIN);
+     return (int)v;
+}
 // } to int
 
 // to long {

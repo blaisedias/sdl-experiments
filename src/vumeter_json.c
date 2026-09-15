@@ -247,7 +247,7 @@ static bool read_object_int_value(json_value* jvalue, const char* jt, int* desti
     if (jvalue && jvalue->type != json_integer) {
         return false;
     }
-    *destination = jvalue ? int_from_long(jvalue->u.integer) : default_value;
+    *destination = jvalue ? int_from_int64_t(jvalue->u.integer) : default_value;
     return true;
 }
 
@@ -488,7 +488,7 @@ static int deserialise_composition(json_value* jcomposition, vu_composition_t* c
             error_printf("composition placement index is not an integer\n");
             return -1;
         }
-        composition->ix_placements[ix] = int_from_long(jcp->u.array.values[ix]->u.integer);
+        composition->ix_placements[ix] = int_from_int64_t(jcp->u.array.values[ix]->u.integer);
     }
     return 0;
 }
@@ -538,7 +538,7 @@ static int deserialise_component(json_value* jcomponent,  vu_component_t* compon
             error_printf("deserialise_component: composition value is not an integer\n");
             return -1;
         }
-        component->ix_compositions[ix] = int_from_long(jcomp->u.integer);
+        component->ix_compositions[ix] = int_from_int64_t(jcomp->u.integer);
     }
     return 0;
 }

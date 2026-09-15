@@ -256,7 +256,7 @@ static json_value* get_object_object_value(json_value* value, json_token jt) {
 static int get_object_int_value(json_value* value, json_token jt, int default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_integer) {
-        return int_from_long(value->u.integer);
+        return int_from_int64_t(value->u.integer);
     }
     return default_value;
 }
@@ -625,7 +625,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 json_value* jstates = get_object_value(value, JT_STATES);
                 if (jstates != NULL && jstates->type == json_array) {
                     json_printf("     states\n");
-                    widget = widget_create_multistate_button(ctx, int_from_long(jstates->u.array.length));
+                    widget = widget_create_multistate_button(ctx, int_from_int64_t(jstates->u.array.length));
                     for(unsigned x=0; x < jstates->u.array.length; ++x) {
                         json_value* svalue = jstates->u.array.values[x];
                         widget_multistate_button_addstate(widget, x, 
@@ -717,7 +717,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 {
                     json_value* slider_v =get_object_value(value, JT_SLIDER_VALUE);
                     if (slider_v && slider_v->type == json_integer) {
-                        widget_slider_update_value(widget, int_from_long(slider_v->u.integer), NULL);
+                        widget_slider_update_value(widget, int_from_int64_t(slider_v->u.integer), NULL);
                     }
                 }
             }break;
