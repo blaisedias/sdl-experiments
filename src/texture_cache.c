@@ -16,6 +16,7 @@
 #include "types.h"
 #include "logging.h"
 #include "timing.h"
+#include "conversion.h"
 #include <assert.h>
 
 #define TEXTURE_CACHE_FAILFAST 1
@@ -50,7 +51,7 @@ static tcache_entry empty_tce = {
 static tcache_entry deleted_entry;
 static tcache_entry* tce_deleted=&deleted_entry;
 
-static void tcache_cap_num_bytes(unsigned inc);
+static void tcache_cap_num_bytes(size_t inc);
 
 static inline bool external_tce(tcache_entry* tce) {
     return tce != NULL && tce != tce_deleted && tce != &empty_tce;
@@ -213,7 +214,8 @@ static void release_texture(tcache_entry* tce) {
 //        perf_printf("release_texture: destroy_texture: %07.2f millis\n", (float)(ms_1 - ms_0)/1000);
         tce->texture = NULL;
         num_texture_bytes -= tce->num_bytes;
-        tce->w = tce->h = tce->num_bytes = 0;
+        tce->w = tce->h = 0;
+        tce->num_bytes = 0;
         profile_texture_printf("release_texture: destroy_texture: %06u usec %u/%u\n", ms_1 - ms_0, num_texture_bytes, max_num_texture_bytes);
         tcache_printf("release_texture: texture_bytes=%d\n", num_texture_bytes);
     }
@@ -228,7 +230,7 @@ static void update_texture(tcache_entry* tce, const SDL_Texture* texture) {
         if (texture) {
             Uint32 fmt;
             if (0 == SDL_QueryTexture((SDL_Texture*)texture, &fmt, NULL, &tce->w, &tce->h)) {
-                tce->num_bytes = SDL_BYTESPERPIXEL(fmt) * tce->w * tce->h;
+                tce->num_bytes = SDL_BYTESPERPIXEL(fmt) * size_t_from_int(tce->w) * size_t_from_int(tce->h);
                 num_texture_bytes += tce->num_bytes;
                 tcache_printf("update_texture: texture_bytes=%d %s\n", num_texture_bytes, tce->path);
             }
@@ -261,7 +263,7 @@ texture_id_t tcache_create_entry(const char* path) {
         return EMPTY_TEXTURE_ID;
     }
     uint32_t hashv = hashfn(path);
-    texture_id_t indx = hashv%HASHTPRIME;
+    texture_id_t indx = int_from_uint32_t(hashv%HASHTPRIME);
     int hop_count = 0;
 
     tcache_init();
@@ -330,7 +332,7 @@ SDL_Texture* tcache_get_texture(const char* path, texture_id_t* texture_id, SDL_
         return NULL;
     }
     uint32_t hashv = hashfn(path);
-    texture_id_t indx = hashv%HASHTPRIME;
+    texture_id_t indx = int_from_uint32_t(hashv%HASHTPRIME);
     tcache_entry* tce = tbl[indx];
 
     for(int count=0; count < HASHTPRIME; ++count) {
@@ -467,7 +469,7 @@ bool tcache_delete_texture(const char* path) {
         return false;
     }
     uint32_t hashv = hashfn(path);
-    texture_id_t indx = hashv%HASHTPRIME;
+    texture_id_t indx = int_from_uint32_t(hashv%HASHTPRIME);
     tcache_entry* tce = tbl[indx];
 
     tcache_printf("tcache_delete_texture: %s\n", path);
@@ -499,7 +501,7 @@ static int lru_sort_tce(tcache_entry** lru_sorted_tbl) {
     return indx;
 }
 
-static bool cap_exceeded(int increment, int ejected) {
+static bool cap_exceeded(size_t increment, int ejected) {
     UNUSED(ejected);
     return max_num_texture_bytes && (num_texture_bytes + increment) > max_num_texture_bytes;
 }
@@ -517,7 +519,7 @@ static struct {
 // context of the renderer thread.
 // Devise a scheme where entries are marked for ejection in the context of other threads
 // and the renderer thread merely performs the release.
-static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
+static bool tcache_eject(size_t increment, bool (*check)(size_t, int)) {
     int64_t ms_0 = get_micro_seconds();
     int ejected_count = 0;
     for(; lru_eject.ix < lru_eject.count && check(increment, ejected_count); ++lru_eject.ix) {
@@ -526,7 +528,7 @@ static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
             release_texture(tce);
             tce->ejected = true;
             ++ejected_count;
-            tcache_eject_printf("tcache_eject: %s %u / %u lru:%u, req:%u\n", tce->path, num_texture_bytes, max_num_texture_bytes, tce->lru_count, increment);
+            tcache_eject_printf("tcache_eject: %s %u / %u lru:%u, req:%u\n", tce->path, num_texture_bytes, max_num_texture_bytes, tce->lru_count, (unsigned)increment);
         }
     }
     assert(lru_eject.ix <= lru_eject.count);
@@ -537,7 +539,7 @@ static bool tcache_eject(unsigned increment, bool (*check)(int, int)) {
 }
 
 // Eject least recently used textures to reduce texture bytes to the configured limit
-static void tcache_cap_num_bytes(unsigned increment) {
+static void tcache_cap_num_bytes(size_t increment) {
     if( max_num_texture_bytes && (num_texture_bytes + increment) > max_num_texture_bytes ) {
         int64_t ms_0 = get_micro_seconds();
         if (lru_eject.render_cycle != render_cycle) {
@@ -586,7 +588,7 @@ static void tcache_cap_num_bytes(unsigned increment) {
     }
 }
 
-static bool test_cap_exceeded(int increment, int ejected_count) {
+static bool test_cap_exceeded(size_t increment, int ejected_count) {
     UNUSED(increment);
     return ejected_count == 0;
 }
@@ -631,7 +633,7 @@ bool tcache_load_from_file(texture_id_t texture_id, SDL_Renderer* renderer) {
             } else {
                 tce->w = tce->surface->w;
                 tce->h = tce->surface->h;
-                tce->num_surface_bytes = tce->surface->pitch * tce->h;
+                tce->num_surface_bytes = size_t_from_int(tce->surface->pitch * tce->h);
                 __atomic_add_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
             }
         }
@@ -661,7 +663,7 @@ bool tcache_set_surface(texture_id_t texture_id, SDL_Surface* surface) {
             tce->surface = surface;
             tce->w = surface->w;
             tce->h = surface->h;
-            tce->num_surface_bytes = tce->surface->pitch * tce->h;
+            tce->num_surface_bytes = size_t_from_int(tce->surface->pitch * tce->h);
             __atomic_add_fetch(&num_surface_bytes, tce->num_surface_bytes, __ATOMIC_ACQ_REL);
             return true;
         } else {
@@ -707,9 +709,9 @@ texture_id_t tcache_load_media(const char* path, SDL_Renderer* renderer, bool* p
 
 void tcache_concise_dump() {
     int count = 0;
-    int64_t locked_texture_bytes=0;
-    int64_t unlocked_texture_bytes=0;
-    int64_t ejected_texture_bytes=0;
+    size_t locked_texture_bytes=0;
+    size_t unlocked_texture_bytes=0;
+    size_t ejected_texture_bytes=0;
     printf("texture cache dump:\n");
     printf("-----------------------------\n");
     bool locked_vals[2] = {true, false};
@@ -771,7 +773,7 @@ void tcache_concise_dump() {
     }
     printf("Number of hashtable entries=%d\n", HASHTPRIME);
     printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
-    printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
+    printf("Memory used for table entries = %lu\n", (unsigned long)(size_t_from_int(count) * sizeof(tcache_entry)));
     printf("Texture bytes = %lu %f MiB, locked=%ld %f MiB, unlocked=%ld %f MiB, ejected=%ld %f MiB\n", 
             (long unsigned)num_texture_bytes, (float)num_texture_bytes/(1024*1024),
             (long)locked_texture_bytes, (float)locked_texture_bytes/(1024*1024),
@@ -823,8 +825,8 @@ void tcache_dump() {
     tcache_dump_LRU();
     printf("Number of hashtable entries=%d\n", HASHTPRIME);
     printf("Occupancy %f %d/%d\n", ((float)count/HASHTPRIME)*100, count, HASHTPRIME);
-    printf("Memory used for table entries = %ld\n", (long)(count * sizeof(tcache_entry)));
-    printf("Sizeof cache_entry = %ld\n", (long)sizeof(tcache_entry));
+    printf("Memory used for table entries = %lu\n", (unsigned long)(size_t_from_int(count) * sizeof(tcache_entry)));
+    printf("Sizeof cache_entry = %lu\n", (unsigned long)sizeof(tcache_entry));
     printf("Sizeof table = %ld\n", (long)sizeof(tbl));
     printf("-----------------------------\n");
 }
@@ -879,7 +881,7 @@ bool tcache_unlock_texture(texture_id_t texture_id) {
 // especially if the token does not exist
 texture_id_t tcache_get_texture_id(const char* token) {
     uint32_t hashv = hashfn(token);
-    texture_id_t indx = hashv%HASHTPRIME;
+    texture_id_t indx = int_from_unsigned(hashv%HASHTPRIME);
 
     for(int count=0; count < HASHTPRIME; ++count, ++indx) {
         tcache_entry* tce = tbl[indx];

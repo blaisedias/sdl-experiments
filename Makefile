@@ -70,7 +70,7 @@ CF_WARNINGS_COMMON = -Wall -Wextra \
 					 -Wundef \
 					 -Wunreachable-code \
 					 -Wstrict-prototypes \
-					 -Werror
+
 
 
 # commented out for pCP compiler version (14.x) which emits warnings without highlight "offending" code.
@@ -79,11 +79,19 @@ CF_WARNINGS_COMMON = -Wall -Wextra \
 #					 -Wconversion \
 
 CF = $(CF_WARNINGS_COMMON) \
-	 -Wswitch-enum \
-	 -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+		-Wswitch-enum \
+		-Wconversion \
+		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS) \
+
+#		-DVOLUME_CALIB_LEVEL=1 \
+
 
 CF_JSON_PARSER = $(CF_WARNINGS_COMMON) \
-	 -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+
+CF_CITY_HASH = $(CF_WARNINGS_COMMON) \
+		-Wswitch-enum \
+		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
 
 CCP = g++
 CC = gcc
@@ -172,10 +180,10 @@ $(OBJS_DIR)/%.o: $(JSON-PARSER-SRC)/%.c | $(OBJS_DIR)
 	$(CC) $(CF_JSON_PARSER) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
 
 $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJS_DIR)
-	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES-CITYHASH)
+	$(CCP) $(CF_CITY_HASH) -c -o $(@) $< $(INCLUDES-CITYHASH)
 
 $(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.c | $(OBJS_DIR)
-	$(CC) $(CF) -DHAVE_BUILTIN_EXPECT=0 -c -o $(@) $< $(INCLUDES-CITYHASH)
+	$(CC) $(CF_CITY_HASH) -DHAVE_BUILTIN_EXPECT=0 -c -o $(@) $< $(INCLUDES-CITYHASH)
 
 $(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)

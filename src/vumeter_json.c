@@ -4,7 +4,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <SDL2/SDL.h>
+#include <assert.h>
 #include "application.h"
+#include "conversion.h"
 #include "logging.h"
 #include "util.h"
 #define DEBUG_VUMETER_JSON
@@ -12,6 +14,11 @@
 #include "vumeter_json.h"
 
 #define bool  SDL_bool
+
+static inline size_t size_t_from_off_t(off_t v) {
+    assert(v >= 0);
+    return (size_t)v;
+}
 
 static void printf_rect(const SDL_Rect* rect) {
     printf("x=%4d, y=%4d, w=%4d, h=%4d", rect->x, rect->y, rect->w, rect->h);
@@ -240,7 +247,7 @@ static bool read_object_int_value(json_value* jvalue, const char* jt, int* desti
     if (jvalue && jvalue->type != json_integer) {
         return false;
     }
-    *destination = jvalue ? jvalue->u.integer : default_value;
+    *destination = jvalue ? int_from_long(jvalue->u.integer) : default_value;
     return true;
 }
 
@@ -270,7 +277,7 @@ static bool read_object_double_value(json_value* jvalue, const char* jt, double*
         if (jvalue->type == json_double) {
             *destination = jvalue->u.dbl;
         } else {
-            *destination = jvalue->u.integer;
+            *destination = (double)jvalue->u.integer;
         }
     } else {
         *destination = default_value;
@@ -344,16 +351,16 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
         error_printf("deserialise_resource_list: got null object for resources\n");
         return -1;
     }
-    vu_specs->resource_list.count = jresources->u.array.length;
+    vu_specs->resource_list.count = int_from_unsigned(jresources->u.array.length);
     // allocation should include string termination NULL characters
-    size_t bufflen = jresources->u.array.length;
+    int bufflen = int_from_unsigned(jresources->u.array.length);
     for(unsigned ix=0; ix < jresources->u.array.length; ++ix) {
         json_value* jelem = jresources->u.array.values[ix];
         switch (jelem->type) {
             case json_null:
                 break;
             case json_string:
-                bufflen += jelem->u.string.length+1;
+                bufflen += int_from_unsigned(jelem->u.string.length+1);
                 break;
             case json_none:
             case json_object:
@@ -366,11 +373,11 @@ static int deserialise_resource_list(json_value* jresources, vu_meters_specs_t* 
                 return -1;
         }
     }
-    if (NULL == CALLOC(bufflen, vu_specs->resource_list.string_buffer)) {
+    if (NULL == CALLOC(size_t_from_int(bufflen), vu_specs->resource_list.string_buffer)) {
         error_printf("OOM: resources strings %ld\n", bufflen);
         return -1;
     }
-    if (NULL == CALLOC(jresources->u.array.length, vu_specs->resource_list.names)) {
+    if (NULL == CALLOC(size_t_from_unsigned_long(jresources->u.array.length), vu_specs->resource_list.names)) {
         error_printf("OOM: resources strings %ld\n", bufflen);
         return -1;
     }
@@ -412,9 +419,9 @@ static int deserialise_placement_list(json_value* jplacements, vu_meters_specs_t
         error_printf("deserialise_placement_list: got null object for placements\n");
         return -1;
     }
-    vu_specs->placement_list.count = jplacements->u.array.length;
+    vu_specs->placement_list.count = int_from_unsigned(jplacements->u.array.length);
 //    vu_specs->placement_list.elements = calloc(vu_specs->placement_list.count, sizeof( vu_specs->placement_list.elements[0]));
-    if(NULL == CALLOC(vu_specs->placement_list.count, vu_specs->placement_list.elements)) {
+    if(NULL == CALLOC(size_t_from_int(vu_specs->placement_list.count), vu_specs->placement_list.elements)) {
         error_printf("OOM placements %d\n", vu_specs->placement_list.count);
         return -1;
     }
@@ -470,9 +477,9 @@ static int deserialise_composition(json_value* jcomposition, vu_composition_t* c
         error_printf("got null object for compositions placements\n");
         return -1;
     }
-    composition->placement_count = jcp->u.array.length;
+    composition->placement_count = int_from_unsigned(jcp->u.array.length);
 //    composition->ix_placements = calloc(composition->placement_count, sizeof(composition->ix_placements[0]));
-    if(NULL == CALLOC(composition->placement_count,composition->ix_placements)) {
+    if(NULL == CALLOC(size_t_from_int(composition->placement_count), composition->ix_placements)) {
         error_printf("OOM composition placements %d\n", composition->placement_count);
         return -1;
     }
@@ -481,7 +488,7 @@ static int deserialise_composition(json_value* jcomposition, vu_composition_t* c
             error_printf("composition placement index is not an integer\n");
             return -1;
         }
-        composition->ix_placements[ix] = jcp->u.array.values[ix]->u.integer;
+        composition->ix_placements[ix] = int_from_long(jcp->u.array.values[ix]->u.integer);
     }
     return 0;
 }
@@ -491,9 +498,9 @@ static int deserialise_composition_list(json_value* jcompositions, vu_meters_spe
         error_printf("deserialise_composition_list: got null object for compositions\n");
         return -1;
     }
-    vu_specs->composition_list.count = jcompositions->u.array.length;
+    vu_specs->composition_list.count = int_from_unsigned(jcompositions->u.array.length);
 //    vu_specs->composition_list.compositions = calloc(vu_specs->composition_list.count, sizeof( vu_specs->composition_list.compositions[0]));
-    if (NULL == CALLOC(vu_specs->composition_list.count, vu_specs->composition_list.compositions)) {
+    if (NULL == CALLOC(size_t_from_int(vu_specs->composition_list.count), vu_specs->composition_list.compositions)) {
         error_printf("OOM composition list compositions %d\n", vu_specs->composition_list.count);
         return -1;
     }
@@ -519,19 +526,19 @@ static int deserialise_component(json_value* jcomponent,  vu_component_t* compon
     }
 
 //    component->ix_compositions = calloc(jcomponent->u.array.length, sizeof(component->ix_compositions[0]));
-    if (NULL == CALLOC(jcomponent->u.array.length, component->ix_compositions)) {
+    if (NULL == CALLOC(size_t_from_unsigned_long(jcomponent->u.array.length), component->ix_compositions)) {
         error_printf("deserialise_component: OOM %d\n", jcomponent->u.array.length);
         return -1;
     }
 
-    component->composition_count = jcomponent->u.array.length;
+    component->composition_count = int_from_unsigned(jcomponent->u.array.length);
     for(unsigned ix = 0; ix < jcomponent->u.array.length; ++ix) {
         json_value* jcomp = jcomponent->u.array.values[ix];
         if (jcomp->type != json_integer) {
             error_printf("deserialise_component: composition value is not an integer\n");
             return -1;
         }
-        component->ix_compositions[ix] = jcomp->u.integer;
+        component->ix_compositions[ix] = int_from_long(jcomp->u.integer);
     }
     return 0;
 }
@@ -556,7 +563,7 @@ static int deserialise_vumeter(json_value* jvumeter, vumeter_defn_t* vumeter) {
                 jcomponents->u.array.length, 1+NUM_VU_CHANNELS);
         return -1;
     }
-    vumeter->component_count = jcomponents->u.array.length;
+    vumeter->component_count = int_from_unsigned(jcomponents->u.array.length);
     for(unsigned ix = 0; ix < jcomponents->u.array.length; ++ix) {
         if (0 != deserialise_component(jcomponents->u.array.values[ix], &vumeter->components[ix])) {
             return -1;
@@ -570,9 +577,9 @@ static int deserialise_vumeter_list(json_value* jvumeters, vu_meters_specs_t* vu
         error_printf("deserialise_vumeter_list: got null object for vumeters\n");
         return -1;
     }
-    vu_specs->vumeter_list.count = jvumeters->u.array.length;
+    vu_specs->vumeter_list.count = int_from_unsigned(jvumeters->u.array.length);
 //    vu_specs->vumeter_list.vumeters = calloc(vu_specs->vumeter_list.count, sizeof( vu_specs->vumeter_list.vumeters[0]));
-    if (NULL == CALLOC(vu_specs->vumeter_list.count, vu_specs->vumeter_list.vumeters)) {
+    if (NULL == CALLOC(size_t_from_int(vu_specs->vumeter_list.count), vu_specs->vumeter_list.vumeters)) {
         error_printf("OOM vumeter list vumeters %d\n", vu_specs->vumeter_list.count);
         return -1;
     }
@@ -750,14 +757,14 @@ static bool _deserialise_vumeter_json_string(vu_meters_t** pvu, const char* json
     // each spec resources maps to a texture
     // allocate the vu_meters state texture array
     vu->state->textures_list.count = vu->spec->resource_list.count;
-    CALLOC(vu->state->textures_list.count, vu->state->textures_list.textures);
+    CALLOC(size_t_from_int(vu->state->textures_list.count), vu->state->textures_list.textures);
     if (NULL == vu->state->textures_list.textures) {
         error_printf("OOM: textures_id_t %d\n", vu->state->textures_list.count);
         return false;
     }
 
     vu->state->vu_meter_disabled.count = vu->spec->vumeter_list.count;
-    if (NULL == CALLOC(vu->state->vu_meter_disabled.count, vu->state->vu_meter_disabled.elements)) {
+    if (NULL == CALLOC(size_t_from_int(vu->state->vu_meter_disabled.count), vu->state->vu_meter_disabled.elements)) {
         error_printf("OOM: disabled_flags %d\n", vu->state->vu_meter_disabled.count);
         return false;
     }
@@ -782,8 +789,8 @@ vu_meters_t* deserialise_vumeters_json_file(const char* filepath) {
         return NULL;
     }
 
-    if (CALLOC(filestatus.st_size, json_str)  == NULL) {
-        error_printf("deserialise_vumeters_file: OOM %d %s \n", filestatus.st_size, filepath);
+    if (CALLOC(size_t_from_off_t(filestatus.st_size), json_str)  == NULL) {
+        error_printf("deserialise_vumeters_file: OOM %d %s \n", size_t_from_off_t(filestatus.st_size), filepath);
         return NULL;
     }
 
@@ -794,7 +801,7 @@ vu_meters_t* deserialise_vumeters_json_file(const char* filepath) {
         return NULL;
     }
 
-    if (1 != fread(json_str, filestatus.st_size, 1, fp)) {
+    if (1 != fread(json_str, size_t_from_off_t(filestatus.st_size), 1, fp)) {
         fclose(fp);
         free(json_str);
         error_printf("deserialise_vumeters_file: failed to read file data %s \n", filepath);
@@ -802,7 +809,7 @@ vu_meters_t* deserialise_vumeters_json_file(const char* filepath) {
     }
     fclose(fp);
 
-    vu_meters_t* vu = deserialise_vumeters_json_string(json_str, filestatus.st_size, filepath);
+    vu_meters_t* vu = deserialise_vumeters_json_string(json_str, size_t_from_off_t(filestatus.st_size), filepath);
     free(json_str);
 
     if (NULL == vu) {

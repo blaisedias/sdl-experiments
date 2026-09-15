@@ -1,6 +1,7 @@
-#include <SDL2/SDL.h>
 #ifndef __jl_util_h_
 #define __jl_util_h_
+
+#include <SDL2/SDL.h>
 
 //extern const SDL_RendererFlip* const oriented_flip;
 void setup_orientation(float orientation, int w, int h, SDL_Rect* screen);
@@ -30,7 +31,7 @@ int strcmp_ex(const char* const x, const char* const y);
 void free_ex(void** tgt);
 #define FREE(x) free_ex((void **)(&x))
 
-void* calloc_ex(void** tgt, int nmemb, size_t memb_size);
+void* calloc_ex(void** tgt, size_t nmemb, size_t memb_size);
 #define CALLOC(n,p) calloc_ex((void**)&p, n, sizeof(*p))
 
 #define ARRAYLEN(a) (int)(sizeof((a))/sizeof((a)[0]))

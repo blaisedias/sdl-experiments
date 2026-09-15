@@ -19,6 +19,7 @@
 #include "timing.h"
 #include "logging.h"
 #include "lyrion_player.h"
+#include "conversion.h"
 
 #define CLI_PORT 9090
 #define SLIMPROTO_PORT 3483
@@ -341,13 +342,13 @@ static inline void free_ex(void** tgt) {
 #define ZERO(x) memset((x), 0, sizeof(*(x)))
 
 uint64_t compute_player_hash(const char* s) {
-    const int p = 31;
-    const int m = 1e9 + 9;
+    const uint64_t p = 31;
+    const uint64_t m = 1e9 + 9;
     uint64_t hash_value = 0;
     uint64_t p_pow = 1;
     char *c = (char *)s;
     while(*c) {
-        hash_value = (hash_value + (*c - 'a' + 1) * p_pow) % m;
+        hash_value = (hash_value + (uint64_t)(*c - 'a' + 1) * p_pow) % m;
         p_pow = (p_pow * p) % m;
         ++c;
     }
@@ -453,9 +454,9 @@ static char* splitcolon(char* in) {
     return NULL;
 }
 
-static int escaped_strlen(const char* str) {
+static size_t escaped_strlen(const char* str) {
     const char *p = str;
-    int len = 0;
+    size_t len = 0;
     while(p && *p) {
         ++len;
         if (*p == ':') {
@@ -468,32 +469,33 @@ static int escaped_strlen(const char* str) {
 
 static int __lms_req(const char* prefix, const char* suffix, const char *format, va_list args, char** data_ptr, lms_io_ptr io_ptr) {
     // if send fails return value is -1,
-    int rv = -2;
+    ssize_t rv = -2;
     *data_ptr = NULL;
     ZERO(io_ptr->cmd_buff);
     ZERO(io_ptr->buffer);
     char *p = io_ptr->cmd_buff;
     size_t len = sizeof(io_ptr->cmd_buff);
     if (prefix) {
-        int prefixlen = strlen(prefix);
+        size_t prefixlen = strlen(prefix);
         strcpy(p, prefix);
         p[prefixlen] = ' ';
         p += prefixlen + 1;
         len -= prefixlen;
     }
     int w = vsnprintf(p, len, format, args);
-    int suffixlen = 0;
+    size_t suffixlen = 0;
     if (suffix) {
         suffixlen = strlen(suffix);
     }
-    if (w < (int)len - suffixlen - 1) {
+//    if (w < (int)len - suffixlen - 1) {
+    if (len - suffixlen - 1 > size_t_from_int(w)) {
         strcat(p, suffix);
-        int s_len = strlen(io_ptr->cmd_buff);
+        size_t s_len = strlen(io_ptr->cmd_buff);
         rv = send(io_ptr->sockfd, io_ptr->cmd_buff, s_len, 0);
         if ( 0 < rv )
         {
             fgets(io_ptr->buffer, sizeof(io_ptr->buffer), io_ptr->fp);
-            int hdr_len = escaped_strlen(io_ptr->cmd_buff) - suffixlen + 1;
+            size_t hdr_len = escaped_strlen(io_ptr->cmd_buff) - suffixlen + 1;
             char* c = io_ptr->buffer + hdr_len;
             while (*c != 0) {
                 if (*c == '\n' || *c == '\r') {
@@ -509,7 +511,7 @@ static int __lms_req(const char* prefix, const char* suffix, const char *format,
     } else {
         fprintf(stderr, "cmd buff is too small!\n%s\n", io_ptr->cmd_buff);
     }
-    return rv;
+    return int_from_ssize_t(rv);
 }
 
 // returns 0 on success
@@ -1596,7 +1598,7 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
     char* post;
     char* pprint = buff;
     int   wr;
-    int   avail = bufflen;
+    int   avail = int_from_size_t(bufflen);
 
     *pprint = '\0';
     if (player == NULL) {
@@ -1609,7 +1611,7 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
     char* scan = fmt;
 
 #define SNPRINTF(str) \
-    wr = snprintf(pprint, avail, "%s", (str)); \
+    wr = snprintf(pprint, size_t_from_int(avail), "%s", (str)); \
     avail -= wr; \
     if (avail < 1) goto END; \
     pprint += wr
@@ -1618,9 +1620,9 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
     if (aw) { \
         char fieldfmt[16]; \
         snprintf(fieldfmt, sizeof(fieldfmt), "%%%sd", aw); \
-        wr = snprintf(pprint, avail, fieldfmt, (integer)); \
+        wr = snprintf(pprint, size_t_from_int(avail), fieldfmt, (integer)); \
     } else { \
-        wr = snprintf(pprint, avail, "%d", (integer)); \
+        wr = snprintf(pprint, size_t_from_int(avail), "%d", (integer)); \
     } \
     avail -= wr; \
     if (avail < 1) goto END; \
@@ -1630,9 +1632,9 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
     if (aw) { \
         char fieldfmt[16]; \
         snprintf(fieldfmt, sizeof(fieldfmt), "%%%ss", aw); \
-        wr = snprintf(pprint, avail, fieldfmt, (str)); \
+        wr = snprintf(pprint, size_t_from_int(avail), fieldfmt, (str)); \
     } else { \
-        wr = snprintf(pprint, avail, "%s", (str)); \
+        wr = snprintf(pprint, size_t_from_int(avail), "%s", (str)); \
     } \
     avail -= wr; \
     if (avail < 1) goto END; \
@@ -1640,7 +1642,7 @@ void player_sprintf(lyrion_player_ptr player, char* buff, size_t bufflen, const 
 
 
 #define SNPRINTF_TIME(integer, suppress0) \
-    wr = snprintf_time(pprint, avail, (integer), suppress0); \
+    wr = snprintf_time(pprint, size_t_from_int(avail), (integer), suppress0); \
     avail -= wr; \
     if (avail < 1) goto END; \
     pprint += wr

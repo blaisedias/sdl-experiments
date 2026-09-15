@@ -5,8 +5,8 @@
 #include <time.h>
 #include <string.h>
 #include <stdint.h>
-
 #include "nowplaying.h"
+#include "conversion.h"
 
 typedef enum {
     TD_WEEKDAY,
@@ -52,7 +52,7 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
     char*   pre = NULL;
     char*   post;
     char*   pprint = buff;
-    size_t  avail = bufflen;
+    int     avail = int_from_size_t(bufflen);
     char*   fmt = strdup(format);
     char*   scan;
     int     wr;
@@ -82,7 +82,7 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
     } 
 
 #define SNPRINTF(str) \
-    wr = snprintf(pprint, avail, "%s", (str)); \
+    wr = snprintf(pprint, size_t_from_int(avail), "%s", (str)); \
     avail -= wr; \
     if (avail < 1) goto END; \
     pprint += wr
@@ -93,9 +93,9 @@ void timedate_sprintf(char* buff, size_t bufflen, const char *format) {
         if (aw) { \
             char fieldfmt[16]; \
             snprintf(fieldfmt, sizeof(fieldfmt), "%%%ss", aw); \
-            wr = snprintf(pprint, avail, fieldfmt, (str)); \
+            wr = snprintf(pprint, size_t_from_int(avail), fieldfmt, (str)); \
         } else { \
-            wr = snprintf(pprint, avail, "%s", (str)); \
+            wr = snprintf(pprint, size_t_from_int(avail), "%s", (str)); \
         } \
         avail -= wr; \
         if (avail < 1) goto END; \

@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "util.h"
 #include "logging.h"
+#include "conversion.h"
 
 static float screen_orientation=0.0f;
 static int screen_width, screen_height;
@@ -10,6 +11,10 @@ const char* const flip_strings[3] = {
     "Horizontal",
     "Vertical"
 };
+
+static inline int rup_scale_int(int v, float f) {
+    return (int)(0.5f + (float)v*f);
+}
 
 //void (*translate_xy)(int* x, int* y);
 void (*translate_point)(SDL_Point* pt);
@@ -294,15 +299,15 @@ void center_rect(const SDL_Rect* outer, const SDL_Rect* inner, SDL_Rect* dst) {
 void scale_rect_size(const SDL_Rect* src, SDL_Rect* dst, float scalef) {
     dst->x = src->x;
     dst->y = src->y;
-    dst->w = (int)(src->w * scalef + 0.5);
-    dst->h = (int)(src->h * scalef + 0.5);
+    dst->w = rup_scale_int(src->w, scalef);
+    dst->h = rup_scale_int(src->h, scalef);
 }
 
 void scale_rect(const SDL_Rect* src, SDL_Rect* dst, float scalef) {
-    dst->x = (int)(src->x * scalef + 0.5);
-    dst->y = (int)(src->y * scalef + 0.5);
-    dst->w = (int)(src->w * scalef + 0.5);
-    dst->h = (int)(src->h * scalef + 0.5);
+    dst->x = rup_scale_int(src->x , scalef);
+    dst->y = rup_scale_int(src->y , scalef);
+    dst->w = rup_scale_int(src->w , scalef);
+    dst->h = rup_scale_int(src->h , scalef);
 }
 
 void print_sdl_key_scancode(SDL_Scancode scancode) {
@@ -1072,11 +1077,11 @@ void free_ex(void** tgt) {
     *tgt = NULL;
 }
 
-void* calloc_ex(void** tgt, int nmemb, size_t memb_size) {
+void* calloc_ex(void** tgt, size_t nmemb, size_t memb_size) {
     if (tgt) {
         *tgt  = calloc(nmemb, memb_size);
         if (*tgt == NULL) {
-            error_printf("OOM: %d * %d = %ld\n", nmemb, (int)memb_size, (long)(nmemb*memb_size));
+            error_printf("OOM: %d * %d = %lu\n", nmemb, (int)memb_size, (long)((size_t)nmemb*memb_size));
         }
 #if 0
         {

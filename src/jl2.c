@@ -18,10 +18,15 @@
 #include "widgets_json.h"
 #include "vumeter.h"
 #include "nowplaying.h"
+#include "audio_volume.h"
+#include "conversion.h"
 
+#if VOLUME_CALIB_LEVEL
+FILE* fp_vol_calib;
+#endif
 lyrion_player_ptr get_player(void);
 
-#define WINDOW_TITLE "Tsp"
+#define WINDOW_TITLE "JL2"
 #define HIDE_CURSOR_COUNT 50
 static int show_cursor = 0;
 static const char* help_text=""
@@ -47,7 +52,9 @@ static const char* help_text=""
 " - printftcache enable printing of texture cache module\n"
 " - printftcacheeject enable printing of texture cache module ejects\n"
 " - printfapp enable printing of application processing\n"
+#if VOLUME_CALIB_LEVEL
 " - printfvolcalib enable printing of volume calibration messages\n"
+#endif
 " - debug_redraw_backdrop enable printing when backdrop is redrawn\n"
 "\n"  
 " - dl <path-to-object-file> : dynamically load VU meter in object file\n"
@@ -69,6 +76,10 @@ static const char* help_text=""
 " - lms <name>: lyrion media server network name or ip address \n"
 "\n"
 " - monitor-tcache: print texture cache memory usage at regular intervals \n"
+#if VOLUME_CALIB_LEVEL
+"\n"
+" - volcalib: emit volume calibration to /tmp/volume_levels.txt en"
+#endif
 "\n";  
 
 static const char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
@@ -150,7 +161,7 @@ int main(int argc, char** argv) {
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "cycle")) {
             if (argc > i+1) {
-                app_context.cycle_secs = atof(argv[i+1]);
+                app_context.cycle_secs = (float)atof(argv[i+1]);
                 i += 1;
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "wxh")) {
@@ -206,15 +217,17 @@ int main(int argc, char** argv) {
             enable_printf(TEXTURE_CACHE_EJECT_PRINTF);
         } else if (0 == strcmp(argv[i], "printfapp")) {
             enable_printf(APP_PRINTF);
+#if VOLUME_CALIB_LEVEL
         } else if (0 == strcmp(argv[i], "printfvolcalib")) {
             enable_printf(VOL_CALIB_PRINTF);
+#endif
         } else if (0 == strcmp(argv[i], "debug_redraw_backdrop")) {
             app_context.debug_redraw_backdrop = true;
         } else if (0 == strcmp(argv[i], "fs") || 0 == strcmp(argv[i], "fullscreen")) {
             app_context.fullscreen = true;
         } else if (0 == strcmp(argv[i], "texture_cache_size")) {
             if (argc > i+1) {
-                tcache_set_limit(atoi(argv[i+1]));
+                tcache_set_limit(unsigned_from_int(atoi(argv[i+1])));
                 i += 1;
             } else { invalid_args(argv[i]); }
         } else if (0 == strcmp(argv[i], "lms")) {
@@ -227,7 +240,7 @@ int main(int argc, char** argv) {
             dump_vu = true;
         } else if (0 == strcmp(argv[i], "texture_cache_size")) {
             if (argc > i+1) {
-                tcache_set_limit(atoi(argv[i+1]));
+                tcache_set_limit(unsigned_from_int(atoi(argv[i+1])));
                 i += 1;
             }
         } else if (0 == strcmp(argv[i], "lms")) {
@@ -278,6 +291,10 @@ int main(int argc, char** argv) {
                 ) {
             puts(help_text);
             exit(EXIT_SUCCESS);
+#if VOLUME_CALIB_LEVEL
+        } else if (0 == strcmp(argv[i], "volcalib")) {
+            fp_vol_calib=fopen("/tmp/volume_levels.txt", "w");
+#endif
         } else {
             puts(help_text);
             error_printf("Unknown command line option %d) %s\n", i, argv[i]);
@@ -312,6 +329,12 @@ int main(int argc, char** argv) {
     app_cleanup(&app_context, EXIT_SUCCESS);
 
     SDL_DestroyMutex(view_change_mutex);
+#if VOLUME_CALIB_LEVEL
+    if (fp_vol_calib) {
+        fflush(fp_vol_calib);
+        fclose(fp_vol_calib);
+    }
+#endif
     return 0;
 }
 
@@ -470,7 +493,7 @@ log_printf("starting controller\n");
 
     //TODO select view when previously shutdown
     
-    int64_t next_vu_time = app_ctx->cycle_secs * 1000;
+    int64_t next_vu_time = (int64_t)app_ctx->cycle_secs * 1000;
     if (next_vu_time) {
         next_vu_time += get_milli_seconds();
     }
@@ -500,7 +523,7 @@ log_printf("starting controller\n");
         if (next_vu_time && get_milli_seconds() > next_vu_time) {
             SDL_Event next_visu_event = {.type = USEREVENT_NEXT_VISU };
             SDL_PushEvent(&next_visu_event);
-            next_vu_time = app_ctx->cycle_secs * 1000 + get_milli_seconds();
+            next_vu_time = (int64_t)app_ctx->cycle_secs * 1000 + get_milli_seconds();
         }
         size_t nt = tcache_get_texture_bytes_count();
         size_t ns = tcache_get_surface_bytes_count();
@@ -508,8 +531,8 @@ log_printf("starting controller\n");
             static size_t prev_nt_val, prev_ns_val;
             float f_nt = (float)nt/(1024*1024);
             float f_ns = (float)ns/(1024*1024);
-            size_t nt_val = f_nt*100;
-            size_t ns_val = f_ns*100;
+            size_t nt_val = (size_t)f_nt*100;
+            size_t ns_val = (size_t)f_ns*100;
             if (prev_nt_val != nt_val || prev_ns_val != ns_val) {
                 log_printf("textures:%.02f MiB surfaces:=%.02f MiB\n",
                         (float)nt/(1024*1024),
@@ -568,8 +591,8 @@ static void my_render_foreground(app_context_ptr app_ctx) {
 }
 
 static void print_tcache_stats(void){
-    unsigned texture_bytes = tcache_get_texture_bytes_count();
-    unsigned surface_bytes = tcache_get_surface_bytes_count();
+    size_t texture_bytes = tcache_get_texture_bytes_count();
+    size_t surface_bytes = tcache_get_surface_bytes_count();
     log_printf("texture:%u %fMiB surface:%u %fMib\n", texture_bytes, (float)texture_bytes/(1024*1024), surface_bytes, (float)surface_bytes/(1024*1024));
 }
 
@@ -579,8 +602,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
         return;
     }    
     static  SDL_Scancode prev_keydown;
-    static int64_t keydown_start_time = 0;
-    int key_press_duration = 0;
+//    static int64_t keydown_start_time = 0;
+//    int key_press_duration = 0;
     const Uint8 *key_states = SDL_GetKeyboardState(NULL);
     switch (eventp->type) {
             case USEREVENT_NEXT_VISU:
@@ -622,18 +645,18 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
             case SDL_KEYDOWN:
                 if (eventp->key.keysym.scancode != prev_keydown) {
                     prev_keydown = eventp->key.keysym.scancode;
-                    keydown_start_time = get_milli_seconds();
+//                    keydown_start_time = get_milli_seconds();
                 }
                 break;
             case SDL_KEYUP:
                 print_sdl_key_scancode(eventp->key.keysym.scancode);
                 {
                     if (eventp->key.keysym.scancode == prev_keydown) {
-                        key_press_duration = get_milli_seconds() - keydown_start_time;
+//                        key_press_duration = get_milli_seconds() - keydown_start_time;
                         prev_keydown = SDL_SCANCODE_UNKNOWN;
                     }
                 }
-                app_printf("key press duration = %d ms\n", key_press_duration);
+//                app_printf("key press duration = %d ms\n", key_press_duration);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
                 switch (eventp->key.keysym.scancode) {
@@ -747,8 +770,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
 //                } else {
                 {
                     SDL_Point pt = { 
-                        .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
-                        .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
+                        .x = (int)(eventp->tfinger.x*(float)app_ctx->screen_width),
+                        .y = (int)(eventp->tfinger.y*(float)app_ctx->screen_height)
                     };
                     if (view) { widget_list_react(view->list, POINTER_MOTION, &pt); }
                 }
@@ -764,8 +787,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
 //                } else {
                 {
                     SDL_Point pt = { 
-                        .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
-                        .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
+                        .x = (int)(eventp->tfinger.x*(float)app_ctx->screen_width),
+                        .y = (int)(eventp->tfinger.y*(float)app_ctx->screen_height)
                     };
                     if (view) { widget_list_react(view->list, POINTER_DOWN, &pt); }
                 }
@@ -781,8 +804,8 @@ static void my_event_handler(app_context_ptr app_ctx, SDL_Event* eventp) {
 //                } else {
                 {
                     SDL_Point pt = { 
-                        .x = (int)(eventp->tfinger.x*app_ctx->screen_width),
-                        .y = (int)(eventp->tfinger.y*app_ctx->screen_height)
+                        .x = (int)(eventp->tfinger.x*(float)app_ctx->screen_width),
+                        .y = (int)(eventp->tfinger.y*(float)app_ctx->screen_height)
                     };
                     if (view) { widget_list_react(view->list, POINTER_UP, &pt); }
                 }
@@ -885,7 +908,7 @@ log_printf("starting player_poll_loop\n");
                         case PFV_INT:
                             debug_printf("got int %d for player value %s\n", pvalue.integer, player_value_key);
                             if (wtype == WIDGET_MULTISTATE_BUTTON) {
-                                widget_multistate_button_set_state(t, pvalue.integer);
+                                widget_multistate_button_set_state(t, unsigned_from_int(pvalue.integer));
                             } else if (widget_is_slider(t)) {
                                 if (strcmp("time", player_value_key)) {
                                     bool in_range;
@@ -918,8 +941,14 @@ log_printf("starting player_poll_loop\n");
             }
             player_sprintf(player, buffer, sizeof(buffer), "{playlist_cur_index}{TITLE}{ARTIST}{ALBUM_OR_REMOTE_TITLE}");
             uint64_t new_sig = compute_player_hash(buffer);
-            player_sprintf(player, buffer, sizeof(buffer), "Title:{TITLE} Artist:{ARTIST} Album:{ALBUM_OR_REMOTE_TITLE}");
+//            player_sprintf(player, buffer, sizeof(buffer), "Title:{TITLE} Artist:{ARTIST} Album:{ALBUM_OR_REMOTE_TITLE}");
 //            fprintf(stderr, "\n<< 0x%lx==0x%lx %s >>\n",(unsigned long)sig, (unsigned long)new_sig, buffer);
+#if VOLUME_CALIB_LEVEL
+            if (fp_vol_calib) {
+                player_sprintf(player, buffer, sizeof(buffer), "{TITLE}");
+                fprintf(fp_vol_calib, "T:%s\n", buffer);
+            }
+#endif
             if (sig && new_sig != sig) {
                 // TODO only change visualiser if user setting is set
                 SDL_Event next_visu_event = {.type = USEREVENT_NEXT_VISU };

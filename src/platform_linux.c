@@ -14,8 +14,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include "platform.h"
-
+#include "conversion.h"
 
 // search first 4 interfaces returned by IFCONF - same method used by squeezelite
 char *platform_get_mac_address() {
@@ -34,7 +35,8 @@ char *platform_get_mac_address() {
     ifc.ifc_req = ifs;
 
     if (ioctl(s, SIOCGIFCONF, &ifc) == 0) {
-		ifend = ifs + (ifc.ifc_len / sizeof(struct ifreq));
+        assert(ifc.ifc_len >= 0);
+		ifend = ifs + (size_t_from_int(ifc.ifc_len) / sizeof(struct ifreq));
 
 		for (ifr = ifc.ifc_req; ifr < ifend; ifr++) {
 			if (ifr->ifr_addr.sa_family == AF_INET) {

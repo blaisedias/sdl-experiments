@@ -6,9 +6,8 @@
 #include <time.h>
 #include "timing.h"
 
-
 int64_t get_micro_seconds() {
-    uint64_t millis;
+    int64_t millis;
     struct timespec  ts;
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1) {
         perror("clock_gettime");

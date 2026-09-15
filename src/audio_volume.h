@@ -1,6 +1,10 @@
 #ifndef __jl_audio_volume_h_
 #define __jl_audio_volume_h_
 
+#ifndef  VOLUME_CALIB_LEVEL
+#define  VOLUME_CALIB_LEVEL	 0
+#endif
+
 // For now the number of channels is fix at 2
 // a future change will remove this hard-coding
 #define     NUM_VU_CHANNELS     2
@@ -12,9 +16,9 @@ typedef struct {
     int     decay_hold_counter;
     float   decay_vol;
     float   decay_unit;
-    long long sq_summed;
-    long long div256Sq;
-    long long summed;
+    int     sq_summed;
+    int     div256Sq;
+//    int     summed;
 }runtime_volume_t;
 
 typedef const runtime_volume_t* runtime_volume_ptr;

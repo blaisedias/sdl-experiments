@@ -10,6 +10,7 @@
 #include "actions.h"
 #include "logging.h"
 #include "util.h"
+#include "conversion.h"
 
 #define bool  SDL_bool
 float scalef = 1.0;
@@ -25,6 +26,11 @@ static const char* widget_type_strings[] = {
     "vslider",
     ""
 };
+
+static inline size_t size_t_from_off_t(off_t v) {
+    assert(v >= 0);
+    return (size_t)v;
+}
 
 static widget_type_t tokenise_widget(const char* str) {
     if (str == NULL) {
@@ -250,7 +256,7 @@ static json_value* get_object_object_value(json_value* value, json_token jt) {
 static int get_object_int_value(json_value* value, json_token jt, int default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_integer) {
-        return value->u.integer;
+        return int_from_long(value->u.integer);
     }
     return default_value;
 }
@@ -270,7 +276,7 @@ static uint8_t get_object_uint8_value(json_value* value, json_token jt, uint8_t 
 static int get_scaled_object_int_value(json_value* value, json_token jt, int default_value) {
     value = get_object_value(value, jt);
     if (value && value->type == json_integer) {
-        return (int)(value->u.integer*scalef);
+        return (int)((float)value->u.integer*scalef);
     }
     return default_value;
 }
@@ -619,7 +625,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 json_value* jstates = get_object_value(value, JT_STATES);
                 if (jstates != NULL && jstates->type == json_array) {
                     json_printf("     states\n");
-                    widget = widget_create_multistate_button(ctx, jstates->u.array.length);
+                    widget = widget_create_multistate_button(ctx, int_from_long(jstates->u.array.length));
                     for(unsigned x=0; x < jstates->u.array.length; ++x) {
                         json_value* svalue = jstates->u.array.values[x];
                         widget_multistate_button_addstate(widget, x, 
@@ -711,7 +717,7 @@ static void deserialise_one_widget(json_value* value, view_context_t* ctx) {
                 {
                     json_value* slider_v =get_object_value(value, JT_SLIDER_VALUE);
                     if (slider_v && slider_v->type == json_integer) {
-                        widget_slider_update_value(widget, slider_v->u.integer, NULL);
+                        widget_slider_update_value(widget, int_from_long(slider_v->u.integer), NULL);
                     }
                 }
             }break;
@@ -766,8 +772,8 @@ static bool deserialise_screen(json_value* value, view_context_t* ctx, SDL_Rect*
     return false;
 }
 
-int deserialise_json(const char* json_str, const int len, view_context_t* ctx) {
-    json_value* value = json_parse(json_str, len);
+int deserialise_json(const char* json_str, const size_t len, view_context_t* ctx) {
+    json_value* value = json_parse(json_str, (size_t)len);
 
     if (value == NULL) {
         error_printf("deserialise_json: failed to parse json string\n");
@@ -805,8 +811,7 @@ int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
         return EXIT_FAILURE;
     }
 
-    json_str =  calloc(filestatus.st_size, 1);
-    if (json_str == NULL) {
+    if( NULL ==  CALLOC(size_t_from_off_t(filestatus.st_size), json_str)) {
         error_printf("deserialise_widgets_file: OOM %d %s \n", filestatus.st_size, filepath);
         return EXIT_FAILURE;
     }
@@ -818,7 +823,7 @@ int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
         return EXIT_FAILURE;
     }
 
-    if (1 != fread(json_str, filestatus.st_size, 1, fp)) {
+    if (1 != fread(json_str, size_t_from_off_t(filestatus.st_size), 1, fp)) {
         fclose(fp);
         free(json_str);
         error_printf("deserialise_widgets_file: failed to read file data %s \n", filepath);
@@ -826,7 +831,7 @@ int deserialise_widgets_file(const char* filepath, view_context_t* ctx) {
     }
 
     fclose(fp);
-    int rv = deserialise_json(json_str, filestatus.st_size, ctx);
+    int rv = deserialise_json(json_str, size_t_from_off_t(filestatus.st_size), ctx);
     free(json_str);
 
     if (rv != 0) {

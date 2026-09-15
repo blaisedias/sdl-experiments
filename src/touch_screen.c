@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "timing.h"
+#include "conversion.h"
 
 #include "touch_screen.h"
 
@@ -119,13 +120,13 @@ int touch_screen_service(touch_screen_svc_config* config)
     printf("max_slots %d\n", max_slots);
 #endif
 
-    samp_mt = malloc(read_samples * sizeof(struct ts_sample_mt *));
+    samp_mt = calloc(size_t_from_int(read_samples), sizeof(struct ts_sample_mt *));
     if (!samp_mt) {
         ts_close(ts);
         return -ENOMEM;
     }
     for (i = 0; i < read_samples; i++) {
-        samp_mt[i] = calloc(max_slots, sizeof(struct ts_sample_mt));
+        samp_mt[i] = calloc(size_t_from_int32_t(max_slots), sizeof(struct ts_sample_mt));
         if (!samp_mt[i]) {
             free(samp_mt);
             ts_close(ts);
@@ -175,7 +176,7 @@ int touch_screen_service(touch_screen_svc_config* config)
                         config->up(samp_mt[j][i].x, samp_mt[j][i].y);
                     }
                 }
-                down = samp_mt[j][i].pressure;
+                down = int_from_unsigned(samp_mt[j][i].pressure);
             }
         }
     }

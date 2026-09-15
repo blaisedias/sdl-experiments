@@ -7,6 +7,7 @@
 #include "util.h"
 #include "logging.h"
 #include "timing.h"
+#include "conversion.h"
 
 bool debug_rects = false;
 bool show_rects = false;
@@ -28,6 +29,18 @@ static const char* widget_type_strings[] = {
 
 static unsigned text_widget_id = 1;
 static void text_render_surface(widget_t* wdgt);
+
+static inline int inverse_scale_int(int v, float f) {
+    return (int)((float)v/f);
+}
+
+static inline int scale_int(int v, float f) {
+    return (int)((float)v*f);
+}
+
+static inline float fscale(int a, int b) {
+    return (float)a/(float)b;
+}
 
 bool widget_highlighted(widget_t* wdgt) {
     return  __atomic_load_n(&wdgt->atomic_highlight, __ATOMIC_ACQUIRE);
@@ -164,28 +177,28 @@ static void setup_image_fit_src_rect(widget_t *wdgt) {
             case IMAGE_STRETCH_FILL:
                 break;
             case IMAGE_CENTRED_FILL: {
-                float scale_f = MAX((float)(wdgt->rect.w)/wdgt->sub.image.w, (float)(wdgt->rect.h)/wdgt->sub.image.h);
-                wdgt->sub.image.src_rect.w = wdgt->rect.w/scale_f;
-                wdgt->sub.image.src_rect.h = wdgt->rect.h/scale_f;
+                float scale_f = MAX(fscale(wdgt->rect.w, wdgt->sub.image.w), fscale(wdgt->rect.h, wdgt->sub.image.h));
+                wdgt->sub.image.src_rect.w = inverse_scale_int(wdgt->rect.w, scale_f);
+                wdgt->sub.image.src_rect.h = inverse_scale_int(wdgt->rect.h, scale_f);
                 wdgt->sub.image.src_rect.x = (wdgt->sub.image.w -  wdgt->sub.image.src_rect.w)/2;
                 wdgt->sub.image.src_rect.y = (wdgt->sub.image.h -  wdgt->sub.image.src_rect.h)/2;
                 debug_printf("image widget: centered_fill src: {w=%d, h=%d} %f, scalef=%f {%d,%d,%d,%d}\n", 
                         wdgt->sub.image.w, wdgt->sub.image.h, 
-                        (float)wdgt->sub.image.w/wdgt->sub.image.h,
+                        fscale(wdgt->sub.image.w, wdgt->sub.image.h),
                         scale_f,
                         wdgt->sub.image.src_rect.x, wdgt->sub.image.src_rect.y, wdgt->sub.image.src_rect.w, wdgt->sub.image.src_rect.h
                         );
                 }break;
             case IMAGE_FIT: {
-                float scale_f = MIN((float)(wdgt->rect.w)/wdgt->sub.image.w, (float)(wdgt->rect.h)/wdgt->sub.image.h);
+                float scale_f = MIN(fscale(wdgt->rect.w, wdgt->sub.image.w), fscale(wdgt->rect.h,wdgt->sub.image.h));
 
-                wdgt->sub.image.dst_rect.w = wdgt->sub.image.w*scale_f;
-                wdgt->sub.image.dst_rect.h = wdgt->sub.image.h*scale_f;
+                wdgt->sub.image.dst_rect.w = scale_int(wdgt->sub.image.w, scale_f);
+                wdgt->sub.image.dst_rect.h = scale_int(wdgt->sub.image.h, scale_f);
                 wdgt->sub.image.dst_rect.x = wdgt->rect.x + (wdgt->rect.w -  wdgt->sub.image.dst_rect.w)/2;
                 wdgt->sub.image.dst_rect.y = wdgt->rect.y + (wdgt->rect.h -  wdgt->sub.image.dst_rect.h)/2;
                 debug_printf("image widget: dst: fit: {w=%d, h=%d} %f, scalef=%f {%d,%d,%d,%d}\n", 
                         wdgt->sub.image.w, wdgt->sub.image.h, 
-                        (float)wdgt->sub.image.w/wdgt->sub.image.h,
+                        fscale(wdgt->sub.image.w, wdgt->sub.image.h),
                         scale_f,
                         wdgt->sub.image.dst_rect.x, wdgt->sub.image.dst_rect.y, wdgt->sub.image.dst_rect.w, wdgt->sub.image.dst_rect.h
                         );
@@ -735,13 +748,13 @@ static void multistate_button_widget_render(widget_t* wdgt) {
 widget_t* widget_create_multistate_button(const view_context_t* view, int state_count){
     widget_t* wdgt = widget_create(view);
     if (wdgt) {
-        _bnt_resource_t* res = calloc(state_count, sizeof(_bnt_resource_t));
+        _bnt_resource_t* res = calloc(size_t_from_int(state_count), sizeof(_bnt_resource_t));
         if (res == NULL) {
             widget_destroy(wdgt);
             return NULL;
         }
         *((widget_type_t*)&wdgt->type) = WIDGET_MULTISTATE_BUTTON ;
-        wdgt->sub.multistate_button.state_count = state_count;
+        wdgt->sub.multistate_button.state_count = unsigned_from_int(state_count);
         wdgt->sub.multistate_button.res = res;
         wdgt->action = ACTION_END;
         wdgt->render_backdrop = multistate_button_widget_render;
@@ -912,8 +925,8 @@ widget_t* widget_text_set_y_scaling_threshold(widget_t* wdgt, float threshold) {
 
 
 static void text_justify(_text_data_ptr txt_w, SDL_Rect* enclosure, int w, int h, float scale) {
-    int scaled_w = w / scale;
-    int scaled_h = h / scale;
+    int scaled_w = inverse_scale_int(w, scale);
+    int scaled_h = inverse_scale_int(h, scale);
 
     txt_w->dst_rect.w = scaled_w;
     txt_w->dst_rect.h = scaled_h;
@@ -945,9 +958,9 @@ static void text_render_surface(widget_t* wdgt) {
                     // FIXME: 
                     // width exceeds the texture width supported by the renderer
                     // for now scale down the surface to match that limit
-                    float scalef = (float)wdgt->view->app->max_texture_width/surface->w;
+                    float scalef = fscale(wdgt->view->app->max_texture_width, surface->w);
                     SDL_Surface *scaled_surface = SDL_CreateRGBSurfaceWithFormat(0,
-                            surface->w*scalef, surface->h*scalef,
+                            scale_int(surface->w, scalef), scale_int(surface->h, scalef),
                             SDL_BITSPERPIXEL(wdgt->view->app->pixelFormat), wdgt->view->app->pixelFormat);
                     if (scaled_surface) {
                         SDL_BlitScaled(surface, NULL, scaled_surface, NULL);
@@ -965,8 +978,8 @@ static void text_render_surface(widget_t* wdgt) {
                 tcache_set_surface(txt_w->texture_id, surface);
                 
                 // for now scale text to fit content.
-                float scale_x = MAX((float)surface->w/wdgt->rect.w, 1.0);
-                float scale_y = (float)surface->h/wdgt->rect.h;
+                float scale_x = MAX(fscale(surface->w, wdgt->rect.w), 1.0f);
+                float scale_y = fscale(surface->h, wdgt->rect.h);
 
                 if (scale_y > txt_w->y_scaling_threshold && scale_y > scale_x) {
                     text_justify(txt_w, &wdgt->rect, surface->w, surface->h, scale_y);
