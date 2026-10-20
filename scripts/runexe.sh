@@ -53,6 +53,6 @@ if [ -f "/usr/local/etc/pcp/pcpversion.cfg" ]; then
 fi
 export TCACHE_SIZE="texture_cache_size 50000000"
 
-DLVUMETERS="dl VUMeters/Chevrons/indexed-meta.json dl VUMeters/PurpleTastic/indexed-meta.json dl VUMeters/SpeakerGray/indexed-meta.json dl VUMeters/SpeakerGreen/indexed-meta.json dl VUMeters/TransparentWhite/indexed-meta.json dl VUMeters/TubeD/indexed-meta.json dl VUMeters/Kolossos/indexed-meta.json"
+VUMETERS="vu VUMeters/Chevrons/indexed-meta.json vu VUMeters/PurpleTastic/indexed-meta.json vu VUMeters/SpeakerGray/indexed-meta.json vu VUMeters/SpeakerGreen/indexed-meta.json vu VUMeters/TransparentWhite/indexed-meta.json vu VUMeters/TubeD/indexed-meta.json vu VUMeters/Kolossos/indexed-meta.json"
 set -x
-./bin/jl2 $TCACHE_SIZE $DLVUMETERS $*
+./bin/jl2 $TCACHE_SIZE $VUMETERS $*
