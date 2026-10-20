@@ -17,7 +17,7 @@
                         "h": 0
                     }
                 },
-                "image": "./images/wallpapers/HD_IceCold2.png",
+                "image": "./images/wallpapers/HD_MilkyWay1.png",
                 "#comment": "image_scaling is one of [fit, center, stretch]",
                 "image_scaling": "center",
                 "focus_enable": false
