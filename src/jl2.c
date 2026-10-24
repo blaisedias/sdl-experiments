@@ -41,6 +41,7 @@ static const char* help_text=""
 " - cycle <count> : number of seconds before cycling to the next the VU Meter\n"
 "\n"  
 " - vu <path-to-vu-meter-json-file> : load VU meters defined in json file\n"
+" - vusamples <samples_KiB> : Number of samples used to calculate volume level\n"
 "\n"
 " - json: comma seperated list of view json files, default: npvu.json,npvularge.json,npvuartwork.json\n"
 "\n"
@@ -84,6 +85,7 @@ static const char* help_text=""
 static const char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
 static bool dump_vu = false;
 static bool monitor_tcache = false;
+static int vusamples_KiB = 1;
 
 #define MAX_NP_VIEWS   10
 static volatile view_context_ptr current_view = NULL;
@@ -269,6 +271,11 @@ int main(int argc, char** argv) {
 //                }
                 i += 1;
             }
+        } else if (0 == strcmp(argv[i], "vusamples")) {
+            if (argc > i+1) {
+                vusamples_KiB = atoi(argv[i+1]);
+                i += 1;
+            }
         } else if (0 == strcmp(argv[i], "json")) {
             if (argc > i+1) {
                 json_files = argv[i+1];
@@ -301,6 +308,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    vumeter_vis_setup(vusamples_KiB);
     app_printf("screen= %dx%d orientation=%f\n", app_context.screen_width, app_context.screen_height, app_context.orientation);
 
     controller_sem = SDL_CreateSemaphore(0);
@@ -334,6 +342,7 @@ int main(int argc, char** argv) {
         fclose(fp_vol_calib);
     }
 #endif
+    vumeter_vis_teardown();
     return 0;
 }
 

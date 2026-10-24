@@ -13,8 +13,29 @@
 #include "logging.h"
 #include "conversion.h"
 
-#define SAMPLE_COUNT   (1024 * 2)
-#define TOT_SAMPLES     (SAMPLE_COUNT*2)
+static uint32_t sample_count = 0;
+static uint32_t tot_samples = 0;
+static int16_t* samples_buff = NULL;
+
+void vumeter_vis_setup(int samples_KiB) {
+    if (samples_KiB > 0) {
+        sample_count = (uint32_t)samples_KiB * 1024;
+        tot_samples = sample_count * 2;
+        if (samples_buff) {
+            free(samples_buff);
+            samples_buff = NULL;
+        }
+        samples_buff = calloc(tot_samples, sizeof(samples_buff[0]));
+    }
+}
+
+void vumeter_vis_teardown() {
+    if (samples_buff) {
+        free(samples_buff);
+        samples_buff = NULL;
+        tot_samples = 0;
+    }
+}
 
 static inline int avg_ll(long long accumulator, uint32_t samples) {
 	return (int)(accumulator/llong_from_uint32_t(samples));
@@ -72,7 +93,7 @@ static int _visualizer_vumeter_div256_squared(void) {
 
 	int offs;
 
-	num_samples = SAMPLE_COUNT;
+	num_samples = sample_count;
 
 	sample_accumulator[0] = 0;
 	sample_accumulator[1] = 0;
@@ -125,113 +146,17 @@ static inline bool tenpc_delta(long long a, long long b) {
 extern FILE* fp_vol_calib;
 #endif
 
-#if 0
-static int _visualizer_vumeter_cp(void) {
-	static int16_t buff[TOT_SAMPLES];
-#if  VOLUME_CALIB_LEVEL
-	static int same_count =0;
-	static bool vc_displayed = false;
-	static long long prev_sq_summed[2] = { 0, 0};
-#endif // VOLUME_CALIB_LEVEL
-
-	long long div256Sq_accumulator[2] = {0,0};
-	long long summed_accumulator[2] = {0,0};
-	float f_sq_summed_accumulator[2] = {0.0, 0.0};
-//	int32_t num_samples = SAMPLE_COUNT;
-//	int32_t tot_samples = TOT_SAMPLES;
-
-	vis_check();
-
-	if (vis_get_playing()) {
-		vis_lock();
-		int32_t offs;
-		int32_t vis_buffer_len = (int32_t)vis_get_buffer_len();
-		int32_t  vis_buffer_idx = (int32_t)vis_get_buffer_idx();
-
-		if ( TOT_SAMPLES > (uint32_t)vis_buffer_len ) {
-			vis_unlock();
-			error_printf("total samples %u  exceeds visualiser buffer length %u\n",
-							TOT_SAMPLES , vis_buffer_len);
-			exit(EXIT_FAILURE);
-		}
-
-
-		offs = vis_buffer_idx - TOT_SAMPLES;
-		while (offs < 0) offs += vis_buffer_len;
-
-		size_t ns1 = MIN((size_t)(vis_buffer_len - offs), TOT_SAMPLES);
-		size_t ns2 = TOT_SAMPLES - ns1;
-		int16_t *ptr = vis_get_buffer() + offs;
-		memcpy(buff, ptr, sizeof(*ptr)*ns1);
-		if (ns2) {
-			memcpy(buff + ns1,
-					vis_get_buffer(),
-					sizeof(*ptr)*ns2);
-		}
-		vis_unlock();
-
-		s16_t sample;
-		s32_t sample_sq;
-
-		ptr = buff;
-		for (int32_t i=0; i < SAMPLE_COUNT; i++) {
-			float f = abs(*ptr);
-			f *=f;
-			f_sq_summed_accumulator[0] += f;
-			summed_accumulator[0] += abs(*ptr);
-			sample = (*ptr++) >> 8;
-			sample_sq = sample * sample;
-			div256Sq_accumulator[0] += sample_sq;
-
-			f = abs(*ptr);
-			f *=f;
-			f_sq_summed_accumulator[1] += f;
-			summed_accumulator[1] += abs(*ptr);
-			sample = (*ptr++) >> 8;
-			sample_sq = sample * sample;
-			div256Sq_accumulator[1] += sample_sq;
-		}
-	}
-	vol_runtimes[0].div256Sq = avg_ll(div256Sq_accumulator[0], SAMPLE_COUNT);
-	vol_runtimes[1].div256Sq = avg_ll(div256Sq_accumulator[1], SAMPLE_COUNT);
-	vol_runtimes[0].summed = avg_ll(summed_accumulator[0], SAMPLE_COUNT);
-	vol_runtimes[1].summed = avg_ll(summed_accumulator[1], SAMPLE_COUNT);
-	vol_runtimes[0].sq_summed = sqrt_avg(f_sq_summed_accumulator[0], SAMPLE_COUNT);
-	vol_runtimes[1].sq_summed = sqrt_avg(f_sq_summed_accumulator[1], SAMPLE_COUNT);
-
-#if VOLUME_CALIB_LEVEL
-//	if (prev_sq_summed[0] != sq_summed_accumulator[0] || prev_sq_summed[1] != sq_summed_accumulator[1]) {
-	if (tenpc_delta(prev_sq_summed[0],vol_runtimes[0].sq_summed) || tenpc_delta(prev_sq_summed[1],vol_runtimes[1].sq_summed)) {
-		same_count = 0;
-		vc_displayed = false;
-	} else {
-		++same_count;
-		if (same_count >= 120 && !vc_displayed) {
-			vc_displayed = true;
-			vol_calib_printf("Summed:%lld %lld Div256Sq:%lld %lld SqSummed:%lld %lld\n",
-					summed_accumulator[0], summed_accumulator[1],
-					div256Sq_accumulator[0]/SAMPLE_COUNT, div256Sq_accumulator[1]/SAMPLE_COUNT,
-					(long long)vol_runtimes[0].sq_summed, (long long)vol_runtimes[1].sq_summed
-					);
-		}
-	}
-	prev_sq_summed[0] = vol_runtimes[0].sq_summed;
-	prev_sq_summed[1] = vol_runtimes[1].sq_summed;
-#endif // VOLUME_CALIB_LEVEL
-
-	legacy_digitise();
-	return 1;
-}
-#endif
-
 static inline bool ignore_delta(int a, int b) {
 	int d = abs(a - b);
 	// 1%
 	return d > a /100;
 }
 
-static int _visualizer_vumeter_cp2(void) {
-	static int16_t buff[TOT_SAMPLES];
+static bool _visualizer_vumeter_cp2(void) {
+    if (samples_buff == NULL) {
+        return false;
+    }
+
 #if  VOLUME_CALIB_LEVEL
 	static int same_count = 0;
 	static bool vc_displayed = false;
@@ -240,8 +165,6 @@ static int _visualizer_vumeter_cp2(void) {
 
 	long long div256Sq_accumulator[2] = {0, 0};
 	float f_sq_summed_accumulator[2] = {0.0, 0.0};
-//	int32_t num_samples = SAMPLE_COUNT;
-//	int32_t tot_samples = TOT_SAMPLES;
 
 	vis_check();
 
@@ -251,23 +174,23 @@ static int _visualizer_vumeter_cp2(void) {
 		int32_t vis_buffer_len = (int32_t)vis_get_buffer_len();
 		int32_t  vis_buffer_idx = (int32_t)vis_get_buffer_idx();
 
-		if ( TOT_SAMPLES > (uint32_t)vis_buffer_len ) {
+		if ( tot_samples > (uint32_t)vis_buffer_len ) {
 			vis_unlock();
 			error_printf("total samples %u  exceeds visualiser buffer length %u\n",
-							TOT_SAMPLES , vis_buffer_len);
+							tot_samples , vis_buffer_len);
 			exit(EXIT_FAILURE);
 		}
 
 
-		offs = vis_buffer_idx - TOT_SAMPLES;
+		offs = vis_buffer_idx - (int)tot_samples;
 		while (offs < 0) offs += vis_buffer_len;
 
-		size_t ns1 = MIN((size_t)(vis_buffer_len - offs), TOT_SAMPLES);
-		size_t ns2 = TOT_SAMPLES - ns1;
+		size_t ns1 = MIN((size_t)(vis_buffer_len - offs), tot_samples);
+		size_t ns2 = tot_samples - ns1;
 		int16_t *ptr = vis_get_buffer() + offs;
-		memcpy(buff, ptr, sizeof(*ptr)*ns1);
+		memcpy(samples_buff, ptr, sizeof(*ptr)*ns1);
 		if (ns2) {
-			memcpy(buff + ns1,
+			memcpy(samples_buff + ns1,
 					vis_get_buffer(),
 					sizeof(*ptr)*ns2);
 		}
@@ -276,8 +199,8 @@ static int _visualizer_vumeter_cp2(void) {
 		s16_t sample;
 		s32_t sample_sq;
 
-		ptr = buff;
-		for (int32_t i=0; i < SAMPLE_COUNT; i++) {
+		ptr = samples_buff;
+		for (uint32_t i=0; i < sample_count; i++) {
 			sample_sq = (*ptr);
 			sample_sq *= sample_sq;
 			f_sq_summed_accumulator[0] += (float)sample_sq;
@@ -295,10 +218,10 @@ static int _visualizer_vumeter_cp2(void) {
 			ptr++;
 		}
 	}
-	vol_runtimes[0].div256Sq = avg_ll(div256Sq_accumulator[0], SAMPLE_COUNT);
-	vol_runtimes[1].div256Sq = avg_ll(div256Sq_accumulator[1], SAMPLE_COUNT);
-	vol_runtimes[0].sq_summed = sqrt_avg(f_sq_summed_accumulator[0], SAMPLE_COUNT);
-	vol_runtimes[1].sq_summed = sqrt_avg(f_sq_summed_accumulator[1], SAMPLE_COUNT);
+	vol_runtimes[0].div256Sq = avg_ll(div256Sq_accumulator[0], sample_count);
+	vol_runtimes[1].div256Sq = avg_ll(div256Sq_accumulator[1], sample_count);
+	vol_runtimes[0].sq_summed = sqrt_avg(f_sq_summed_accumulator[0], sample_count);
+	vol_runtimes[1].sq_summed = sqrt_avg(f_sq_summed_accumulator[1], sample_count);
 
 #if VOLUME_CALIB_LEVEL
 //	if (prev_sq_summed[0] != sq_summed_accumulator[0] || prev_sq_summed[1] != sq_summed_accumulator[1]) {
@@ -329,7 +252,7 @@ static int _visualizer_vumeter_cp2(void) {
 #endif // VOLUME_CALIB_LEVEL
 
 	legacy_digitise();
-	return 1;
+	return true;
 }
 
 
@@ -342,7 +265,9 @@ static int peak_hold_counter_init_value = 30;
 static int decay_hold_counter_init_value = 3;
 
 void update_volume_levels(float decay_unit) {
-	_visualizer_vumeter_cp2();
+	if (!_visualizer_vumeter_cp2() ) {
+        return;
+    }
 
 	for (int ix_chan=0; ix_chan < NUM_VU_CHANNELS; ++ix_chan) {
 		if (vol_runtimes[ix_chan].vol >= vol_runtimes[ix_chan].peak_hold_vol) {
