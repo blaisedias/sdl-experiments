@@ -1,6 +1,9 @@
 #!/bin/sh
-SCRIPTPATH=$(realpath "$0")
-echo "$SCRIPTPATH"
+SCRIPTDIR=$(dirname $(realpath "$0"))
+ROOTDIR=$(dirname $SCRIPTDIR)
+cd ${ROOTDIR}
+
+echo "Running from $ROOTDIR"
 
 function pcp_setup {
     echo "export XDG_RUNTIME_DIR=/home/tc/.X.d"
