@@ -8,15 +8,15 @@
 #include "conversion.h"
 
 int64_t get_micro_seconds() {
-    int64_t millis;
+    int64_t micros;
     struct timespec  ts;
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1) {
         perror("clock_gettime");
         exit(EXIT_FAILURE);
     }
-    millis = (ts.tv_sec*1000000);
-    millis += (ts.tv_nsec/1000);
-    return millis;
+    micros = (ts.tv_sec*1000000);
+    micros += (ts.tv_nsec/1000);
+    return micros;
 }
 
 int64_t get_milli_seconds() {
