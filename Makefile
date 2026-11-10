@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2025  Blaise Dias
+# Copyright (C) 2025-2026  Blaise Dias
 # 
 # This file is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,13 +30,12 @@ ifeq ($(PLATFORM),piCorePlayer)
 else
 	INCLUDE_TSLIB =
 	TS_LIB_H = 
-#	gcc -fsanitize=address -fno-omit-frame-pointer -g -O1 -o
-#	TARG_DEFS = -fno-omit-frame-pointer -g -O1 -fsanitize=thread
-#	TARG_DEFS = -fno-omit-frame-pointer -g -O1
-#	TARG_DEFS = -fsanitize=leak
 endif
 
 DEFS = $(TARG_DEFS)
+#DEFS = -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64 $(TARG_DEFS)
+#		-DVOLUME_CALIB_LEVEL=1
+
 SRC = ./src
 GENERATED = ./generated
 JSON-PARSER-SRC = ./json-parser
@@ -57,7 +56,12 @@ SANITIZE =
 #SANITIZE =  -fsanitize=memory -fno-omit-frame-pointer -fsanitize=undefined
 #SANITIZE =   -fsanitize=undefined -fsanitize=address 
 GLOBAL_DEPS = ./Makefile
-#CF = -Wall -fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE)
+
+# debug builds
+CF_OPTIM = -fno-omit-frame-pointer -g -Og 
+# release builds
+#CF_OPTIM = -O2 
+
 CF_WARNINGS_COMMON = -Wall -Wextra \
 					 -Wpedantic \
 					 -Wuninitialized \
@@ -82,22 +86,20 @@ CF_WARNINGS_COMMON = -Wall -Wextra \
 CF = $(CF_WARNINGS_COMMON) \
 		-Wswitch-enum \
 		-Wconversion \
-		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS) \
+		$(CF_OPTIM) $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS) \
 
-#		-DVOLUME_CALIB_LEVEL=1 \
 
 
 CF_JSON_PARSER = $(CF_WARNINGS_COMMON) \
-		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+		$(CF_OPTIM) $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
 
 CF_CITY_HASH = $(CF_WARNINGS_COMMON) \
 		-Wswitch-enum \
-		-fno-omit-frame-pointer -g -O1 $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
+		$(CF_OPTIM) $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
 
 CCP = g++
 CC = gcc
-CF_PIC = $(CF) -fpic
-CF_SHARED = $(CF) -fpic -shared
+CF_LIBS = $(CF) -fpic -shared
 
 
 all: $(BIN_DIR)/jl2
@@ -146,7 +148,7 @@ clean:
 generated: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h
 
 #{
-Makefile.deps: \
+Makefile.deps: Makefile \
 		$(SRC)/*.c $(JSON-PARSER-SRC)/*.c $(CITYHASH-SRC)/*.c \
 		$(SRC)/*.h $(JSON-PARSER-SRC)/*.h $(CITYHASH-SRC)/*.h \
 		./scripts/mkdeps.py $(GLOBAL_DEPS) generated 
@@ -193,7 +195,7 @@ $(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
 #	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
 
 $(LIB_DIR)/%.so: $(OBJS_DIR)/%.o | $(LIB_DIR)
-	$(CC) $(CF_SHARED) $(INCLUDES) $< -o $@
+	$(CC) $(CF_LIBS) $(INCLUDES) $< -o $@
 
 # generated code
 $(GENERATED)/vumeter_enum.c: src/vumeter_enums.json
@@ -238,11 +240,11 @@ $(BIN_DIR)/test_touch: $(OBJS_DIR)/test_touch.o $(OBJS_DIR)/touch_screen.o $(OBJ
 #
 $(BIN_DIR)/local_player_test: $(SRC)/local_player_test.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
-		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
+		-o $(@) $^ $(LIBDIRS) $(LIBS)
 
 $(BIN_DIR)/lyrion_player_strhash: $(SRC)/lyrion_player_strhash.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
-		-O1 -o $(@) $^ $(LIBDIRS) $(LIBS)
+		-o $(@) $^ $(LIBDIRS) $(LIBS)
 
 VUMETER_TEST_OBJS = \
 	$(OBJS_DIR)/vumeter_json.o \
