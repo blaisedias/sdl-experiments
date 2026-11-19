@@ -24,7 +24,7 @@ typedef struct {
 typedef const runtime_volume_t* runtime_volume_ptr;
 
 void vumeter_vis_setup(int samples_KiB);
-void vumeter_vis_teardown();
+void vumeter_vis_teardown(void);
 void update_volume_levels(float decay_unit);
 int vumeter_set_peak_hold(int v);
 int vumeter_set_decay_hold(int v);

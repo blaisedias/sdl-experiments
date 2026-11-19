@@ -29,7 +29,7 @@ void vumeter_vis_setup(int samples_KiB) {
     }
 }
 
-void vumeter_vis_teardown() {
+void vumeter_vis_teardown(void) {
     if (samples_buff) {
         free(samples_buff);
         samples_buff = NULL;
