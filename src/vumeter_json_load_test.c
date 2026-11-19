@@ -13,7 +13,7 @@ static void printf_point(const SDL_Point* point) {
     printf("x=%4d, y=%4d", point->x, point->y);
 }
 
-void vumeter_check_setup(SDL_Rect* bounds_in, int count) {
+static void vumeter_check_setup(SDL_Rect* bounds_in, int count) {
     static const char* component_prefix[] = {"F", "L", "R"};
     static const bool spc[] = {false, true};
     printf("bounds:\n");
@@ -38,8 +38,8 @@ void vumeter_check_setup(SDL_Rect* bounds_in, int count) {
             for (int ixb = 0; ixb < count; ++ixb) {
                 SDL_Rect* bounds = &bounds_in[ixb];
                 for(int ispc=0; ispc < ARRAYLEN(spc); ++ispc) {
-                    vumtr->vss->state->equal_horizontal_spacing = spc[ispc];
-                    vumeter_setup(vumtr, bounds);
+                    // vumtr->vss->state->equal_horizontal_spacing = spc[ispc];
+                    vumeter_setup(vumtr, bounds, true);
                     printf("    ");
                     printf(" offset:");
                     printf_point(&vumtr->offset);
