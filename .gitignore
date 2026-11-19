@@ -2,6 +2,8 @@ Makefile.deps
 obj/
 lib/
 bin/
+dep/
+*.d
 *.xcf
 *.svg
 unchecked-meta.json

@@ -36,18 +36,19 @@ DEFS = $(TARG_DEFS)
 #DEFS = -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64 $(TARG_DEFS)
 #		-DVOLUME_CALIB_LEVEL=1
 
-SRC = ./src
-GENERATED = ./generated
-JSON-PARSER-SRC = ./json-parser
-CITYHASH-SRC = ./cityhash-c
+SRC = src
+GENERATED = generated
+JSON-PARSER-SRC = json-parser
+CITYHASH-SRC = cityhash-c
 INCLUDES-JSON-PARSER = -I $(JSON-PARSER-SRC)
 INCLUDES-CITYHASH = -I $(CITYHASH-SRC)
 INCLUDES-GENERATED = -I $(GENERATED)
 INCLUDES = -I $(SRC) $(INCLUDES-GENERATED) $(INCLUDES-JSON-PARSER) $(INCLUDES-CITYHASH) $(INCLUDE_TSLIB)
 
-BIN_DIR = ./bin
-OBJS_DIR = ./obj
-LIB_DIR = ./lib
+BIN_DIR = bin
+OBJ_DIR = obj
+DEP_DIR = dep
+LIB_DIR = lib
 LIBS = -lm $(SDL2_LIBS) -lSDL2_image -lSDL2_ttf -lts 
 
 SANITIZE = 
@@ -88,8 +89,6 @@ CF = $(CF_WARNINGS_COMMON) \
 		-Wconversion \
 		$(CF_OPTIM) $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS) \
 
-
-
 CF_JSON_PARSER = $(CF_WARNINGS_COMMON) \
 		$(CF_OPTIM) $(TARG_CF) $(DEFS) $(SANITIZE) $(SDL2_CFLAGS) $(USER_CFLAGS)
 
@@ -101,100 +100,104 @@ CCP = g++
 CC = gcc
 CF_LIBS = $(CF) -fpic -shared
 
-
 all: $(BIN_DIR)/jl2
 
-TSP_OBJS =  \
-		  $(OBJS_DIR)/application.o \
-		  $(OBJS_DIR)/logging.o \
-		  $(OBJS_DIR)/timing.o \
-		  $(OBJS_DIR)/util.o \
-		  $(OBJS_DIR)/event_queue.o \
-		  $(OBJS_DIR)/touch_screen.o \
-		  $(OBJS_DIR)/touch_screen_sdl2.o \
-		  $(OBJS_DIR)/platform_linux.o \
-		  $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/city.o \
-		  $(OBJS_DIR)/lyrion_player.o \
-		  $(OBJS_DIR)/timedate.o \
-		  $(OBJS_DIR)/widgets.o \
-		  $(OBJS_DIR)/actions.o \
-		  $(OBJS_DIR)/json.o \
-		  $(OBJS_DIR)/widgets_json.o \
-		  $(OBJS_DIR)/visualizer.o \
-		  $(OBJS_DIR)/vumeter.o \
-		  $(OBJS_DIR)/vumeter_json.o \
-		  $(OBJS_DIR)/vis_vumeter.o \
-		  $(OBJS_DIR)/slider_widget.o \
-		  $(OBJS_DIR)/vumeter_widget.o \
-		  $(OBJS_DIR)/vumeter_enum.o \
+JL2_OBJS =  \
+		  $(OBJ_DIR)/application.o \
+		  $(OBJ_DIR)/logging.o \
+		  $(OBJ_DIR)/timing.o \
+		  $(OBJ_DIR)/util.o \
+		  $(OBJ_DIR)/event_queue.o \
+		  $(OBJ_DIR)/touch_screen.o \
+		  $(OBJ_DIR)/touch_screen_sdl2.o \
+		  $(OBJ_DIR)/platform_linux.o \
+		  $(OBJ_DIR)/texture_cache.o $(OBJ_DIR)/city.o \
+		  $(OBJ_DIR)/lyrion_player.o \
+		  $(OBJ_DIR)/timedate.o \
+		  $(OBJ_DIR)/widgets.o \
+		  $(OBJ_DIR)/actions.o \
+		  $(OBJ_DIR)/json.o \
+		  $(OBJ_DIR)/widgets_json.o \
+		  $(OBJ_DIR)/visualizer.o \
+		  $(OBJ_DIR)/vumeter.o \
+		  $(OBJ_DIR)/vumeter_json.o \
+		  $(OBJ_DIR)/vis_vumeter.o \
+		  $(OBJ_DIR)/slider_widget.o \
+		  $(OBJ_DIR)/vumeter_widget.o \
+		  $(OBJ_DIR)/vumeter_enum.o \
 
-
-
-$(BIN_DIR)/Tsp7 : $(OBJS_DIR)/Tsp7.o $(TSP_OBJS) | $(BIN_DIR)
+$(BIN_DIR)/jl2 : $(OBJ_DIR)/jl2.o $(JL2_OBJS) | $(BIN_DIR)
 	$(CC) $(CF) $(INCLUDES-CITYHASH)  -o $(@) $^ $(LIBDIRS) $(LIBS)
-
-$(BIN_DIR)/jl2 : $(OBJS_DIR)/jl2.o $(TSP_OBJS) | $(BIN_DIR)
-	$(CC) $(CF) $(INCLUDES-CITYHASH)  -o $(@) $^ $(LIBDIRS) $(LIBS)
-
 
 .PHONY: clean
 
 clean:
-	rm -f $(OBJS_DIR)/*
+	rm -f $(OBJ_DIR)/*
 	rm -f $(BIN_DIR)/*
 	rm -f $(LIB_DIR)/*
+	rm -f $(DEP_DIR)/*
 	rm -f $(GENERATED)/*
 
 generated: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h
 
-#{
-Makefile.deps: Makefile \
-		$(SRC)/*.c $(JSON-PARSER-SRC)/*.c $(CITYHASH-SRC)/*.c \
-		$(SRC)/*.h $(JSON-PARSER-SRC)/*.h $(CITYHASH-SRC)/*.h \
-		./scripts/mkdeps.py $(GLOBAL_DEPS) generated 
-	./scripts/mkdeps.py '$(SRC)' '$(JSON-PARSER-SRC)' '$(CITYHASH-SRC)' '$(GENERATED)' -o '$(OBJS_DIR)' -g '$(GLOBAL_DEPS)'
+#== { Dependencies =============== 
+sources := $(wildcard $(SRC)/*.c)
+sources_json_parser := $(wildcard $(JSON-PARSER-SRC)/*.c)
+sources_city_hash := $(wildcard $(CITYHASH-SRC)/*.c)
+objs := $(sources:$(SRC)/%.c=$(OBJ_DIR)/%.o)
+objs_json_parser := $(sources_json_parser:$(JSON-PARSER-SRC)/%.c=$(OBJ_DIR)/%.o)
+objs_cityhash := $(sources_cityhash:$(CITYHASH-SRC)/%.c=$(OBJ_DIR)/%.o)
+deps := $(sources:$(SRC)/%.c=$(DEP_DIR)/%.d)
+deps_json_parser := $(sources_json_parser:$(JSON-PARSER-SRC)/%.c=$(DEP_DIR)/%.d)
+deps_cityhash := $(sources_cityhash:$(CITYHASH-SRC)/%.c=$(DEP_DIR)/%.d)
 
-include Makefile.deps
-#}
-# Alternative makefile way of doing above.
-#
-#https://www.gnu.org/software/make/manual/make.html#Automatic-Prerequisites
-#sources = $(SRC)/
-#
-#%.d: %.c
-#	@set -e; rm -f $@; \
-#	$(CC) -M $(CF) $< > $@.$$$$; \
-#	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-#	rm -f $@.$$$$
-#
-#include $(sources:.c=.d)
-#
+SOURCES := $(sources) $(sources_json_parser) $(sources_cityhash)
+OBJS := $(objs) $(objs_json_parser) $(objs_cityhash)
+DEPS := $(deps) $(deps_json_parser) $(deps_cityhash)
 
-$(OBJS_DIR)/%.o: $(SRC)/%.cpp | $(OBJS_DIR)
+$(DEP_DIR)/%.d: $(SRC)/%.c | $(DEP_DIR) generated 
+	@set -e; rm -f $@; \
+	$(CC) -MM $(INCLUDES) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+$(DEP_DIR)/%.d: $(CITYHASH-SRC)/%.c | $(DEP_DIR)
+	@set -e; rm -f $@; \
+	$(CC) -MM $(INCLUDES) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+$(DEP_DIR)/%.d: $(JSON-PARSER-SRC)/%.c | $(DEP_DIR)
+	@set -e; rm -f $@; \
+	$(CC) -MM $(INCLUDES) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+include $(DEPS)
+#== }
+
+$(OBJ_DIR)/%.o: $(SRC)/%.cpp | $(OBJ_DIR)
 	$(CCP) $(CF) -c -o $(@) $< $(INCLUDES)
 
-$(OBJS_DIR)/%.o: $(SRC)/%.c | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(SRC)/%.c | $(OBJ_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)
 
-$(OBJS_DIR)/%.o: $(JSON-PARSER-SRC)/%.cpp | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(JSON-PARSER-SRC)/%.cpp | $(OBJ_DIR)
 	$(CCP) $(CF_JSON_PARSER) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
 
-$(OBJS_DIR)/%.o: $(JSON-PARSER-SRC)/%.c | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(JSON-PARSER-SRC)/%.c | $(OBJ_DIR)
 	$(CC) $(CF_JSON_PARSER) -c -o $(@) $< $(INCLUDES-JSON-PARSER)
 
-$(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(CITYHASH-SRC)/%.cpp | $(OBJ_DIR)
 	$(CCP) $(CF_CITY_HASH) -c -o $(@) $< $(INCLUDES-CITYHASH)
 
-$(OBJS_DIR)/%.o: $(CITYHASH-SRC)/%.c | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(CITYHASH-SRC)/%.c | $(OBJ_DIR)
 	$(CC) $(CF_CITY_HASH) -DHAVE_BUILTIN_EXPECT=0 -c -o $(@) $< $(INCLUDES-CITYHASH)
 
-$(OBJS_DIR)/%.o: $(GENERATED)/%.c | $(OBJS_DIR)
+$(OBJ_DIR)/%.o: $(GENERATED)/%.c | $(OBJ_DIR)
 	$(CC) $(CF) -c -o $(@) $< $(INCLUDES)
 
-#$(BIN_DIR)/sqvumeter : $(SQVUMETER_OBJS) | $(BIN_DIR)
-#	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
-
-$(LIB_DIR)/%.so: $(OBJS_DIR)/%.o | $(LIB_DIR)
+$(LIB_DIR)/%.so: $(OBJ_DIR)/%.o | $(LIB_DIR)
 	$(CC) $(CF_LIBS) $(INCLUDES) $< -o $@
 
 # generated code
@@ -204,71 +207,84 @@ $(GENERATED)/vumeter_enum.c: src/vumeter_enums.json
 $(GENERATED)/vumeter_enum.h: src/vumeter_enums.json
 	./scripts/generate_enums_with_strings.py --src src/vumeter_enums.json --destdir generated/ --name vumeter_enum
 
-# test executables
-# 1. texture cache
-$(BIN_DIR)/test_tcache : $(OBJS_DIR)/test_tcache.o $(OBJS_DIR)/texture_cache.o $(OBJS_DIR)/logging.o $(OBJS_DIR)/city.o $(OBJS_DIR)/timing.o $(OBJS_DIR)/event_queue.o | $(BIN_DIR)
-	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
+## { test executables ===================
+# # 1. texture cache
+# $(BIN_DIR)/test_tcache : $(OBJ_DIR)/test_tcache.o $(OBJ_DIR)/texture_cache.o $(OBJ_DIR)/logging.o $(OBJ_DIR)/city.o $(OBJ_DIR)/timing.o $(OBJ_DIR)/event_queue.o | $(BIN_DIR)
+# 	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
+# 
+# # 2. json parsing
+# TEST_WIDGETS_JSON_OBJS =  \
+# 	$(OBJ_DIR)/widgets_json.o \
+# 	$(OBJ_DIR)/json.o \
+# 	$(OBJ_DIR)/logging.o \
+# 	$(OBJ_DIR)/widgets.o \
+# 	$(OBJ_DIR)/slider_widget.o \
+# 	$(OBJ_DIR)/vumeter_widget.o \
+# 	$(OBJ_DIR)/actions.o \
+# 	$(OBJ_DIR)/util.o \
+# 	$(OBJ_DIR)/vumeter.o \
+# 	$(OBJ_DIR)/vumeter_json.o \
+# 	$(OBJ_DIR)/visualizer.o \
+# 	$(OBJ_DIR)/vis_vumeter.o \
+# 	$(OBJ_DIR)/city.o $(OBJ_DIR)/texture_cache.o \
+# 	$(OBJ_DIR)/timing.o $(OBJ_DIR)/event_queue.o \
+# 	$(OBJ_DIR)/lyrion_player.o \
+# 	$(OBJ_DIR)/timedate.o \
+# 	$(OBJ_DIR)/platform_linux.o
+# 
+# $(BIN_DIR)/test_widgets_json : $(OBJ_DIR)/test_widgets_json.o $(TEST_WIDGETS_JSON_OBJS) | $(BIN_DIR)
+# 	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
+# 
+# # 3. touch screen
+# $(BIN_DIR)/test_touch: $(OBJ_DIR)/test_touch.o $(OBJ_DIR)/touch_screen.o $(OBJ_DIR)/timing.o
+# 	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
+# 
+# # 4. lyrion player test
+# $(BIN_DIR)/local_player_test: $(SRC)/local_player_test.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
+# 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
+# 		-o $(@) $^ $(LIBDIRS) $(LIBS)
 
-# 2. json parsing
-TEST_WIDGETS_JSON_OBJS =  \
-	$(OBJS_DIR)/widgets_json.o \
-	$(OBJS_DIR)/json.o \
-	$(OBJS_DIR)/logging.o \
-	$(OBJS_DIR)/widgets.o \
-	$(OBJS_DIR)/slider_widget.o \
-	$(OBJS_DIR)/vumeter_widget.o \
-	$(OBJS_DIR)/actions.o \
-	$(OBJS_DIR)/util.o \
-	$(OBJS_DIR)/vumeter.o \
-	$(OBJS_DIR)/vumeter_json.o \
-	$(OBJS_DIR)/visualizer.o \
-	$(OBJS_DIR)/vis_vumeter.o \
-	$(OBJS_DIR)/city.o $(OBJS_DIR)/texture_cache.o \
-	$(OBJS_DIR)/timing.o $(OBJS_DIR)/event_queue.o \
-	$(OBJS_DIR)/lyrion_player.o \
-	$(OBJS_DIR)/timedate.o \
-	$(OBJS_DIR)/platform_linux.o
+# 5. test vumeter json load
+VUMETER_TEST_OBJS = \
+	$(OBJ_DIR)/vumeter_json.o \
+	$(OBJ_DIR)/json.o \
+	$(OBJ_DIR)/vumeter.o \
+	$(OBJ_DIR)/logging.o \
+	$(OBJ_DIR)/util.o \
+	$(OBJ_DIR)/texture_cache.o  $(OBJ_DIR)/city.o \
+	$(OBJ_DIR)/timing.o \
+	$(OBJ_DIR)/visualizer.o \
+	$(OBJ_DIR)/vis_vumeter.o \
+	$(OBJ_DIR)/platform_linux.o \
 
-$(BIN_DIR)/test_widgets_json : $(OBJS_DIR)/test_widgets_json.o $(TEST_WIDGETS_JSON_OBJS) | $(BIN_DIR)
-	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
 
-# 3. touch screen
-$(BIN_DIR)/test_touch: $(OBJS_DIR)/test_touch.o $(OBJS_DIR)/touch_screen.o $(OBJS_DIR)/timing.o
-	$(CC) $(CF) -o $(@) $^ $(LIBDIRS) $(LIBS)
-
-# 4. lyrion player test
-#
-$(BIN_DIR)/local_player_test: $(SRC)/local_player_test.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
+$(BIN_DIR)/test_vumeter_json_load: $(SRC)/test_vumeter_json_load.c $(GENERATED)/vumeter_enum.c $(VUMETER_TEST_OBJS) 
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
-		-o $(@) $^ $(LIBDIRS) $(LIBS)
+		-Og -g -o $(@) $^ $(INCLUDES) $(LIBDIRS) $(LIBS)
 
+#test: $(BIN_DIR)/test_tcache $(BIN_DIR)/test_widgets_json $(BIN_DIR)/local_player_test $(BIN_DIR)/test_vumeter_json_load
+test: $(BIN_DIR)/test_vumeter_json_load
+## } 
+
+## { utilities / tools ===================
 $(BIN_DIR)/lyrion_player_strhash: $(SRC)/lyrion_player_strhash.c $(SRC)/lyrion_player.c $(SRC)/logging.c $(SRC)/timing.c
 	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
 		-o $(@) $^ $(LIBDIRS) $(LIBS)
 
-VUMETER_TEST_OBJS = \
-	$(OBJS_DIR)/vumeter_json.o \
-	$(OBJS_DIR)/json.o \
-	$(OBJS_DIR)/vumeter.o \
-	$(OBJS_DIR)/logging.o \
-	$(OBJS_DIR)/util.o \
-	$(OBJS_DIR)/texture_cache.o  $(OBJS_DIR)/city.o \
-	$(OBJS_DIR)/timing.o \
-	$(OBJS_DIR)/visualizer.o \
-	$(OBJS_DIR)/vis_vumeter.o \
-	$(OBJS_DIR)/platform_linux.o \
+util: $(BIN_DIR)/lyrion_player_strhash
+## } 
 
-
-$(BIN_DIR)/vumeter_json_load_test: $(SRC)/vumeter_json_load_test.c $(GENERATED)/vumeter_enum.c $(VUMETER_TEST_OBJS) 
-	$(CC) $(CF) -fsanitize=address -fsanitize=undefined -fsanitize=null -fsanitize=alignment -fsanitize=float-cast-overflow \
-		-Og -g -o $(@) $^ $(INCLUDES) $(LIBDIRS) $(LIBS)
-
-# directories
+## { sub directories ===================
 $(BIN_DIR):
 	mkdir -p $@
 
-$(OBJS_DIR):
+$(OBJ_DIR):
 	mkdir -p $@
 
 $(LIB_DIR):
 	mkdir -p $@
+
+$(DEP_DIR):
+	mkdir -p $@
+
+## }
