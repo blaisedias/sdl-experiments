@@ -835,8 +835,14 @@ lyrion_player_ptr get_player(void) {
 }
 
 static int player_poll_loop(app_context_ptr app_ctx) {
-    player_mode_t    player_mode = PLAYER_MODE_UNDEFINED;
-//    int64_t          player_mode_start_timestamp = 0;
+    player_mode_t   player_mode = PLAYER_MODE_UNDEFINED;
+    // "switch to main screen timer" value.
+    // It is simpler to implement the timer logic within the player loop,
+    // as opposed to using a timer with a callback.
+    int64_t         notplaying_timer_start = 0;
+    // state flag, indicating initiator of switch to main view is this loop
+    // if not set then the user has switched to main view and that selection should be honoured.
+    bool            auto_switch_from_main_view = false; 
 
     player_transient_state pts;
     // workspace is non const
@@ -967,7 +973,20 @@ log_printf("starting player_poll_loop\n");
             if (PFV_INT == get_player_value(player, &pv, "MODE")) {
                 if (player_mode != pv.mode) {
                     player_mode = pv.mode;
-//                    player_mode_start_timestamp = get_milli_seconds();
+                    switch(player_mode) {
+                        case PLAYER_MODE_PAUSED:
+                        case PLAYER_MODE_STOPPED:
+                            if (get_current_view() != main_view) {
+                                // view != main => a now playing view,
+                                // player is paused or stopped, start the switch to main screen "timer"
+                                notplaying_timer_start = get_milli_seconds();
+                            }
+                            break;
+                        case PLAYER_MODE_PLAYING:
+                        case PLAYER_MODE_UNDEFINED:
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -1030,6 +1049,42 @@ log_printf("starting player_poll_loop\n");
                 timedate_sprintf(buffer, sizeof(buffer), widget_text_get_timedate_format(t));
                 debug_printf("'%s' -> '%s'\n", widget_text_get_timedate_format(t), buffer);
                 widget_text_set_content(t, buffer);
+            }
+
+            // "switch to main screen timer" logic.
+            switch(player_mode) {
+                case PLAYER_MODE_PAUSED:
+                case PLAYER_MODE_STOPPED:
+                    if (view != main_view) {
+                        if (notplaying_timer_start) {
+                            // player is paused or stopped, and the switch to main view "timer" is running.
+                            // TODO: make timeout configurable
+                            if (get_milli_seconds() - notplaying_timer_start > 10000) {
+                                dispatch_action(ACTION_MAIN_VIEW, 0);
+                                auto_switch_from_main_view = true;
+                                notplaying_timer_start = 0;
+                            }
+                        } else {
+                            // view != main => a now playing view,
+                            // player is paused or stopped, start the switch to main screen "timer"
+                            notplaying_timer_start = get_milli_seconds();
+                        }
+                    } else {
+                        // view is main view, "disable" the timer.
+                        notplaying_timer_start = 0;
+                    }
+                    break;
+                case PLAYER_MODE_PLAYING:
+                    if (view == main_view && auto_switch_from_main_view) {
+                        dispatch_action(ACTION_NP_VIEW, 0);
+                        auto_switch_from_main_view = false;
+                    }
+                    // playing, "disable" the timer.
+                    notplaying_timer_start = 0;
+                    break;
+                case PLAYER_MODE_UNDEFINED:
+                default:
+                    break;
             }
         }
         }
