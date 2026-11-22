@@ -8,6 +8,22 @@
     },
     "widgets": [
         {
+            "image": {
+                "location": {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 0,
+                        "h": 0
+                    }
+                },
+                "image": "./images/wallpapers/wallpaper_clock_word_darker.png",
+                "#comment": "image_scaling is one of [fit, center, stretch]",
+                "image_scaling": "center",
+                "focus_enable": false
+            }
+        },
+        {
             "text": {
                 "location": {
                     "position": {
