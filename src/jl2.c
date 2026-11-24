@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 //#include <GL/glew.h>
 //#include <stdbool.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -151,8 +152,20 @@ static view_context_ptr get_current_view(void) {
     return __atomic_load_n(&current_view, __ATOMIC_ACQUIRE);
 }
 
+void handle_signal(int sig);
+void handle_signal(int sig) {
+    fprintf(stderr, "Terminating got signal %d\n", sig);
+static SDL_Event quit_event = {.type = SDL_QUIT };
+    SDL_PushEvent(&quit_event);
+}
+
 int main(int argc, char** argv) {
     view_change_mutex = SDL_CreateMutex();
+
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+    signal(SIGHUP, handle_signal);
+    signal(SIGKILL, handle_signal);
 
     for(int i = 1; i < argc; ++i) {
         if (0 == strcmp(argv[i], "max_secs")) {
