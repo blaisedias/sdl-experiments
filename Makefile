@@ -138,7 +138,7 @@ clean:
 	rm -f $(DEP_DIR)/*
 	rm -f $(GENERATED)/*
 
-generated: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h
+generate: $(GENERATED)/vumeter_enum.c $(GENERATED)/vumeter_enum.h $(GENERATED)
 
 #== { Dependencies =============== 
 sources := $(wildcard $(SRC)/*.c)
@@ -155,7 +155,7 @@ SOURCES := $(sources) $(sources_json_parser) $(sources_cityhash)
 OBJS := $(objs) $(objs_json_parser) $(objs_cityhash)
 DEPS := $(deps) $(deps_json_parser) $(deps_cityhash)
 
-$(DEP_DIR)/%.d: $(SRC)/%.c | $(DEP_DIR) generated 
+$(DEP_DIR)/%.d: $(SRC)/%.c | $(DEP_DIR) generate 
 	@set -e; rm -f $@; \
 	$(CC) -MM $(INCLUDES) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,$(OBJ_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
@@ -201,10 +201,10 @@ $(LIB_DIR)/%.so: $(OBJ_DIR)/%.o | $(LIB_DIR)
 	$(CC) $(CF_LIBS) $(INCLUDES) $< -o $@
 
 # generated code
-$(GENERATED)/vumeter_enum.c: src/vumeter_enums.json
+$(GENERATED)/vumeter_enum.c: src/vumeter_enums.json | $(GENERATED)
 	./scripts/generate_enums_with_strings.py --src src/vumeter_enums.json --destdir generated/ --name vumeter_enum
 
-$(GENERATED)/vumeter_enum.h: src/vumeter_enums.json
+$(GENERATED)/vumeter_enum.h: src/vumeter_enums.json | $(GENERATED)
 	./scripts/generate_enums_with_strings.py --src src/vumeter_enums.json --destdir generated/ --name vumeter_enum
 
 ## { test executables ===================
@@ -285,6 +285,9 @@ $(LIB_DIR):
 	mkdir -p $@
 
 $(DEP_DIR):
+	mkdir -p $@
+
+$(GENERATED):
 	mkdir -p $@
 
 ## }
