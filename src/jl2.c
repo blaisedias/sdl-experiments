@@ -83,7 +83,7 @@ static const char* help_text=""
 #endif
 "\n";  
 
-static const char *json_files = "npvu.json,npvularge.json,npvuartwork.json";
+static const char *json_files = "npvu.json,npvu-nc.json,npvularge.json,npvuartwork.json";
 static bool dump_vu = false;
 static bool monitor_tcache = false;
 static int vusamples_KiB = 1;
